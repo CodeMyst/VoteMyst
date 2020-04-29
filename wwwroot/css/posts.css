@@ -1,0 +1,71 @@
+.post-display-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+.post-display-options > div {
+    transition: opacity 0.2s;
+    opacity: 0.3;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+.post-display-options > div > img {
+    width: 100%;
+}
+.post-display-options > div.active, .post-display-options > div:hover {
+    opacity: 1;
+}
+
+.posts {
+    padding: 10px;
+    
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: auto;
+}
+.posts-aspect-large {
+    grid-template-columns: repeat(1, auto);
+}
+.posts-aspect-middle {
+    grid-template-columns: repeat(2, auto);
+}
+.posts-aspect-small {
+    grid-template-columns: repeat(3, auto);
+}
+
+.post {
+    position: relative;
+    height: fit-content;
+    overflow: hidden;
+    margin: 3vmin;
+    border-radius: 10px;
+}
+.post .post-image {
+    display: block;
+    width: 100%;
+    transition: transform 0.2s, filter 0.3s;
+}
+.post .vote-heart {
+    position: absolute;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    margin: auto;
+    width: 0;
+    opacity: 0;
+    filter: drop-shadow(3px 3px 6px #00000066);
+    transition: width 0.3s, opacity 0.3s;
+}
+.post:hover {
+    cursor: pointer;
+}
+.post:hover .post-image {
+    transform: scale(1.1);
+    filter: /* blur(4px) */ brightness(0.6);
+}
+.post:hover .vote-heart {
+    width: 25%;
+    opacity: 1;
+}

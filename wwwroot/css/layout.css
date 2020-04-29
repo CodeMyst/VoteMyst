@@ -1,0 +1,57 @@
+body {
+    background-color: var(--color-nano);
+    font-family: 'Raleway', sans-serif;
+    color: var(--color-white);
+    overflow-y: scroll;
+    margin: 0;
+}
+
+a {
+    color: var(--color-mystge);
+    text-decoration: none;
+}
+a:hover {
+    color: var(--color-mystlue);
+}
+
+.container {
+    width: 90%;
+    max-width: 960px;
+    position: relative;
+    margin: auto;
+}
+
+.heading {
+    font-size: 3.5rem;
+    justify-self: flex-start;
+    margin: 10px 0;
+}
+.heading img {
+    position: relative;
+    top: 5px;
+    height: 50px;
+}
+.heading a {
+    font-weight: normal;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0 20px;
+}
+
+@media (max-width: 700px) {
+    header {
+        flex-direction: column;
+    }
+}
+
+footer {
+    text-align: center;
+    font-size: 0.9em;
+}
+footer a {
+    font-weight: bold;
+    letter-spacing: 0.08em;
+}

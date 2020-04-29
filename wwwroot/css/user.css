@@ -1,0 +1,39 @@
+.widget {
+    margin: auto 0 auto auto;
+    height: 50px;
+    border-radius: 25px;
+}
+.user-widget {
+    display: flex;
+    background-color: var(--color-nanolight);
+}
+.user-widget {
+    cursor: default;
+}
+.user-widget .avatar {
+    height: 100%;
+    border-radius: 50%;
+}
+.user-widget .username {
+    margin: auto 20px auto 10px;
+}
+.user-widget .username .discord-name {
+    font-weight: bold;
+    letter-spacing: 0.05em;
+}
+.user-widget .username .discord-tag {
+    opacity: 0.5;
+}
+
+.login-widget {
+    display: flex;
+    cursor: pointer;
+    background-color: var(--color-discord-blurple);
+}
+.login-widget img {
+    height: 80%;
+    margin: auto 10px auto 2px;
+}
+.login-widget p {
+    margin: auto 0px auto 15px;
+}
