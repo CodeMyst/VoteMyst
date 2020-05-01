@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using VoteMyst.Database;
 
 namespace VoteMyst
 {
@@ -24,6 +25,13 @@ namespace VoteMyst
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            services.AddDbContext<VoteMystContext>();
+
+            services.AddSingleton<UserDataHelper>();
+            services.AddSingleton<EventHelper>();
+            services.AddSingleton<EntryHelper>();
+            services.AddSingleton<VoteHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
