@@ -1,0 +1,101 @@
+@{
+    ViewData["Title"] = "Event";
+    Layout = "_Layout";
+}
+
+<h1>Create a new Event</h1>
+
+<form method="post" enctype="multipart/form-data"
+    autocomplete="off" onsubmit="return validateForm()">
+    <table>
+        <tr>
+            <th>Title:</th>
+            <td>
+                <input name="title" type="text" placeholder="My Event Title!" />
+            </td>
+        </tr>
+        <tr>
+            <th>Description:</th>
+            <td>
+                <textarea name="description" 
+                    placeholder="This is an event."></textarea>
+            </td>
+        </tr>
+        <tr>
+            <th>Type:</th>
+            <td>
+                <select name="type">
+                    <option value="art">Art</option>
+                    <option value="text">Text</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>Dates:</th>
+            <td>
+                <div class="row-layout">
+                    <div>
+                        <p>Reveal</p>
+                        <input name="revealDate" type="date" />
+                    </div>
+                    <div>
+                        <p>Start</p>
+                        <input name="startDate" type="date" />
+                    </div>
+                    <div class="break"></div>
+                    <div>
+                        <p>Submission End</p>
+                        <input name="endDate" type="date" />
+                    </div>
+                    <div>
+                        <p>Voting End</p>
+                        <input name="voteEndDate" type="date" />
+                    </div>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <div class="form-submit">
+        <button type="submit">Create Event</button>
+        <span></span>
+    </div>
+</form>
+
+<script>
+    const alertOutput = document.querySelector(".form-submit span");
+    function alertError(message) {
+        alertOutput.innerHTML = message;
+        return false;
+    }
+    function validateForm() {
+        let form = document.forms[0];
+        let time = new Date().getTime();
+
+        let revealDate = form["revealDate"].valueAsDate;
+        let startDate = form["startDate"].valueAsDate;
+        let endDate = form["endDate"].valueAsDate;
+        let voteEndDate = form["voteEndDate"].valueAsDate;
+
+        if (form["title"].value == "") {
+            return alertError("The event must have a title.");
+        }
+
+        if (revealDate == null) {
+            form["revealDate"].valueAsDate = new Date();
+        }
+
+        if (startDate == null || endDate == null || voteEndDate == null) {
+            return alertError("The start, end and voting end dates may not be left blank.");
+        }
+
+        if (endDate.getTime() <= time) {
+            return alertError("The end date may not be in the past.");
+        }
+
+        if (!(revealDate.getTime() <= startDate.getTime()
+            && startDate.getTime() <= endDate.getTime()
+            && endDate.getTime() <= voteEndDate.getTime())) {
+            return alertError("The event dates must be in chronological order (reveal, start, end, vote end).");
+        }
+    }
+</script>

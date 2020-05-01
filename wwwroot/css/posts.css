@@ -19,12 +19,11 @@
     opacity: 1;
 }
 
-.posts {
-    padding: 10px;
-    
+.posts {    
     display: grid;
     grid-template-columns: repeat(2, auto);
     grid-template-rows: auto;
+    padding: 10px;
 }
 .posts-aspect-large {
     grid-template-columns: repeat(1, auto);
@@ -36,36 +35,54 @@
     grid-template-columns: repeat(3, auto);
 }
 
-.post {
-    position: relative;
-    height: fit-content;
-    overflow: hidden;
-    margin: 3vmin;
-    border-radius: 10px;
+@media (max-width: 640px) {
+    .post-display-options {
+        display: none;
+    }
+    .posts {
+        grid-template-columns: repeat(1, auto);
+    }
 }
-.post .post-image {
+
+.post {
+    display: flex;
+    margin: 3vmin;
+}
+.post .post-container {
+    display: flex;
+    flex-direction: column;
+    margin: auto 0;
+    height: fit-content;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.post .post-user {
+    display: flex;
+    flex-direction: row;
+    cursor: default;
+    background-color: var(--color-nanolight);
+    align-items: center;
+    height: 48px;
+}
+.post .post-user img {
+    height: 70%;
+    margin: 10% 5px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.post .post-user .username {
+    font-size: 0.9rem;
+    margin: auto 3px;
+}
+.post .post-user .post-date {
+    font-size: 0.8rem;
+    margin: auto 10px auto auto;
+    color: var(--color-nanolightlight);
+}
+.post .post-image img {
     display: block;
     width: 100%;
+    height: auto;
     transition: transform 0.2s, filter 0.3s;
-}
-.post .vote-heart {
-    position: absolute;
-    top: 0; left: 0;
-    right: 0; bottom: 0;
-    margin: auto;
-    width: 0;
-    opacity: 0;
-    filter: drop-shadow(3px 3px 6px #00000066);
-    transition: width 0.3s, opacity 0.3s;
-}
-.post:hover {
-    cursor: pointer;
-}
-.post:hover .post-image {
-    transform: scale(1.1);
-    filter: /* blur(4px) */ brightness(0.6);
-}
-.post:hover .vote-heart {
-    width: 25%;
-    opacity: 1;
 }

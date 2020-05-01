@@ -1,0 +1,30 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Submit";
+}
+
+<h1>Submit a new entry</h1>
+
+<!-- TODO: Check if an event is current happening -->
+
+<!-- TODO: Check if the user has already 
+    uploaded for the current event -->
+
+<p>
+    You're submitting to <b>Event Name Here</b>.
+</p>
+
+<form method="post" enctype="multipart/form-data">
+    <label for="file">File @(VoteMyst.Controllers.SubmitController.MaxFileSize / 1000000)MB:</label>
+    <input type="file" id="file" name="file" /> <br>
+    <button type="submit">Submit!</button>
+</form>
+
+@if(ViewBag.Message != null) 
+{
+    <p>@ViewBag.Message</p>
+}
+
+<p class="disclaimer">
+    Some disclaimer legal stuff about uploading.
+</p>

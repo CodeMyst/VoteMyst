@@ -1,0 +1,16 @@
+:root
+{
+    --color-nano: #ebebeb;
+    --color-nanonotsolight: #cfcfcf;
+    --color-nanolight: #c0c0c0;
+    --color-nanolightlight: #777777;
+    --color-nanobrightest: #5f5f5f;
+    --color-white: #000000;
+    --color-mystge: #ee720d;
+    --color-mystlue: #1EAEDB;
+    --color-mysted: #ff4c4c;
+    --color-discord-blurple: #7289DA;
+    
+    --color-badge-admin: #9a90ff;
+    --color-badge-banned: #bd1c1c;
+}

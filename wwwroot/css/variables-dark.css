@@ -4,21 +4,13 @@
     --color-nanonotsolight: #1c1c1c;
     --color-nanolight: #222222;
     --color-nanolightlight: #777777;
+    --color-nanobrightest: #a6a6a6;
     --color-white: #ffffff;
     --color-mystge: #ee720d;
     --color-mystlue: #1EAEDB;
     --color-mysted: #ff4c4c;
     --color-discord-blurple: #7289DA;
-
-    --font-size-code: 1rem;
-    --font-size-small: 1rem;
-    --font-size-normal: 1.2rem;
-    --font-size-medium: 1.5rem;
-    --font-size-big: 3rem;
-
-    --border-radius: 0.3rem;
-
-    --break-small: 640px;
-
-    --font-stack: 'Ubuntu Mono', monospace;
+    
+    --color-badge-admin: #9a90ff;
+    --color-badge-banned: #bd1c1c;
 }

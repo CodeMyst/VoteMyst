@@ -1,0 +1,53 @@
+@{
+    ViewData["Title"] = "User";
+    Layout = "_Layout";
+
+    var currentUser = ViewBag.User;
+}
+
+<div class="user-info">
+    <div class="user-info-column">
+        <img class="user-avatar" src="@currentUser.AvatarUrl" />
+        <p class="username">
+            <span class="discord-name">@currentUser.DiscordName</span>
+            <span class="discord-tag">#@currentUser.DiscordTag</span>
+        </p>
+        @if(currentUser.PermissionGroup != null) 
+        {
+            <p class="user-badge @currentUser.PermissionGroup.ToLower()">
+                @currentUser.PermissionGroup
+            </p>
+        }
+        
+    </div>
+    <table class="user-info-table">
+        <tr>
+            <th>Join Date:</th>
+            <td>@currentUser.JoinDate.ToString("dd/MM/yyyy")</td>
+        </tr>
+        <tr>
+            <th>Total votes:</th>
+            <td>0</td>
+        </tr>
+        <tr>
+            <th>Total submissions:</th>
+            <td>0</td>
+        </tr>
+    </table>
+
+    <a href="/" class="logout-button">
+        Log Out
+    </a>
+</div>
+
+<input style="display:none" type="checkbox" checked="true" onchange="theme()" />
+
+<script>
+    function theme() {
+        let useDark = document.querySelector("input").checked;
+        document.querySelector("link[--theme-css]")
+            .setAttribute("href", useDark
+                ? "/css/variables-dark.css"
+                : "/css/variables-light.css");
+    }
+</script>
