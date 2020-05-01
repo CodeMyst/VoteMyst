@@ -4,11 +4,16 @@ using VoteMyst.Database.Models;
 
 namespace VoteMyst.Database
 {
-    public static class EventHelper
+    public class EventHelper
     {
-        private static readonly VoteMystContext context = VoteMystContext.Context;
+        private readonly VoteMystContext context;
 
-        public static bool CreateEvent(string name, string description,
+        public EventHelper(VoteMystContext context)
+        {
+            this.context = context;
+        }
+
+        public bool CreateEvent(string name, string description,
                                        EventType eventType, DateTime revealDate,
                                        DateTime startDate, DateTime endDate,
                                        DateTime voteEndDate, out Event ev)
@@ -29,22 +34,22 @@ namespace VoteMyst.Database
             return context.SaveChanges() > 0;
         }
 
-        public static Event GetEvent(int eventId)
+        public Event GetEvent(int eventId)
             => context.Events
                 .FirstOrDefault(x => x.EventId == eventId);
 
-        public static Event[] GetEventLikeName(string name)
+        public Event[] GetEventLikeName(string name)
             => context.Events
                 .Where(x => x.Title.Contains(name, StringComparison.InvariantCultureIgnoreCase))
                 .ToArray();
 
-        public static Event[] GetEventsBetween(DateTime start, DateTime end)
+        public Event[] GetEventsBetween(DateTime start, DateTime end)
             => context.Events
                 .Where(x => x.StartDate >= start)
                 .Where(x => x.StartDate <= end)
                 .ToArray();
 
-        public static Event[] GetEventsUserParticipatedIn(ulong snowflake)
+        public Event[] GetEventsUserParticipatedIn(ulong snowflake)
             => context.Entries
                 .Where(x => x.Snowflake == snowflake)
                 .Join(context.Events.AsEnumerable(),
@@ -53,12 +58,12 @@ namespace VoteMyst.Database
                     (x, y) => y)
                 .ToArray();
 
-        public static Event[] GetAllEventsAfter(DateTime date)
+        public Event[] GetAllEventsAfter(DateTime date)
             => context.Events
                 .Where(x => x.StartDate >= date)
                 .ToArray();
 
-        public static Event[] GetAllEventsBefore(DateTime date)
+        public Event[] GetAllEventsBefore(DateTime date)
             => context.Events
                 .Where(x => x.StartDate <= date)
                 .ToArray();
