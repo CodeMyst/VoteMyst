@@ -1,0 +1,38 @@
+.home-container {
+    text-align: center;
+    margin: 5rem 10%;
+}
+
+.current-event-name {
+    font-size: 3rem;
+    margin-bottom: 0;
+}
+.current-event-description {
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: normal;
+    font-style: italic;
+    color: var(--color-nanobrightest);
+}
+.current-event-timer {
+    color: var(--color-nanobrightest);
+    font-size: 1.2rem;
+}
+
+.current-event-metadata {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.current-event-metadata > div {
+    min-width: 100px;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid var(--color-nanolight);
+    border-radius: 10px;
+}
+.current-event-metadata > div > * {
+    margin: 10px 15px;
+    font-size: 0.9rem;
+}

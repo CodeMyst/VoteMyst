@@ -3,4 +3,27 @@
     Layout = "_Layout";
 }
 
-Information on the current event:
+<div class="home-container current-event">
+    <h1 class="current-event-name">Event Name</h1>
+    <h3 class="current-event-description">Event Description will go here!</h3>
+
+    <p class="current-event-timer">
+        Submissions will be closed in
+        <span class="timer" --timer-end-unix="1588444705 ">0:00:00:00</span>.
+    </p>
+
+    <div class="current-event-metadata">
+        <div>
+            <h3>Total Entries</h3>
+            <p>23</p>
+        </div>
+        <div>
+            <h3>Total Votes Cast</h3>
+            <p>943</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/js/timer.js"></script>
+}

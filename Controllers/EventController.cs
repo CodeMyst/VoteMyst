@@ -8,6 +8,11 @@ namespace VoteMyst.Controllers
 {
     public class EventController : Controller
     {
+        public IActionResult Browse()
+        {
+            return View();
+        }
+
         public IActionResult Display(int userId) 
         {
             ViewBag.ID = userId;

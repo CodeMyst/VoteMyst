@@ -55,20 +55,32 @@ namespace VoteMyst
             {
                 // Consult the wiki about page information
                 
-                endpoints.MapControllerRoute(name: "selfUser",
-                    pattern: "user/me",
+                // User searching
+                endpoints.MapControllerRoute(name: "searchUser",
+                    pattern: "users",
+                    defaults: new { controller = "User", action = "Search" });
+                // Self user viewing (indirectly uses the 'other user' view)
+                endpoints.MapControllerRoute(name: "viewSelfUser",
+                    pattern: "users/me",
                     defaults: new { controller = "User", action = "DisplaySelf" });
-                endpoints.MapControllerRoute(name: "user",
-                    pattern: "user/{*userId:int}",
+                // View user by ID
+                endpoints.MapControllerRoute(name: "viewUser",
+                    pattern: "users/{*userId:int}",
                     defaults: new { controller = "User", action = "Display" });
+
+                // Browse events / Create event / Edit event
                 endpoints.MapControllerRoute(name: "newEvent",
-                    pattern: "event/new",
-                    defaults: new { controller = "Event", action = "New" });
-                endpoints.MapControllerRoute(name: "event",
-                    pattern: "event/{*eventId:int}",
+                    pattern: "events/{action:alpha}",
+                    defaults: new { controller = "Event", action = "Browse" });
+                // View event by ID
+                endpoints.MapControllerRoute(name: "viewEvent",
+                    pattern: "events/{eventId:int}",
                     defaults: new { controller = "Event", action = "Display" });
+
+                // Vote on an event
                 endpoints.MapControllerRoute(name: "vote",
                     pattern: "vote");
+                // Submit an entry to an event
                 endpoints.MapControllerRoute(name: "submit",
                     pattern: "submit");
 

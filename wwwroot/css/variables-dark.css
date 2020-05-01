@@ -4,6 +4,7 @@
     --color-nanonotsolight: #1c1c1c;
     --color-nanolight: #222222;
     --color-nanolightlight: #777777;
+    --color-nanobrightest: #a6a6a6;
     --color-white: #ffffff;
     --color-mystge: #ee720d;
     --color-mystlue: #1EAEDB;
@@ -12,6 +13,4 @@
     
     --color-badge-admin: #9a90ff;
     --color-badge-banned: #bd1c1c;
-
-    
 }

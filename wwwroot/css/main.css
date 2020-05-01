@@ -1,7 +1,12 @@
-@import url(variables.css);
+/* 
+    NOTE: CSS Variables are imported dynamically through the
+          layout header, to allow theme switching.
+*/
+
 @import url(fonts.css);
 
 @import url(layout.css);
+@import url(home.css);
 @import url(user.css);
 @import url(posts.css);
 @import url(submit.css);

@@ -17,6 +17,10 @@ namespace VoteMyst.Controllers
             public DateTime JoinDate { get; set; }
         }
 
+        public IActionResult Search() 
+        {
+            return View();
+        }
         public IActionResult Display(int userId) 
         {
             // JUST FOR TESTING

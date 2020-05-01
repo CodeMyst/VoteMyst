@@ -34,4 +34,20 @@
             <td>0</td>
         </tr>
     </table>
+
+    <a href="/" class="logout-button">
+        Log Out
+    </a>
 </div>
+
+<input style="display:none" type="checkbox" checked="true" onchange="theme()" />
+
+<script>
+    function theme() {
+        let useDark = document.querySelector("input").checked;
+        document.querySelector("link[--theme-css]")
+            .setAttribute("href", useDark
+                ? "/css/variables-dark.css"
+                : "/css/variables-light.css");
+    }
+</script>
