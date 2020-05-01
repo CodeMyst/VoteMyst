@@ -1,23 +1,24 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OAuth;
 
 using VoteMyst.Discord;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using VoteMyst.Database;
 
 namespace VoteMyst
 {
@@ -34,6 +35,7 @@ namespace VoteMyst
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+          
             services.AddMvc(options => options.EnableEndpointRouting = false );
             services.AddHttpClient<DiscordService>();
 
@@ -91,6 +93,13 @@ namespace VoteMyst
                 options.Scope.Add("identify");
                 options.Scope.Add("guilds");
             });
+
+            services.AddDbContext<VoteMystContext>();
+
+            services.AddScoped<UserDataHelper>();
+            services.AddScoped<EventHelper>();
+            services.AddScoped<EntryHelper>();
+            services.AddScoped<VoteHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

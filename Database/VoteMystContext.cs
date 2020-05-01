@@ -5,8 +5,7 @@ namespace VoteMyst.Database
 {
     public class VoteMystContext : DbContext
     {
-        public static readonly VoteMystContext Context = new VoteMystContext();
-        private VoteMystContext() : base()
+        public VoteMystContext() : base()
         {
             System.Console.WriteLine("Creating...");
         }
