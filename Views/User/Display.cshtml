@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "User";
+    Layout = "_Layout";
+}
+
+<div class="user-info">
+    @if (true /* User found? */)
+    {
+        <div class="user-info-column">
+            <img class="user-avatar" src="/examples/ex01.png" />
+            <p class="username">
+                <span class="discord-name">Some Long Discord Name</span><span class="discord-tag">#2384</span>
+            </p>
+            <p class="user-badge admin">Admin</p>
+        </div>
+        <table class="user-info-table">
+            <tr>
+                <th>Join Date:</th>
+                <td>29.09.2001</td>
+            </tr>
+            <tr>
+                <th>Total votes:</th>
+                <td>0</td>
+            </tr>
+            <tr>
+                <th>Total submissions:</th>
+                <td>0</td>
+            </tr>
+        </table>
+    }
+    else 
+    {
+        <div class="user-not-found">
+            Could not find the specified user.
+        </div>
+    }
+</div>

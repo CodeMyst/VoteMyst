@@ -1,0 +1,29 @@
+form.entry-form {
+    margin: 18px auto;
+}
+
+.button {
+    display: inline-block;
+    height: 38px;
+    line-height: 38px;
+    padding: 0 30px;
+    background-color: var(--color-mystge);
+    color: var(--color-nano);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: var(--color-nanolight);
+    color: var(--color-white);
+}
+
+.disclaimer {
+    margin: 2rem 0;
+    padding-left: 1rem;
+    color: var(--color-nanolightlight);
+    font-style: italic;
+}

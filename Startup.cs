@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using VoteMyst.Discord;
+
 namespace VoteMyst
 {
     public class Startup
@@ -24,6 +26,7 @@ namespace VoteMyst
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddHttpClient<DiscordService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,7 +53,29 @@ namespace VoteMyst
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                //endpoints.MapRazorPages();
+
+                // Consult the wiki about page information
+                
+                endpoints.MapControllerRoute(name: "selfUser",
+                    pattern: "user/me",
+                    defaults: new { controller = "User", action = "DisplaySelf" });
+                endpoints.MapControllerRoute(name: "user",
+                    pattern: "user/{*userId:int}",
+                    defaults: new { controller = "User", action = "Display" });
+                endpoints.MapControllerRoute(name: "newEvent",
+                    pattern: "event/new",
+                    defaults: new { controller = "Event", action = "New" });
+                endpoints.MapControllerRoute(name: "event",
+                    pattern: "event/{*eventId:int}",
+                    defaults: new { controller = "Event", action = "Display" });
+                endpoints.MapControllerRoute(name: "vote",
+                    pattern: "vote");
+                endpoints.MapControllerRoute(name: "submit",
+                    pattern: "submit");
+
+                endpoints.MapControllerRoute(name: "default", 
+                    pattern: "{controller=Home}/{action=Index}");
             });
         }
     }
