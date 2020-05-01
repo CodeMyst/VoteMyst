@@ -48,10 +48,10 @@ namespace VoteMyst
 
             .AddCookie(options =>
             {
+                options.ExpireTimeSpan = new TimeSpan (2, 0, 0, 0);
                 options.Cookie = new CookieBuilder ()
                 {
-                    Name = "DiscordCookie",
-                    Expiration = new TimeSpan (2, 0, 0, 0)
+                    Name = "DiscordCookie"
                 };
             })
 

@@ -1,4 +1,4 @@
-@if (false /* TODO: Is logged in? */)
+@if (User.Identity.IsAuthenticated)
 {
     <a href="/users/me" class="widget user-widget">
         <img class="avatar" src="/examples/ex01.png" />
@@ -10,7 +10,7 @@
 }
 else 
 {
-    <a class="widget login-widget">
+    <a href="/login" class="widget login-widget">
         <p>Login with Discord</p>
         <img class="discord-logo" src="https://discordapp.com/assets/1c8a54f25d101bdc607cec7228247a9a.svg" />
     </a>
