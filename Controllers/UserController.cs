@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
 namespace VoteMyst.Controllers
@@ -15,6 +16,17 @@ namespace VoteMyst.Controllers
             public string PermissionGroup { get; set; }
             public string AvatarUrl { get; set; }
             public DateTime JoinDate { get; set; }
+        }
+
+        public IActionResult Login()
+        {
+            return Challenge(new AuthenticationProperties { RedirectUri = "/user/me" });
+        }
+
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("DiscordCookie");
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Display(int userId) 
@@ -39,6 +51,7 @@ namespace VoteMyst.Controllers
 
         public IActionResult DisplaySelf()
         {
+            if (User.Identity.IsAuthenticated) Console.WriteLine(User.Identity.Name);
             // TODO: Fetch self user ID
             return Display(-1);
         }
