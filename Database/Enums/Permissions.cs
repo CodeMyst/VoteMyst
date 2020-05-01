@@ -28,8 +28,8 @@ namespace VoteMyst.Database
         // Groups
         Banned = 0,
         Guest = ViewEntries | ViewEvents,
-        Default = Guest | SubmitEntries | SubmitVotes | EditEntries | AllowWinning,
-        Moderator = Default | DeleteEntries | DeleteVotes | ViewUsers ^ AllowWinning,
+        Default = Guest | SubmitEntries | SubmitVotes | EditEntries | ViewUsers | AllowWinning,
+        Moderator = Default | DeleteEntries | DeleteVotes ^ AllowWinning,
         Admin = ulong.MaxValue ^ AllowWinning
 
     }
