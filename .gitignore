@@ -1,10 +1,8 @@
 bin/
 obj/
-
 .vs/
 .vscode/
-
 *.sln
 *.csproj.user
-
 assets/
+appsettings.json
