@@ -12,5 +12,7 @@ namespace VoteMyst.Database.Models
         public ulong Snowflake { get; set; }
         [Column("entry_id")]
         public int EntryId { get; set; }
+        [Column("vote_date")]
+        public DateTime VoteDate { get; set; }
     }
 }

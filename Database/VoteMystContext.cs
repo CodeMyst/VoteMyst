@@ -5,7 +5,8 @@ namespace VoteMyst.Database
 {
     public class VoteMystContext : DbContext
     {
-        public VoteMystContext() : base()
+        public static readonly VoteMystContext Context = new VoteMystContext();
+        private VoteMystContext() : base()
         {
             System.Console.WriteLine("Creating...");
         }
@@ -18,8 +19,7 @@ namespace VoteMyst.Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             System.Console.WriteLine("Configuring");
-            optionsBuilder.UseMySQL(
-                "server=localhost;database=votemyst;user=RIP;password=FAKEPASSWORDOMEGALUL");
+            optionsBuilder.UseMySql("server=localhost;database=votemyst;user=votemyst;password=votemyst");
         }
     }
 }

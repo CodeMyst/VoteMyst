@@ -10,5 +10,7 @@ namespace VoteMyst.Database.Models
         public ulong Snowflake { get; set; }
         [Column("first_seen")]
         public DateTime JoinDate { get; set; }
+        [Column("permission_level")]
+        public Permissions PermissionLevel { get; set; }
     }
 }
