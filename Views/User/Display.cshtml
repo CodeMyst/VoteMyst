@@ -1,37 +1,37 @@
 @{
     ViewData["Title"] = "User";
     Layout = "_Layout";
+
+    var currentUser = ViewBag.User;
 }
 
 <div class="user-info">
-    @if (true /* User found? */)
-    {
-        <div class="user-info-column">
-            <img class="user-avatar" src="/examples/ex01.png" />
-            <p class="username">
-                <span class="discord-name">Some Long Discord Name</span><span class="discord-tag">#2384</span>
+    <div class="user-info-column">
+        <img class="user-avatar" src="@currentUser.AvatarUrl" />
+        <p class="username">
+            <span class="discord-name">@currentUser.DiscordName</span>
+            <span class="discord-tag">#@currentUser.DiscordTag</span>
+        </p>
+        @if(currentUser.PermissionGroup != null) 
+        {
+            <p class="user-badge @currentUser.PermissionGroup.ToLower()">
+                @currentUser.PermissionGroup
             </p>
-            <p class="user-badge admin">Admin</p>
-        </div>
-        <table class="user-info-table">
-            <tr>
-                <th>Join Date:</th>
-                <td>29.09.2001</td>
-            </tr>
-            <tr>
-                <th>Total votes:</th>
-                <td>0</td>
-            </tr>
-            <tr>
-                <th>Total submissions:</th>
-                <td>0</td>
-            </tr>
-        </table>
-    }
-    else 
-    {
-        <div class="user-not-found">
-            Could not find the specified user.
-        </div>
-    }
+        }
+        
+    </div>
+    <table class="user-info-table">
+        <tr>
+            <th>Join Date:</th>
+            <td>@currentUser.JoinDate.ToString("dd/MM/yyyy")</td>
+        </tr>
+        <tr>
+            <th>Total votes:</th>
+            <td>0</td>
+        </tr>
+        <tr>
+            <th>Total submissions:</th>
+            <td>0</td>
+        </tr>
+    </table>
 </div>

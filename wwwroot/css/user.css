@@ -29,6 +29,7 @@
     letter-spacing: 0.05em;
 }
 .username .discord-tag {
+    margin-left: -4px;
     color: var(--color-nanolightlight);
 }
 
@@ -68,8 +69,7 @@
 }
 
 .user-info .username {
-    width: 90%;
-    max-width: 256px;
+    width: 256px;
     margin: 0.8rem auto;
     font-size: 1rem;
     text-align: center;
@@ -84,6 +84,7 @@
     width: 50%;
     line-height: 1.5rem;
     margin: 0px auto;
+    cursor: default;
 
     border: 1px solid white;
     border-radius: 0.75rem;
@@ -115,7 +116,7 @@
 }
 
 .user-info .user-not-found {
-    
+
 }
 
 @media (max-width: 640px) {

@@ -10,7 +10,19 @@ namespace VoteMyst.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            // If an event is currently happening, display information about it
+            if (true) 
+            {
+                return View("DisplayCurrent");
+            }
+            
+            // If an event is coming up, display information about it
+            if (true)
+            {
+                return View("DisplayUpcoming");
+            }
+
+            return View("DisplayNone");
         }
     }
 }
