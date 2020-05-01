@@ -28,10 +28,10 @@ namespace VoteMyst
 
             services.AddDbContext<VoteMystContext>();
 
-            services.AddSingleton<UserDataHelper>();
-            services.AddSingleton<EventHelper>();
-            services.AddSingleton<EntryHelper>();
-            services.AddSingleton<VoteHelper>();
+            services.AddScoped<UserDataHelper>();
+            services.AddScoped<EventHelper>();
+            services.AddScoped<EntryHelper>();
+            services.AddScoped<VoteHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
