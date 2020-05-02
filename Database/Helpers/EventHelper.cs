@@ -13,12 +13,12 @@ namespace VoteMyst.Database
             this.context = context;
         }
 
-        public bool CreateEvent(string name, string description,
+        public Event CreateEvent(string name, string description,
                                        EventType eventType, DateTime revealDate,
                                        DateTime startDate, DateTime endDate,
-                                       DateTime voteEndDate, out Event ev)
+                                       DateTime voteEndDate)
         {
-            ev = new Event()
+            Event ev = new Event()
             {
                 Title = name,
                 Description = description,
@@ -31,7 +31,9 @@ namespace VoteMyst.Database
 
             context.Events.Add(ev);
 
-            return context.SaveChanges() > 0;
+            context.SaveChanges();
+
+            return ev;
         }
 
         public Event GetEvent(int eventId)
@@ -49,9 +51,9 @@ namespace VoteMyst.Database
                 .Where(x => x.StartDate <= end)
                 .ToArray();
 
-        public Event[] GetEventsUserParticipatedIn(ulong snowflake)
+        public Event[] GetEventsUserParticipatedIn(int userId)
             => context.Entries
-                .Where(x => x.Snowflake == snowflake)
+                .Where(x => x.UserId == userId)
                 .Join(context.Events.AsEnumerable(),
                     x => x.EventId,
                     y => y.EventId,

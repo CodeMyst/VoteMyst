@@ -11,6 +11,7 @@ namespace VoteMyst.Database
         {
         }
 
+        public DbSet<Authorization> Authorizations { get; set; }
         public DbSet<Entry> Entries { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<UserData> UserData { get; set; }

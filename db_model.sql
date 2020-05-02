@@ -21,6 +21,19 @@ CREATE SCHEMA IF NOT EXISTS `votemyst` DEFAULT CHARACTER SET utf8 ;
 USE `votemyst` ;
 
 -- -----------------------------------------------------
+-- Table `votemyst`.`authorizations`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `votemyst`.`authorizations` (
+  `auth_id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `service_id` VARCHAR(64) NOT NULL,
+  `service_type` BIT(8) NOT NULL,
+  PRIMARY KEY (`auth_id`, `user_id`),
+  UNIQUE INDEX `auth_id_UNIQUE` (`auth_id` ASC) VISIBLE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
 -- Table `votemyst`.`entries`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `votemyst`.`entries` (

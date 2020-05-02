@@ -13,21 +13,23 @@ namespace VoteMyst.Database
             this.context = context;
         }
 
-        public bool AddVote(Entry entry, UserData user, out Vote vote)
-            => AddVote(entry.EntryId, user.Snowflake, out vote);
+        public Vote AddVote(Entry entry, UserData user)
+            => AddVote(entry.EntryId, user.UserId);
 
-        public bool AddVote(int entryId, ulong snowflake, out Vote vote)
+        public Vote AddVote(int entryId, int userId)
         {
-            vote = new Vote()
+            Vote vote = new Vote()
             {
                 EntryId = entryId,
-                Snowflake = snowflake,
+                UserId = userId,
                 VoteDate = DateTime.UtcNow
             };
 
             context.Votes.Add(vote);
 
-            return context.SaveChanges() > 0;
+            context.SaveChanges();
+
+            return vote;
         }
 
         public bool DeleteVote(Vote vote)
@@ -42,12 +44,12 @@ namespace VoteMyst.Database
         }
 
         public bool DeleteVote(Entry entry, UserData user)
-            => DeleteVote(entry.EntryId, user.Snowflake);
+            => DeleteVote(entry.EntryId, user.UserId);
 
-        public bool DeleteVote(int entryId, ulong snowflake)
+        public bool DeleteVote(int entryId, int userId)
         {
             context.Votes
-                .Remove(GetVoteByUserOnEntry(snowflake, entryId));
+                .Remove(GetVoteByUserOnEntry(userId, entryId));
 
             return context.SaveChanges() > 0;
         }
@@ -57,19 +59,19 @@ namespace VoteMyst.Database
                 .FirstOrDefault(x => x.VoteId == voteId);
 
         public Vote GetVoteByUserOnEntry(UserData user, Entry entry)
-            => GetVoteByUserOnEntry(user.Snowflake, entry.EntryId);
+            => GetVoteByUserOnEntry(user.UserId, entry.EntryId);
 
-        public Vote GetVoteByUserOnEntry(ulong snowflake, int entryId)
+        public Vote GetVoteByUserOnEntry(int userId, int entryId)
             => context.Votes
                 .Where(x => x.EntryId == entryId)
-                .FirstOrDefault(x => x.Snowflake == snowflake);
+                .FirstOrDefault(x => x.UserId == userId);
 
         public Vote[] GetAllVotesOfUser(UserData user)
-            => GetAllVotesOfUser(user.Snowflake);
+            => GetAllVotesOfUser(user.UserId);
 
-        public Vote[] GetAllVotesOfUser(ulong snowflake)
+        public Vote[] GetAllVotesOfUser(int userId)
             => context.Votes
-                .Where(x => x.Snowflake == snowflake)
+                .Where(x => x.UserId == userId)
                 .ToArray();
 
         public Vote[] GetAllVotesForEntry(Entry entry)

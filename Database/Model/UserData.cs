@@ -6,11 +6,17 @@ namespace VoteMyst.Database.Models
 {
     public class UserData
     {
-        [Key, Column("snowflake")]
-        public ulong Snowflake { get; set; }
+        [Key, Column("user_io"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int UserId { get; set; }
+        [Column("display_id")]
+        public string DisplayId { get; set; }
         [Column("first_seen")]
         public DateTime JoinDate { get; set; }
-        [Column("permission_level")]
+        [Column("permissions")]
         public Permissions PermissionLevel { get; set; }
+        [Column("username")]
+        public string Username { get; set; }
+        [Column("avatar")]
+        public string Avatar { get; set; }
     }
 }

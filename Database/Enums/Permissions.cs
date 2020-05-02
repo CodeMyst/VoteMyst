@@ -31,6 +31,5 @@ namespace VoteMyst.Database
         Default = Guest | SubmitEntries | SubmitVotes | EditEntries | ViewUsers | AllowWinning,
         Moderator = Default | DeleteEntries | DeleteVotes ^ AllowWinning,
         Admin = ulong.MaxValue ^ AllowWinning
-
     }
 }
