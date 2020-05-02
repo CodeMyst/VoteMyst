@@ -25,12 +25,14 @@ namespace VoteMyst
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -101,6 +103,8 @@ namespace VoteMyst
             services.AddScoped<EventHelper>();
             services.AddScoped<EntryHelper>();
             services.AddScoped<VoteHelper>();
+            services.AddScoped<AuthorizationHelper>();
+            services.AddScoped<UserProfileBuilder>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -148,7 +152,7 @@ namespace VoteMyst
                     defaults: new { controller = "User", action = "DisplaySelf" });
                 // View user by ID
                 endpoints.MapControllerRoute(name: "viewUser",
-                    pattern: "users/{*userId:int}",
+                    pattern: "users/{*displayId}",
                     defaults: new { controller = "User", action = "Display" });
 
                 // Browse events / Create event / Edit event

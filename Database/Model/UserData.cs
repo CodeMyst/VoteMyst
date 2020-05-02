@@ -6,7 +6,7 @@ namespace VoteMyst.Database.Models
 {
     public class UserData
     {
-        [Key, Column("user_io"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key, Column("user_id"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserId { get; set; }
         [Column("display_id")]
         public string DisplayId { get; set; }

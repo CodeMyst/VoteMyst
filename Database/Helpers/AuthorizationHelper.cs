@@ -6,10 +6,12 @@ namespace VoteMyst.Database
     public class AuthorizationHelper 
     {
         private readonly VoteMystContext context;
+        private readonly UserDataHelper userHelper;
 
-        public AuthorizationHelper(VoteMystContext context) 
+        public AuthorizationHelper(VoteMystContext context, UserDataHelper userHelper) 
         {
             this.context = context;
+            this.userHelper = userHelper;
         }
 
         public Authorization AddAuthorizedUser(int userId, string serviceUserId, ServiceType serviceType)
@@ -28,9 +30,19 @@ namespace VoteMyst.Database
             return authorization;
         }
 
+        public UserData GetAuthorizedUser(ServiceType serviceType, string serviceUserId)
+            => context.Authorizations
+                .Where(auth => auth.ServiceType == serviceType)
+                .Where(auth => auth.ServiceUserId == serviceUserId)
+                .Join(context.UserData,
+                    auth => auth.UserId,
+                    user => user.UserId,
+                    (auth, user) => user)
+                .FirstOrDefault();
+
         public Authorization GetAuthorization(int authId)
             => context.Authorizations
-                .First(x => x.AuthId == authId);
+                .FirstOrDefault(x => x.AuthId == authId);
 
         public Authorization[] GetAllAuthorizationsOfUser(int userId)
             => context.Authorizations

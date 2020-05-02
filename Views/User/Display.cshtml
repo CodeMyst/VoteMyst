@@ -7,7 +7,7 @@
 
 <div class="user-info">
     <div class="user-info-column">
-        <img class="user-avatar" src="@currentUser.Avatar" />
+        <img class="user-avatar" src="/assets/avatars/@(currentUser.DisplayId).png" />
         <p class="username">@currentUser.Username</p>
         @if(currentUser.PermissionGroup != null && currentUser.PermissionGroup != "Default") 
         {

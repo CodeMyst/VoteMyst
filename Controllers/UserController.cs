@@ -3,7 +3,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 using VoteMyst.Discord;
 using VoteMyst.Database;
@@ -15,17 +17,18 @@ namespace VoteMyst.Controllers
     {
         public class UserDisplay
         {
+            public bool IsSelf { get; set; }
             public string Username { get; set; }
+            public string DisplayId { get; set; }
             public string PermissionGroup { get; set; }
-            public string Avatar { get; set; }
             public DateTime JoinDate { get; set; }
         }
 
-        private UserDataHelper _userDataHelper;
+        private UserProfileBuilder _profileBuilder;
 
-        public UserController(UserDataHelper userDataHelper) 
+        public UserController(UserProfileBuilder profileBuilder) 
         {
-            _userDataHelper = userDataHelper;
+            _profileBuilder = profileBuilder;
         }
 
         public IActionResult Search() 
@@ -44,26 +47,33 @@ namespace VoteMyst.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult Display(int userId) 
+        public IActionResult Display(string displayId) 
         {
-            // TODO: Check database for user ID and use userId parameter
-            UserData user = null;
+            UserData user = _profileBuilder.FromId(displayId);
+            if (user == null)
+                return View("NotFound");
+
+            UserData selfUser = _profileBuilder.FromContext(HttpContext);
 
             // TODO: Make sure the page has the information needed to display the profile
             ViewBag.User = new UserDisplay 
             {
-                Username = "TODO:Username",
-                PermissionGroup = (user?.PermissionLevel ?? Permissions.Default).ToString(),
-                Avatar = "https://via.placeholder.com/128",
-                JoinDate = user?.JoinDate ?? DateTime.Today
+                IsSelf = user.DisplayId == selfUser.DisplayId,
+                Username = user.Username,
+                DisplayId = user.DisplayId,
+                PermissionGroup = user.PermissionLevel.ToString(),
+                JoinDate = user.JoinDate
             };
             return View(nameof(Display));
         }
 
         public IActionResult DisplaySelf()
         {
-            // TODO: Fetch self user ID
-            return Display(-1);
+            if (!User.Identity.IsAuthenticated)
+                return Forbid();
+
+            UserData selfUser = _profileBuilder.FromContext(HttpContext);
+            return Display(selfUser.DisplayId);
         }
 
         public IActionResult BanUser(int id)

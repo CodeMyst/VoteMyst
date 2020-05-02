@@ -33,6 +33,17 @@ namespace VoteMyst.Database
             return user;
         }
 
+        public UserData Guest()
+            => new UserData 
+            {
+                UserId = -1,
+                DisplayId = null,
+                Username = "Guest",
+                PermissionLevel = Permissions.Guest,
+                JoinDate = DateTime.Today,
+                Avatar = "defaultAvatar",
+            };
+
         public UserData GetUser(string displayId)
             => context.UserData
                 .FirstOrDefault(x => x.DisplayId.Equals(displayId));
