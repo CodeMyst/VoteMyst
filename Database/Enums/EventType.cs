@@ -6,6 +6,5 @@ namespace VoteMyst.Database
         Story,
         Coding,
         Gamejam,
-        
     }
 }

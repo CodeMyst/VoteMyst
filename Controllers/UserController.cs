@@ -18,13 +18,13 @@ namespace VoteMyst.Controllers
             public DateTime JoinDate { get; set; }
         }
 
-        {
         public IActionResult Search() 
         {
             return View();
         }
         
         public IActionResult Login()
+        {
             return Challenge(new AuthenticationProperties { RedirectUri = "/user/me" });
         }
 

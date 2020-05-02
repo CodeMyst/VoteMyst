@@ -6,6 +6,7 @@ namespace VoteMyst.Database
 {
     public class UserDataHelper
     {
+        private const string DEFAULT_AVATAR = "defaultAvatar";
         private readonly VoteMystContext context;
 
         public UserDataHelper(VoteMystContext context) 
@@ -13,32 +14,38 @@ namespace VoteMyst.Database
             this.context = context;
         }
 
-        public bool NewUser(ulong snowflake, out UserData user)
+        public UserData NewUser()
         {
-            user = new UserData()
+            var guid = Guid.NewGuid().ToString().Replace("-", "");
+            UserData user = new UserData()
             {
-                Snowflake = snowflake,
+                DisplayId = guid,
                 JoinDate = DateTime.UtcNow,
-                PermissionLevel = Permissions.Default
+                PermissionLevel = Permissions.Default,
+                Username = guid,
+                Avatar = DEFAULT_AVATAR
             };
 
             context.UserData.Add(user);
 
-            return context.SaveChanges() > 0;
+            context.SaveChanges();
+
+            return user;
         }
 
-        public UserData GetOrCreateUser(ulong snowflake)
-        {
-            var userData = context.UserData.FirstOrDefault(x => x.Snowflake == snowflake);
+        public UserData GetOrCreateUser(string displayId)
+            => context.UserData
+                .FirstOrDefault(x => x.DisplayId.Equals(displayId))
+                ?? NewUser();
 
-            if (userData == null && !NewUser(snowflake, out userData))
-                userData = null;
+        public UserData GetOrCreateUser(int userId)
+            => context.UserData
+                .FirstOrDefault(x => x.UserId == userId) 
+                ?? NewUser();
+        
 
-            return userData;
-        }
-
-        public bool DeleteUser(ulong snowflake)
-            => DeleteUser(GetOrCreateUser(snowflake));
+        public bool DeleteUser(int userId)
+            => DeleteUser(GetOrCreateUser(userId));
 
         public bool DeleteUser(UserData user)
         {
@@ -47,9 +54,9 @@ namespace VoteMyst.Database
             return context.SaveChanges() > 0;
         }
 
-        public bool AddPermission(ulong snowflake, Permissions permissions)
+        public bool AddPermission(int userId, Permissions permissions)
         {
-            UserData user = GetOrCreateUser(snowflake);
+            UserData user = GetOrCreateUser(userId);
 
             user.PermissionLevel |= permissions;
 
@@ -58,9 +65,9 @@ namespace VoteMyst.Database
             return context.SaveChanges() > 0;
         }
 
-        public bool RemovePermission(ulong snowflake, Permissions permissions)
+        public bool RemovePermission(int userId, Permissions permissions)
         {
-            UserData user = GetOrCreateUser(snowflake);
+            UserData user = GetOrCreateUser(userId);
 
             user.PermissionLevel ^= permissions;
 
@@ -69,9 +76,9 @@ namespace VoteMyst.Database
             return context.SaveChanges() > 0;
         }
 
-        public bool SetPermission(ulong snowflake, Permissions permissions)
+        public bool SetPermission(int userId, Permissions permissions)
         {
-            UserData user = GetOrCreateUser(snowflake);
+            UserData user = GetOrCreateUser(userId);
 
             user.PermissionLevel = permissions;
 

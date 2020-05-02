@@ -14,15 +14,15 @@ namespace VoteMyst.Database
             this.context = context;
         }
 
-        public bool CreateEntry(Event ev, UserData user, EntryType type, string content, out Entry entry)
-            => CreateEntry(ev.EventId, user.Snowflake, type, content, out entry);
+        public Entry CreateEntry(Event ev, UserData user, EntryType type, string content)
+            => CreateEntry(ev.EventId, user.UserId, type, content);
 
-        public bool CreateEntry(int eventId, ulong snowflake, EntryType type, string content, out Entry entry)
+        public Entry CreateEntry(int eventId, int userId, EntryType type, string content)
         {
-            entry = new Entry()
+            Entry entry = new Entry()
             {
                 EventId = eventId,
-                Snowflake = snowflake,
+                UserId = userId,
                 EntryType = type,
                 Content = content,
                 SubmitDate = DateTime.UtcNow
@@ -30,7 +30,9 @@ namespace VoteMyst.Database
 
             context.Entries.Add(entry);
 
-            return context.SaveChanges() > 0;
+             context.SaveChanges();
+
+             return entry;
         }
 
         public Entry GetEntry(int entryID)
@@ -38,11 +40,11 @@ namespace VoteMyst.Database
                 .FirstOrDefault(x => x.EntryId == entryID);
 
         public Entry[] GetEntriesFromUser(UserData user)
-            => GetEntriesFromUser(user.Snowflake);
+            => GetEntriesFromUser(user.UserId);
 
-        public Entry[] GetEntriesFromUser(ulong snowflake)
+        public Entry[] GetEntriesFromUser(int userId)
             => context.Entries
-                .Where(x => x.Snowflake == snowflake)
+                .Where(x => x.UserId == userId)
                 .ToArray();
 
         public Entry[] GetEntriesInEvent(Event ev)
@@ -54,11 +56,11 @@ namespace VoteMyst.Database
                 .ToArray();
 
         public Entry GetEntryOfUserInEvent(Event ev, UserData user)
-            => GetEntryOfUserInEvent(ev.EventId, user.Snowflake);
+            => GetEntryOfUserInEvent(ev.EventId, user.UserId);
 
-        public Entry GetEntryOfUserInEvent(int eventId, ulong snowflake)
+        public Entry GetEntryOfUserInEvent(int eventId, int userId)
             => context.Entries
-                .Where(x => x.Snowflake == snowflake)
+                .Where(x => x.UserId == userId)
                 .FirstOrDefault(x => x.EventId == eventId);
     }
 

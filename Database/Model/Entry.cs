@@ -10,8 +10,8 @@ namespace VoteMyst.Database.Models
         public int EntryId { get; set; }
         [Column("event_id")]
         public int EventId { get; set; }
-        [Column("snowflake")]
-        public ulong Snowflake { get; set; }
+        [Column("user_id")]
+        public int UserId { get; set; }
         [Column("submit_date")]
         public DateTime SubmitDate { get; set; }
         [Column("entry_type")]
