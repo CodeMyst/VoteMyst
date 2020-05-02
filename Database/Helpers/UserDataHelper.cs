@@ -33,31 +33,33 @@ namespace VoteMyst.Database
             return user;
         }
 
-        public UserData GetOrCreateUser(string displayId)
+        public UserData GetUser(string displayId)
             => context.UserData
-                .FirstOrDefault(x => x.DisplayId.Equals(displayId))
-                ?? NewUser();
+                .FirstOrDefault(x => x.DisplayId.Equals(displayId));
+
+        public UserData GetUser(int userId)
+            => context.UserData
+                .FirstOrDefault(x => x.UserId == userId);
+
+        public UserData GetOrCreateUser(string displayId)
+            => GetUser(displayId) ?? NewUser();
 
         public UserData GetOrCreateUser(int userId)
-            => context.UserData
-                .FirstOrDefault(x => x.UserId == userId) 
-                ?? NewUser();
-        
+            => GetUser(userId) ?? NewUser();
 
         public bool DeleteUser(int userId)
-            => DeleteUser(GetOrCreateUser(userId));
+            => DeleteUser(GetUser(userId));
 
         public bool DeleteUser(UserData user)
         {
-            context.UserData.Remove(user);
+            if (user != null) 
+                context.UserData.Remove(user);
 
             return context.SaveChanges() > 0;
         }
 
-        public bool AddPermission(int userId, Permissions permissions)
+        public bool AddPermission(UserData user, Permissions permissions)
         {
-            UserData user = GetOrCreateUser(userId);
-
             user.PermissionLevel |= permissions;
 
             context.UserData.Update(user);
@@ -65,10 +67,8 @@ namespace VoteMyst.Database
             return context.SaveChanges() > 0;
         }
 
-        public bool RemovePermission(int userId, Permissions permissions)
+        public bool RemovePermission(UserData user, Permissions permissions)
         {
-            UserData user = GetOrCreateUser(userId);
-
             user.PermissionLevel ^= permissions;
 
             context.UserData.Update(user);
@@ -76,10 +76,8 @@ namespace VoteMyst.Database
             return context.SaveChanges() > 0;
         }
 
-        public bool SetPermission(int userId, Permissions permissions)
+        public bool SetPermission(UserData user, Permissions permissions)
         {
-            UserData user = GetOrCreateUser(userId);
-
             user.PermissionLevel = permissions;
 
             context.UserData.Update(user);

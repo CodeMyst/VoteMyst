@@ -1,9 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
+
+using VoteMyst.Discord;
+using VoteMyst.Database;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VoteMyst.Controllers
 {
@@ -18,6 +22,13 @@ namespace VoteMyst.Controllers
             public DateTime JoinDate { get; set; }
         }
 
+        private UserDataHelper _userDataHelper;
+
+        public UserController(UserDataHelper userDataHelper) 
+        {
+            _userDataHelper = userDataHelper;
+        }
+
         public IActionResult Search() 
         {
             return View();
@@ -25,7 +36,7 @@ namespace VoteMyst.Controllers
         
         public IActionResult Login()
         {
-            return Challenge(new AuthenticationProperties { RedirectUri = "/user/me" });
+            return Challenge(new AuthenticationProperties { RedirectUri = "/users/me" });
         }
 
         public IActionResult Logout()
@@ -36,27 +47,26 @@ namespace VoteMyst.Controllers
 
         public IActionResult Display(int userId) 
         {
-            // JUST FOR TESTING
-            if (userId % 2 == 0)
-            {
-                return View("NotFound");
-            }
+            string oauthToken = HttpContext.GetTokenAsync("access_token").GetAwaiter().GetResult();
+            DiscordUser discordUser = new DiscordService(oauthToken).GetUserAsync().GetAwaiter().GetResult();
+
+            // TODO: Check database for user ID and use userId parameter
+            var user = _userDataHelper.GetOrCreateUser(discordUser.ID);
 
             // Make sure the page has the information needed to display the profile
             ViewBag.User = new UserDisplay 
             {
-                DiscordName = "Yilian",
-                DiscordTag = "2345",
-                PermissionGroup = "Admin",
-                AvatarUrl = "/examples/ex01.png",
-                JoinDate = DateTime.Now
+                DiscordName = discordUser.Username,
+                DiscordTag = discordUser.Discriminator,
+                PermissionGroup = user.PermissionLevel.ToString(),
+                AvatarUrl = $"https://cdn.discordapp.com/avatars/{discordUser.ID}/{discordUser.Avatar}.png",
+                JoinDate = user.JoinDate
             };
             return View(nameof(Display));
         }
 
         public IActionResult DisplaySelf()
         {
-            if (User.Identity.IsAuthenticated) Console.WriteLine(User.Identity.Name);
             // TODO: Fetch self user ID
             return Display(-1);
         }

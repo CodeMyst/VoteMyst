@@ -15,7 +15,7 @@
                 <img src="/img/trophy.png"/>
                 <a href="/">votemyst</a>
             </h1>
-            <partial name="_UserWidget.cshtml" />
+            @await Component.InvokeAsync("UserWidget")
         </header>
         
         <p class="subheading">a simple website for event voting.</p>

@@ -12,7 +12,7 @@
             <span class="discord-name">@currentUser.DiscordName</span>
             <span class="discord-tag">#@currentUser.DiscordTag</span>
         </p>
-        @if(currentUser.PermissionGroup != null) 
+        @if(currentUser.PermissionGroup != null && currentUser.PermissionGroup != "Default") 
         {
             <p class="user-badge @currentUser.PermissionGroup.ToLower()">
                 @currentUser.PermissionGroup
@@ -35,7 +35,7 @@
         </tr>
     </table>
 
-    <a href="/" class="logout-button">
+    <a href="/logout" class="logout-button">
         Log Out
     </a>
 </div>
