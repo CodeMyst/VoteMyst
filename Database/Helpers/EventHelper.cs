@@ -40,6 +40,12 @@ namespace VoteMyst.Database
             => context.Events
                 .FirstOrDefault(x => x.EventId == eventId);
 
+        public Event[] GetCurrentEvents()
+            => context.Events
+                .Where(x => x.StartDate <= DateTime.UtcNow)
+                .Where(x => x.VoteEndDate > DateTime.UtcNow)
+                .ToArray();
+
         public Event[] GetEventLikeName(string name)
             => context.Events
                 .Where(x => x.Title.Contains(name, StringComparison.InvariantCultureIgnoreCase))

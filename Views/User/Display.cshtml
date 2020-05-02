@@ -1,18 +1,16 @@
 @{
     ViewData["Title"] = "User";
     Layout = "_Layout";
-
-    var currentUser = ViewBag.User;
 }
 
 <div class="user-info">
     <div class="user-info-column">
-        <img class="user-avatar" src="/assets/avatars/@(currentUser.DisplayId).png" />
-        <p class="username">@currentUser.Username</p>
-        @if(currentUser.PermissionGroup != null && currentUser.PermissionGroup != "Default") 
+        <img class="user-avatar" src="/assets/avatars/@(ViewBag.DisplayId).png" />
+        <p class="username">@ViewBag.Username</p>
+        @if(ViewBag.PermissionGroup != null && ViewBag.PermissionGroup != "Default") 
         {
-            <p class="user-badge @currentUser.PermissionGroup.ToLower()">
-                @currentUser.PermissionGroup
+            <p class="user-badge @ViewBag.PermissionGroup.ToLower()">
+                @ViewBag.PermissionGroup
             </p>
         }
         
@@ -20,15 +18,15 @@
     <table class="user-info-table">
         <tr>
             <th>Join Date:</th>
-            <td>@currentUser.JoinDate.ToString("dd/MM/yyyy")</td>
+            <td>@ViewBag.JoinDate.ToString("dd/MM/yyyy")</td>
         </tr>
         <tr>
             <th>Total votes:</th>
-            <td>0</td>
+            <td>@ViewBag.TotalVotes</td>
         </tr>
         <tr>
             <th>Total submissions:</th>
-            <td>0</td>
+            <td>@ViewBag.TotalEntries</td>
         </tr>
     </table>
 

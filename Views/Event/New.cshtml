@@ -59,6 +59,12 @@
         <button type="submit">Create Event</button>
         <span></span>
     </div>
+    @if (ViewBag.SuccessfullyCreated == true)
+    {
+        <p class="event-creation-success">
+            The event was successfully created!
+        </p>
+    }
 </form>
 
 <script>

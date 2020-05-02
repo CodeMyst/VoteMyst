@@ -45,10 +45,22 @@ header {
     margin: 10px 0 20px;
 }
 
-@media (max-width: 640px) {
-    header {
-        flex-direction: column;
-    }
+nav {
+    margin: auto;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    background-color: var(--color-nanolight);
+    border-radius: 10px;
+}
+nav a {
+    display: inline-block;
+    padding: 0.6rem 1.5rem;
+    font-weight: bold;
+}
+nav .admin {
+    border: 1px solid #7e1a1a;
+    border-radius: inherit;
 }
 
 footer {
@@ -58,4 +70,10 @@ footer {
 footer a {
     font-weight: bold;
     letter-spacing: 0.05em;
+}
+
+@media (max-width: 640px) {
+    header {
+        flex-direction: column;
+    }
 }

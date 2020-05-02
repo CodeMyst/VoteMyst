@@ -18,6 +18,8 @@
             @await Component.InvokeAsync("UserWidget")
         </header>
         
+        @await Component.InvokeAsync("Navigation")
+
         <p class="subheading">a simple website for event voting.</p>
 
         @RenderBody()

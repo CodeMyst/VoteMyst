@@ -15,20 +15,15 @@ namespace VoteMyst.Controllers
 {
     public class UserController : Controller
     {
-        public class UserDisplay
-        {
-            public bool IsSelf { get; set; }
-            public string Username { get; set; }
-            public string DisplayId { get; set; }
-            public string PermissionGroup { get; set; }
-            public DateTime JoinDate { get; set; }
-        }
-
         private UserProfileBuilder _profileBuilder;
+        private EntryHelper _entryHelper;
+        private VoteHelper _voteHelper;
 
-        public UserController(UserProfileBuilder profileBuilder) 
+        public UserController(UserProfileBuilder profileBuilder, EntryHelper entryHelper, VoteHelper voteHelper) 
         {
             _profileBuilder = profileBuilder;
+            _entryHelper = entryHelper;
+            _voteHelper = voteHelper;
         }
 
         public IActionResult Search() 
@@ -54,17 +49,18 @@ namespace VoteMyst.Controllers
                 return View("NotFound");
 
             UserData selfUser = _profileBuilder.FromContext(HttpContext);
+            Entry[] entries = _entryHelper.GetEntriesFromUser(selfUser);
 
             // TODO: Make sure the page has the information needed to display the profile
-            ViewBag.User = new UserDisplay 
-            {
-                IsSelf = user.DisplayId == selfUser.DisplayId,
-                Username = user.Username,
-                DisplayId = user.DisplayId,
-                PermissionGroup = user.PermissionLevel.ToString(),
-                JoinDate = user.JoinDate
-            };
-            return View(nameof(Display));
+            ViewBag.IsSelf = user.DisplayId == selfUser.DisplayId;
+            ViewBag.Username = user.Username;
+            ViewBag.DisplayId = user.DisplayId;
+            ViewBag.PermissionsGroup = user.PermissionLevel.ToString();
+            ViewBag.JoinDate = user.JoinDate;
+            ViewBag.TotalEntries = entries.Length;
+            ViewBag.TotalVotes = entries.Select(e => _voteHelper.GetAllVotesForEntry(e).Length).Sum();
+
+            return View("Display");
         }
 
         public IActionResult DisplaySelf()

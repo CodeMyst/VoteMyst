@@ -10,15 +10,14 @@ namespace VoteMyst.Controllers
     public class EventController : Controller
     {
 
-        private readonly EventHelper eventHelper;
+        private readonly EventHelper _eventHelper;
         public EventController(EventHelper eventHelper) 
         {
-            this.eventHelper = eventHelper;
+            this._eventHelper = eventHelper;
         }
 
         public IActionResult Browse()
         {
-            Console.WriteLine(eventHelper);
             return View();
         }
 
@@ -30,6 +29,19 @@ namespace VoteMyst.Controllers
 
         public IActionResult New() 
         {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult New(
+            string title, string description, EventType eventType,
+            DateTime revealDate, DateTime startDate,
+            DateTime endDate, DateTime voteEndDate)
+        {
+            _eventHelper.CreateEvent(title, description, eventType,
+                revealDate, startDate, endDate, voteEndDate);
+
+            ViewBag.SuccessfullyCreated = true;
             return View();
         }
     }
