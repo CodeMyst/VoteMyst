@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 
 using VoteMyst.Discord;
+using VoteMyst.Database;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VoteMyst.Controllers
 {
@@ -20,11 +22,11 @@ namespace VoteMyst.Controllers
             public DateTime JoinDate { get; set; }
         }
 
-        private DiscordService _discord;
+        private UserDataHelper _userDataHelper;
 
-        public UserController(DiscordService discord) 
+        public UserController(UserDataHelper userDataHelper) 
         {
-            _discord = discord;
+            _userDataHelper = userDataHelper;
         }
 
         public IActionResult Search() 
@@ -45,20 +47,20 @@ namespace VoteMyst.Controllers
 
         public IActionResult Display(int userId) 
         {
-            // JUST FOR TESTING
-            if (userId % 2 == 0)
-            {
-                return View("NotFound");
-            }
+            string oauthToken = HttpContext.GetTokenAsync("access_token").GetAwaiter().GetResult();
+            DiscordUser discordUser = new DiscordService(oauthToken).GetUserAsync().GetAwaiter().GetResult();
+
+            // TODO: Check database for user ID and use userId parameter
+            var user = _userDataHelper.GetOrCreateUser(discordUser.ID);
 
             // Make sure the page has the information needed to display the profile
             ViewBag.User = new UserDisplay 
             {
-                DiscordName = "Yilian",
-                DiscordTag = "2345",
-                PermissionGroup = "Admin",
-                AvatarUrl = "/examples/ex01.png",
-                JoinDate = DateTime.Now
+                DiscordName = discordUser.Username,
+                DiscordTag = discordUser.Discriminator,
+                PermissionGroup = user.PermissionLevel.ToString(),
+                AvatarUrl = $"https://cdn.discordapp.com/avatars/{discordUser.ID}/{discordUser.Avatar}.png",
+                JoinDate = user.JoinDate
             };
             return View(nameof(Display));
         }

@@ -12,7 +12,7 @@
             <span class="discord-name">@currentUser.DiscordName</span>
             <span class="discord-tag">#@currentUser.DiscordTag</span>
         </p>
-        @if(currentUser.PermissionGroup != null) 
+        @if(currentUser.PermissionGroup != null && currentUser.PermissionGroup != "Default") 
         {
             <p class="user-badge @currentUser.PermissionGroup.ToLower()">
                 @currentUser.PermissionGroup

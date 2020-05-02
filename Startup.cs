@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,8 +37,8 @@ namespace VoteMyst
         {
             services.AddRazorPages();
           
+            services.AddSingleton(Configuration);
             services.AddMvc(options => options.EnableEndpointRouting = false );
-            services.AddHttpClient<DiscordService>();
 
             services.AddAuthentication(options =>
             {
@@ -94,7 +95,7 @@ namespace VoteMyst
                 options.Scope.Add("guilds");
             });
 
-            services.AddDbContext<VoteMystContext>();
+            services.AddDbContext<VoteMystContext>(options => options.UseMySql(Configuration["MySQLConnection"]));
 
             services.AddScoped<UserDataHelper>();
             services.AddScoped<EventHelper>();

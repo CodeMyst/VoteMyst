@@ -6,7 +6,7 @@ namespace VoteMyst.Discord
     public class DiscordUser
     {
         [JsonPropertyName("id")]
-        public long ID { get; set; }
+        public ulong ID { get; set; }
         [JsonPropertyName("username")]
         public string Username { get; set; }
         [JsonPropertyName("discriminator")]

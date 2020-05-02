@@ -11,21 +11,21 @@ namespace VoteMyst.Discord
 {
     public class DiscordService
     {
-        public HttpClient Client { get; }
+        private readonly HttpClient _client;
 
-        public DiscordService(HttpClient client)
+        public DiscordService(string oauthToken)
         {
-            client.BaseAddress = new Uri("https://discordapp.com/api/");
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            client.DefaultRequestHeaders.Add("User-Agent", "VoteMyst (vote.myst.rs, 0.1)");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "ZEicD9knmkMWRGFpwZoLMqcsRzq0e9");
+            _client = new HttpClient();
 
-            Client = client;
+            _client.BaseAddress = new Uri("https://discordapp.com/api/");
+            _client.DefaultRequestHeaders.Add("Accept", "application/json");
+            _client.DefaultRequestHeaders.Add("User-Agent", "VoteMyst (vote.myst.rs, 0.1)");
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", oauthToken);
         }
 
         public async Task<DiscordUser> GetUserAsync()
         {
-            var response = await Client.GetAsync($"users/@me");
+            var response = await _client.GetAsync($"users/@me");
             response.EnsureSuccessStatusCode();
             string json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<DiscordUser>(json);
