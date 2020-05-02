@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 
 using VoteMyst.Discord;
 using VoteMyst.Database;
-using Microsoft.AspNetCore.Authorization;
+using VoteMyst.Database.Models;
 
 namespace VoteMyst.Controllers
 {
@@ -15,10 +15,9 @@ namespace VoteMyst.Controllers
     {
         public class UserDisplay
         {
-            public string DiscordName { get; set; }
-            public string DiscordTag { get; set; }
+            public string Username { get; set; }
             public string PermissionGroup { get; set; }
-            public string AvatarUrl { get; set; }
+            public string Avatar { get; set; }
             public DateTime JoinDate { get; set; }
         }
 
@@ -47,20 +46,16 @@ namespace VoteMyst.Controllers
 
         public IActionResult Display(int userId) 
         {
-            string oauthToken = HttpContext.GetTokenAsync("access_token").GetAwaiter().GetResult();
-            DiscordUser discordUser = new DiscordService(oauthToken).GetUserAsync().GetAwaiter().GetResult();
-
             // TODO: Check database for user ID and use userId parameter
-            var user = _userDataHelper.GetOrCreateUser(discordUser.ID);
+            UserData user = null;
 
-            // Make sure the page has the information needed to display the profile
+            // TODO: Make sure the page has the information needed to display the profile
             ViewBag.User = new UserDisplay 
             {
-                DiscordName = discordUser.Username,
-                DiscordTag = discordUser.Discriminator,
-                PermissionGroup = user.PermissionLevel.ToString(),
-                AvatarUrl = $"https://cdn.discordapp.com/avatars/{discordUser.ID}/{discordUser.Avatar}.png",
-                JoinDate = user.JoinDate
+                Username = "TODO:Username",
+                PermissionGroup = (user?.PermissionLevel ?? Permissions.Default).ToString(),
+                Avatar = "https://via.placeholder.com/128",
+                JoinDate = user?.JoinDate ?? DateTime.Today
             };
             return View(nameof(Display));
         }

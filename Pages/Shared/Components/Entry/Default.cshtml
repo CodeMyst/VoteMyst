@@ -1,0 +1,15 @@
+<div class="post">
+    <div class="post-container">
+        @if(ViewBag.DisplayUser)
+        {
+            <div class="post-user">
+                <img src="@ViewBag.Avatar"/>
+                <p class="username">@ViewBag.Username</p>
+                <p class="post-date">@ViewBag.Entry.SubmitDate.ToString("dd/MM/yyyy")</p>
+            </div>
+        }
+        <div class="post-image">
+            <img src="@ViewBag.Entry.Content" />
+        </div>
+    </div>
+</div>

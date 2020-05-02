@@ -7,11 +7,8 @@
 
 <div class="user-info">
     <div class="user-info-column">
-        <img class="user-avatar" src="@currentUser.AvatarUrl" />
-        <p class="username">
-            <span class="discord-name">@currentUser.DiscordName</span>
-            <span class="discord-tag">#@currentUser.DiscordTag</span>
-        </p>
+        <img class="user-avatar" src="@currentUser.Avatar" />
+        <p class="username">@currentUser.Username</p>
         @if(currentUser.PermissionGroup != null && currentUser.PermissionGroup != "Default") 
         {
             <p class="user-badge @currentUser.PermissionGroup.ToLower()">

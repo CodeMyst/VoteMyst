@@ -25,13 +25,9 @@
     margin: auto 20px auto 10px;
 }
 
-.username .discord-name {
+.username {
     color: var(--color-white);
     letter-spacing: 0.05em;
-}
-.username .discord-tag {
-    margin-left: -4px;
-    color: var(--color-nanolightlight);
 }
 
 .login-widget {
@@ -77,9 +73,6 @@
     font-size: 1rem;
     text-align: center;
     overflow-wrap: break-word;
-}
-.user-info .username .discord-tag {
-    overflow-wrap: normal;
 }
 
 .user-info .user-badge {

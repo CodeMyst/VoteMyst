@@ -11,17 +11,18 @@ namespace VoteMyst.ViewComponents
 {
     public class UserWidgetViewComponent : ViewComponent
     {
-        public async Task<IViewComponentResult> InvokeAsync() 
+        public Task<IViewComponentResult> InvokeAsync() 
         {
-            ViewBag.IsLoggedIn = User.Identity.IsAuthenticated;
-            if (User.Identity.IsAuthenticated) 
+            bool loggedIn = User.Identity.IsAuthenticated;
+            ViewBag.IsLoggedIn = loggedIn;
+
+            if (loggedIn)
             {
-                string oauthToken = await HttpContext.GetTokenAsync("access_token");
-                DiscordUser discordUser = await new DiscordService(oauthToken).GetUserAsync();
-                ViewBag.DiscordUser = discordUser;
+                ViewBag.Username = "TODO:Username";
+                ViewBag.Avatar = "https://via.placeholder.com/64";
             }
 
-            return View();
+            return Task.FromResult<IViewComponentResult>(View());
         }
     }
 }

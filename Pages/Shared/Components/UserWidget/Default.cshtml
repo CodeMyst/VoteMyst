@@ -1,11 +1,8 @@
 @if (@ViewBag.IsLoggedIn)
 {
     <a href="/users/me" class="widget user-widget">
-        <img class="avatar" src="/examples/ex01.png" />
-        <p class="username">
-            <span class="discord-name">@ViewBag.DiscordUser.Username</span>
-            <span class="discord-tag">#@ViewBag.DiscordUser.Discriminator</span>
-        </p>
+        <img class="avatar" src="@ViewBag.Avatar" />
+        <p class="username">@ViewBag.Username</p>
     </a>
 }
 else 
