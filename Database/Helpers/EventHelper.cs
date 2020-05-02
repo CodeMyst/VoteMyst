@@ -69,6 +69,26 @@ namespace VoteMyst.Database
             => context.Events
                 .Where(x => x.StartDate <= date)
                 .ToArray();
+
+        public Event[] GetAllEventsFinishedBefore(DateTime date)
+            => context.Events
+                .Where(x => x.VoteEndDate < date)
+                .OrderByDescending(x => x.StartDate)
+                .ToArray();
+
+        public Event[] GetCurrentEvents()
+            => context.Events
+                .Where(x => x.StartDate <= DateTime.UtcNow)
+                .Where(x => x.VoteEndDate > DateTime.UtcNow)
+                .OrderBy(x => x.VoteEndDate)
+                .ToArray();
+        
+        public Event[] GetVisiblePlannedEvents()
+            => context.Events
+                .Where(x => x.StartDate > DateTime.UtcNow)
+                .Where(x => x.RevealDate <= DateTime.UtcNow)
+                .OrderBy(x => x.StartDate)
+                .ToArray();
     }
 
 }

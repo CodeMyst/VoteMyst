@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VoteMyst.Database;
+using VoteMyst.Database.Models;
 
 namespace VoteMyst.Controllers
 {
@@ -18,8 +19,15 @@ namespace VoteMyst.Controllers
 
         public IActionResult Browse()
         {
-            Console.WriteLine(eventHelper);
-            return View();
+            Event[] finishedEvents = eventHelper.GetAllEventsFinishedBefore(DateTime.UtcNow);
+            Event[] plannedEvents = eventHelper.GetVisiblePlannedEvents();
+            Event[] ongoingEvents = eventHelper.GetCurrentEvents();
+
+            ViewBag.History = finishedEvents;
+            ViewBag.Planned = plannedEvents;
+            ViewBag.Current = ongoingEvents;
+
+            return View(nameof(Browse));
         }
 
         public IActionResult Display(int userId) 

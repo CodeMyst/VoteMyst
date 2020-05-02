@@ -1,6 +1,48 @@
+@using VoteMyst.Database.Models;
 @{
     ViewData["Title"] = "Browse";
     Layout = "_Layout";
+
+    Event[] currentEvents = ViewBag.Current;
+    Event[] planned = ViewBag.Planned;
+    Event[] history = ViewBag.History;
 }
 
-Browsing old events!
+<div class="events">
+    <div class="events-active">
+        @if(currentEvents.Length == 0) 
+        {
+            <div class="no-event">No active events found!</div>
+        }
+        else 
+        {
+            @foreach (Event e in currentEvents)
+            {
+                @await Component.InvokeAsync("Event", new { ev = e });
+            }
+        }
+    </div>
+    <div class="events-planned">
+        @if(planned.Length == 0) 
+        {
+            <div class="no-event">No planned events found!</div>
+        }
+        else 
+        {
+            @foreach (Event e in planned)
+            {
+                @await Component.InvokeAsync("Event", new { ev = e });
+            }
+        }
+    </div>
+    <div class="events-finished">
+        @foreach (Event e in history)
+        {
+            @await Component.InvokeAsync("Event", new { ev = e });
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/js/timer.js"></script>
+}
