@@ -19,18 +19,15 @@ namespace VoteMyst.PermissionSystem
 
         private class RequirePermissionsAttributeImpl : Attribute, IAsyncResourceFilter
         {
-            private readonly IAuthorizationService authorizationService;
             private readonly PermissionAuthorizationRequirement permissions;
             private readonly DatabaseHelperProvider dbhelper;
             private readonly UserProfileBuilder profileBuilder;
 
-            public RequirePermissionsAttributeImpl(IAuthorizationService authorizationService,
-                                                   PermissionAuthorizationRequirement permissions,
+            public RequirePermissionsAttributeImpl(PermissionAuthorizationRequirement permissions,
                                                    DatabaseHelperProvider dbhelper,
                                                    UserProfileBuilder profileBuilder)
             {
-                this.authorizationService = authorizationService;
-                this.permissions = permissions;   
+                this.permissions = permissions;
                 this.dbhelper = dbhelper;
                 this.profileBuilder = profileBuilder;
             }
