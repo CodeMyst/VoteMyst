@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
+using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
 {
@@ -18,6 +19,7 @@ namespace VoteMyst.Controllers
             _helpers = helpers;
         }
 
+        [RequirePermissions(Permissions.ViewEntries)]
         public IActionResult Index() 
         {
             Event[] currentEvents = _helpers.Events.GetCurrentEvents();

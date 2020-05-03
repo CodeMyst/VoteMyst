@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
+using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
 {
@@ -27,12 +28,14 @@ namespace VoteMyst.Controllers
             _environment = environment;
         }
 
+        [RequirePermissions(Permissions.SubmitEntries)]
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpPost]
+        [RequirePermissions(Permissions.SubmitEntries)]
         public IActionResult Index(IFormFile file)
         {
             if (file.Length > MaxFileSize) {
