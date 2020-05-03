@@ -27,7 +27,7 @@ namespace VoteMyst.ViewComponents
             UserData user = _profileBuilder.FromPrincipal(UserClaimsPrincipal);
 
             ViewBag.HasCurrentEvent = events.Length > 0;
-            ViewBag.IsAdmin = user.PermissionLevel == Permissions.Admin;
+            ViewBag.IsAdmin = user.IsAdmin();
             
             return Task.FromResult<IViewComponentResult>(View());
         }

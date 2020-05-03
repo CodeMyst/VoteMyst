@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using VoteMyst.Discord;
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
+using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
 {
@@ -25,6 +26,7 @@ namespace VoteMyst.Controllers
             _helpers = helpers;
         }
 
+        [RequirePermissions(Permissions.ViewUsers)]
         public IActionResult Search() 
         {
             return View();
@@ -41,6 +43,7 @@ namespace VoteMyst.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [RequirePermissions(Permissions.ViewUsers)]
         public IActionResult Display(string displayId) 
         {
             UserData targetUser = _profileBuilder.FromId(displayId);
@@ -91,12 +94,14 @@ namespace VoteMyst.Controllers
             return Display(selfUser.DisplayId);
         }
 
+        [RequirePermissions(Permissions.ModifyUsers)]
         public IActionResult BanUser(int id)
         {
             throw new NotImplementedException();
         }
 
         [HttpPost]
+        [RequirePermissions(Permissions.ModifyUsers)]
         public IActionResult Display(string displayId, 
             string username = null,
             string avatar = null,

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using VoteMyst.Database;
+using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
 {
@@ -16,23 +17,27 @@ namespace VoteMyst.Controllers
             _helpers = helpers;
         }
 
+        [RequirePermissions(Permissions.ViewEvents)]
         public IActionResult Browse()
         {
             return View();
         }
 
+        [RequirePermissions(Permissions.ViewEntries)]
         public IActionResult Display(int userId) 
         {
             ViewBag.ID = userId;
             return View();
         }
 
+        [RequirePermissions(Permissions.CreateEvents)]
         public IActionResult New() 
         {
             return View();
         }
 
         [HttpPost]
+        [RequirePermissions(Permissions.CreateEvents)]
         public IActionResult New(
             string title, string description, EventType eventType,
             DateTime revealDate, DateTime startDate,
