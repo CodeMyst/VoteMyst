@@ -99,11 +99,7 @@ namespace VoteMyst
 
             services.AddDbContext<VoteMystContext>(options => options.UseMySql(Configuration["MySQLConnection"]));
 
-            services.AddScoped<UserDataHelper>();
-            services.AddScoped<EventHelper>();
-            services.AddScoped<EntryHelper>();
-            services.AddScoped<VoteHelper>();
-            services.AddScoped<AuthorizationHelper>();
+            services.AddScoped<DatabaseHelperProvider>();
             services.AddScoped<UserProfileBuilder>();
         }
 

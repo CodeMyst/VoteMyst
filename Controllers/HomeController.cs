@@ -11,20 +11,16 @@ namespace VoteMyst.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly EventHelper _eventHelper;
-        private readonly EntryHelper _entryHelper;
-        private readonly VoteHelper _voteHelper;
+        private readonly DatabaseHelperProvider _helpers;
 
-        public HomeController(EventHelper eventHelper, EntryHelper entryHelper, VoteHelper voteHelper) 
+        public HomeController(DatabaseHelperProvider helpers) 
         {
-            _eventHelper = eventHelper;
-            _entryHelper = entryHelper;
-            _voteHelper = voteHelper;
+            _helpers = helpers;
         }
 
         public IActionResult Index()
         {
-            Event[] currentEvents = _eventHelper.GetCurrentEvents();
+            Event[] currentEvents = _helpers.Events.GetCurrentEvents();
 
             // If an event is currently happening, display information about it
             if (currentEvents.Length > 0) 
@@ -36,13 +32,13 @@ namespace VoteMyst.Controllers
                 ViewBag.Description = currentEvent.Description;
                 ViewBag.SubmissionEnd = currentEvent.EndDate;
                 ViewBag.VoteEnd = currentEvent.VoteEndDate;
-                ViewBag.TotalEntries = _entryHelper.GetEntriesInEvent(currentEvent).Length;
-                ViewBag.TotalVotes = _voteHelper.GetAllVotesInEvent(currentEvent).Length;
+                ViewBag.TotalEntries = _helpers.Entries.GetEntriesInEvent(currentEvent).Length;
+                ViewBag.TotalVotes = _helpers.Votes.GetAllVotesInEvent(currentEvent).Length;
 
                 return View("DisplayCurrent");
             }
             
-            Event[] upcomingEvents = _eventHelper.GetAllEventsAfter(DateTime.UtcNow);
+            Event[] upcomingEvents = _helpers.Events.GetAllEventsAfter(DateTime.UtcNow);
 
             // If an event is coming up, display information about it
             if (upcomingEvents.Length > 0)

@@ -9,11 +9,11 @@ namespace VoteMyst.Controllers
 {
     public class EventController : Controller
     {
+        private readonly DatabaseHelperProvider _helpers;
 
-        private readonly EventHelper _eventHelper;
-        public EventController(EventHelper eventHelper) 
+        public EventController(DatabaseHelperProvider helpers) 
         {
-            this._eventHelper = eventHelper;
+            _helpers = helpers;
         }
 
         public IActionResult Browse()
@@ -38,7 +38,7 @@ namespace VoteMyst.Controllers
             DateTime revealDate, DateTime startDate,
             DateTime endDate, DateTime voteEndDate)
         {
-            _eventHelper.CreateEvent(title, description, eventType,
+            _helpers.Events.CreateEvent(title, description, eventType,
                 revealDate, startDate, endDate, voteEndDate);
 
             ViewBag.SuccessfullyCreated = true;

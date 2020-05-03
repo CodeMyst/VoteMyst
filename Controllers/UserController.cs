@@ -15,15 +15,13 @@ namespace VoteMyst.Controllers
 {
     public class UserController : Controller
     {
-        private UserProfileBuilder _profileBuilder;
-        private EntryHelper _entryHelper;
-        private VoteHelper _voteHelper;
+        private readonly UserProfileBuilder _profileBuilder;
+        private readonly DatabaseHelperProvider _helpers;
 
-        public UserController(UserProfileBuilder profileBuilder, EntryHelper entryHelper, VoteHelper voteHelper) 
+        public UserController(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers) 
         {
             _profileBuilder = profileBuilder;
-            _entryHelper = entryHelper;
-            _voteHelper = voteHelper;
+            _helpers = helpers;
         }
 
         public IActionResult Search() 
@@ -49,16 +47,16 @@ namespace VoteMyst.Controllers
                 return View("NotFound");
 
             UserData selfUser = _profileBuilder.FromContext(HttpContext);
-            Entry[] entries = _entryHelper.GetEntriesFromUser(selfUser);
+            Entry[] entries = _helpers.Entries.GetEntriesFromUser(selfUser);
 
             // TODO: Make sure the page has the information needed to display the profile
             ViewBag.IsSelf = user.DisplayId == selfUser.DisplayId;
             ViewBag.Username = user.Username;
             ViewBag.DisplayId = user.DisplayId;
-            ViewBag.PermissionsGroup = user.PermissionLevel.ToString();
+            ViewBag.PermissionGroup = user.PermissionLevel.ToString();
             ViewBag.JoinDate = user.JoinDate;
             ViewBag.TotalEntries = entries.Length;
-            ViewBag.TotalVotes = entries.Select(e => _voteHelper.GetAllVotesForEntry(e).Length).Sum();
+            ViewBag.TotalVotes = entries.Select(e => _helpers.Votes.GetAllVotesForEntry(e).Length).Sum();
 
             return View("Display");
         }

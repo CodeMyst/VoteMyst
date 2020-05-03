@@ -11,27 +11,23 @@ namespace VoteMyst.Controllers
 {
     public class VoteController : Controller
     {
-        private readonly EventHelper _eventHelper;
-        private readonly EntryHelper _entryHelper;
-        private readonly VoteHelper _voteHelper;
+        private readonly DatabaseHelperProvider _helpers;
 
-        public VoteController(EventHelper eventHelper, EntryHelper entryHelper, VoteHelper voteHelper)
+        public VoteController(DatabaseHelperProvider helpers)
         {
-            _eventHelper = eventHelper;
-            _entryHelper = entryHelper;
-            _voteHelper = voteHelper;
+            _helpers = helpers;
         }
 
         public IActionResult Index() 
         {
-            Event[] currentEvents = _eventHelper.GetCurrentEvents();
+            Event[] currentEvents = _helpers.Events.GetCurrentEvents();
             if (currentEvents.Length == 0)
                 return NotFound();
 
             // TODO: Maybe support multiple events?
 
             Event currentEvent = currentEvents[0];
-            Entry[] entries = _entryHelper.GetEntriesInEvent(currentEvent);
+            Entry[] entries = _helpers.Entries.GetEntriesInEvent(currentEvent);
 
             Random rnd = new Random();
             Entry[] randomizedEntries = entries.OrderBy(e => rnd.Next()).ToArray();

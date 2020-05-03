@@ -16,21 +16,19 @@ namespace VoteMyst
 {
     public class UserProfileBuilder
     {
-        private readonly UserDataHelper _userHelper;
-        private readonly AuthorizationHelper _authHelper;
+        private readonly DatabaseHelperProvider _helpers;
         private readonly IWebHostEnvironment _environment;
 
-        public UserProfileBuilder(UserDataHelper userHelper, AuthorizationHelper authHelper, IWebHostEnvironment environment)
+        public UserProfileBuilder(DatabaseHelperProvider helpers, IWebHostEnvironment environment)
         {
-            _userHelper = userHelper;
-            _authHelper = authHelper;
+            _helpers = helpers;
             _environment = environment;
         }
 
         public UserData FromContext(HttpContext context)
         {
             if (!context.User.Identity.IsAuthenticated)
-                return _userHelper.Guest();
+                return _helpers.Users.Guest();
 
             string userToken = context.GetTokenAsync(CookieAuthenticationDefaults.AuthenticationScheme, "access_token").GetAwaiter().GetResult();
             if (context.User.Identity.AuthenticationType == "Discord") 
@@ -38,17 +36,17 @@ namespace VoteMyst
                 DiscordService discord = new DiscordService(userToken);
                 DiscordUser discordUser = discord.GetUserAsync().GetAwaiter().GetResult();
                 
-                UserData user = _authHelper.GetAuthorizedUser(ServiceType.Discord, discordUser.ID.ToString());
+                UserData user = _helpers.Authorization.GetAuthorizedUser(ServiceType.Discord, discordUser.ID.ToString());
                 if (user == null) 
                 {
-                    user = _userHelper.NewUser();
+                    user = _helpers.Users.NewUser();
                     user.Username = discordUser.Username;
 
                     // Download the avatar image
                     DownloadHelper.DownloadFile($"https://cdn.discordapp.com/avatars/{discordUser.ID}/{discordUser.Avatar}.png",
                         System.IO.Path.Combine(_environment.WebRootPath, $"assets/avatars/{user.DisplayId}.png"));
 
-                    _authHelper.AddAuthorizedUser(user.UserId, discordUser.ID.ToString(), ServiceType.Discord);
+                    _helpers.Authorization.AddAuthorizedUser(user.UserId, discordUser.ID.ToString(), ServiceType.Discord);
                 }
                 return user;
             }
@@ -57,6 +55,6 @@ namespace VoteMyst
         }
 
         public UserData FromId(string displayId)
-            => _userHelper.GetUser(displayId);
+            => _helpers.Users.GetUser(displayId);
     }
 }

@@ -12,16 +12,16 @@ namespace VoteMyst.ViewComponents
 {
     public class EntryViewComponent : ViewComponent
     {
-        public UserDataHelper _userHelper;
+        private readonly DatabaseHelperProvider _helpers;
 
-        public EntryViewComponent(UserDataHelper userHelper)
+        public EntryViewComponent(DatabaseHelperProvider helpers)
         {
-            _userHelper = userHelper;
+            _helpers = helpers;
         }
 
         public Task<IViewComponentResult> InvokeAsync(Entry entry, bool displayUser = false) 
         {
-            UserData author = _userHelper.GetUser(entry.UserId);
+            UserData author = _helpers.Users.GetUser(entry.UserId);
 
             // TODO: Display the user that posted the entry
             ViewBag.DisplayUser = displayUser;

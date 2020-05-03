@@ -12,18 +12,18 @@ namespace VoteMyst.ViewComponents
 {
     public class NavigationViewComponent : ViewComponent
     {
-        private readonly EventHelper _eventHelper;
         private readonly UserProfileBuilder _profileBuilder;
+        private readonly DatabaseHelperProvider _helpers;
 
-        public NavigationViewComponent(EventHelper eventHelper, UserProfileBuilder profileBuilder)
+        public NavigationViewComponent(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers)
         {
-            _eventHelper = eventHelper;
             _profileBuilder = profileBuilder;
+            _helpers = helpers;
         }
 
         public Task<IViewComponentResult> InvokeAsync() 
         {
-            Event[] events = _eventHelper.GetCurrentEvents();
+            Event[] events = _helpers.Events.GetCurrentEvents();
             UserData user = _profileBuilder.FromContext(HttpContext);
 
             ViewBag.HasCurrentEvent = events.Length > 0;
