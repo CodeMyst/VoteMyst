@@ -13,4 +13,14 @@
     
     --color-badge-admin: #9a90ff;
     --color-badge-banned: #bd1c1c;
+
+    --user-widget-height: 48px;
+}
+
+@media (max-width: 640px)
+{
+    :root 
+    {
+        --user-widget-height: 40px;
+    }
 }

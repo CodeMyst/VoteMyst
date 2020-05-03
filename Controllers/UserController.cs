@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Dynamic;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -42,21 +43,41 @@ namespace VoteMyst.Controllers
 
         public IActionResult Display(string displayId) 
         {
-            UserData user = _profileBuilder.FromId(displayId);
-            if (user == null)
+            UserData targetUser = _profileBuilder.FromId(displayId);
+            if (targetUser == null)
                 return View("NotFound");
 
             UserData selfUser = _profileBuilder.FromContext(HttpContext);
             Entry[] entries = _helpers.Entries.GetEntriesFromUser(selfUser);
 
-            // TODO: Make sure the page has the information needed to display the profile
-            ViewBag.IsSelf = user.DisplayId == selfUser.DisplayId;
-            ViewBag.Username = user.Username;
-            ViewBag.DisplayId = user.DisplayId;
-            ViewBag.PermissionGroup = user.PermissionLevel.ToString();
-            ViewBag.JoinDate = user.JoinDate;
-            ViewBag.TotalEntries = entries.Length;
-            ViewBag.TotalVotes = entries.Select(e => _helpers.Votes.GetAllVotesForEntry(e).Length).Sum();
+            ViewBag.IsSelf = targetUser.DisplayId == selfUser.DisplayId;
+
+            ViewBag.SelfUser = selfUser;
+            ViewBag.InspectedUser = targetUser;
+
+            ViewBag.InspectedUserGroup = targetUser.DeterminePermissionGroup();
+            ViewBag.InspectedTotalEntries = entries.Length;
+            ViewBag.InspectedTotalVotes = entries.Select(e => _helpers.Votes.GetAllVotesForEntry(e).Length).Sum();
+
+            bool allowAdminDashboard = targetUser.DisplayId != selfUser.DisplayId
+                && selfUser.IsAdmin() && !targetUser.IsAdmin();
+            ViewBag.AllowAdminDashboard = allowAdminDashboard;
+            if (allowAdminDashboard)
+            {
+                Permissions[] permissions = Enum.GetValues(typeof(Permissions)).Cast<Permissions>().ToArray();
+                Permissions[] groups = new Permissions[] {
+                    Permissions.Banned, Permissions.Guest, Permissions.Default, Permissions.Moderator, Permissions.Admin
+                };
+                Permissions[] permissionsNoGroups = permissions.Except(groups).ToArray();
+                
+                ViewBag.UserPermissions = (ulong)targetUser.PermissionLevel;
+                ViewBag.PermissionEntries = permissionsNoGroups
+                    .Select(p => (p.ToString(), (ulong)p, targetUser.PermissionLevel.HasFlag(p)))
+                    .ToArray();
+                ViewBag.PermissionGroups = groups
+                    .Select(g => (g.ToString(), (ulong)g))
+                    .ToArray();
+            }
 
             return View("Display");
         }
@@ -73,6 +94,18 @@ namespace VoteMyst.Controllers
         public IActionResult BanUser(int id)
         {
             throw new NotImplementedException();
+        }
+
+        [HttpPost]
+        public IActionResult Display(string displayId, 
+            string username = null,
+            string avatar = null,
+            ulong? permissions = 0)
+        {
+            if (permissions.HasValue)
+                _helpers.Users.SetPermission(_helpers.Users.GetUser(displayId), (Permissions)permissions.Value);
+
+            return Display(displayId);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace VoteMyst.Database
         EditEntries = 1uL << 4,
         ViewUsers = 1uL << 5,
 
-        AllowWinning = 1uL << 63,
+        AllowWinning = 1uL << 31,
 
         // Moderation
         DeleteEntries = 1uL << 32,
@@ -29,7 +29,7 @@ namespace VoteMyst.Database
         Banned = 0,
         Guest = ViewEntries | ViewEvents,
         Default = Guest | SubmitEntries | SubmitVotes | EditEntries | ViewUsers | AllowWinning,
-        Moderator = Default | DeleteEntries | DeleteVotes ^ AllowWinning,
+        Moderator = (Default | DeleteEntries | DeleteVotes) ^ AllowWinning,
         Admin = ulong.MaxValue ^ AllowWinning
     }
 }

@@ -1,38 +1,119 @@
+@using VoteMyst.Database.Models
 @{
     ViewData["Title"] = "User";
     Layout = "_Layout";
+
+    UserData inspectedUser = ViewBag.InspectedUser;
+    UserData selfUser = ViewBag.SelfUser;
 }
 
-<div class="user-info">
+<div class="panel user-info">
     <div class="user-info-column">
-        <img class="user-avatar" src="/assets/avatars/@(ViewBag.DisplayId).png" />
-        <p class="username">@ViewBag.Username</p>
-        @if(ViewBag.PermissionGroup != null && ViewBag.PermissionGroup != "Default") 
+        @await Component.InvokeAsync("Avatar", @ViewBag.InspectedUser)
+        <p class="username">@inspectedUser.Username</p>
+        @if(ViewBag.InspectedUserGroup != null) 
         {
-            <p class="user-badge @ViewBag.PermissionGroup.ToLower()">
-                @ViewBag.PermissionGroup
+            <p class="user-badge @ViewBag.InspectedUserGroup.ToLower()">
+                @ViewBag.InspectedUserGroup
             </p>
         }
     </div>
     <table class="user-info-table">
         <tr>
             <th>Join Date:</th>
-            <td>@ViewBag.JoinDate.ToString("dd/MM/yyyy")</td>
+            <td>@inspectedUser.JoinDate.ToString("dd/MM/yyyy")</td>
         </tr>
         <tr>
             <th>Total votes:</th>
-            <td>@ViewBag.TotalVotes</td>
+            <td>@ViewBag.InspectedTotalVotes</td>
         </tr>
         <tr>
             <th>Total submissions:</th>
-            <td>@ViewBag.TotalEntries</td>
+            <td>@ViewBag.InspectedTotalEntries</td>
         </tr>
     </table>
 
-    <a href="/logout" class="logout-button">
-        Log Out
-    </a>
+    @if(ViewBag.IsSelf)
+    {
+        <a href="/logout" class="logout-button">
+            Log Out
+        </a>
+    }
 </div>
+
+@if(ViewBag.AllowAdminDashboard)
+{
+    <form class="panel user-admin-panel" method="post">
+        <table class="user-permission-table">
+            @foreach(var entry in ViewBag.PermissionEntries)
+            {
+                <tr>
+                    <td>
+                        <p class="permission-label">@entry.Item1</p>
+                    </td>
+                    <td>
+                        <div class="permission-checkbox" 
+                            --permissionflag="@entry.Item2"
+                            @(entry.Item3 ? "checked" : "")>
+                            <div class="knob"></div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </table>
+        <table class="user-groups-table">
+            @foreach(var entry in ViewBag.PermissionGroups)
+            {
+                <tr>
+                    <td>
+                        <div class="button permission-button"
+                            --permissionflag="@entry.Item2">Apply @entry.Item1</div>
+                    </td>
+                </tr>
+            }
+        </table>
+        <input type="hidden" name="userId" value="@ViewBag.InspectedUser.DisplayId" />
+        <input type="hidden" name="permissions" value="0" />
+        <button type="submit">Update Permissions</button>
+    </form>
+
+    <script>
+        function recalculatePermissions() {
+            let permissions = 0n;
+            document.querySelectorAll(".permission-checkbox")
+                .forEach(c => {
+                    if (c.hasAttribute("checked")) {
+                        permissions += BigInt(c.getAttribute("--permissionflag"));
+                    }
+                });
+            document.forms[0]["permissions"].value = permissions;
+        }
+        function applyPermissions(permissions) {
+            document.querySelectorAll(".permission-checkbox")
+                .forEach(c => {
+                    let mask = BigInt(c.getAttribute("--permissionflag"));
+                    if ((permissions & mask) != 0) {
+                        c.setAttribute("checked", "");
+                    }
+                    else {
+                        c.removeAttribute("checked");
+                    }
+                });
+            document.forms[0]["permissions"].value = permissions;
+        }
+        recalculatePermissions();
+
+        document.querySelectorAll(".permission-checkbox")
+            .forEach(c => c.addEventListener("click", e => {
+                c.toggleAttribute("checked");
+                recalculatePermissions();
+            }));
+        document.querySelectorAll(".permission-button")
+            .forEach(c => c.addEventListener("click", e => {
+                applyPermissions(BigInt(c.getAttribute("--permissionflag")));
+            }));
+    </script>
+}
 
 <input style="display:none" type="checkbox" checked="true" onchange="theme()" />
 
