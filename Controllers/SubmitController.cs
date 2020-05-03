@@ -47,7 +47,7 @@ namespace VoteMyst.Controllers
             // TODO: Maybe support multiple events?
 
             Event currentEvent = currentEvents[0];
-            UserData user = _profileBuilder.FromContext(HttpContext);
+            UserData user = _profileBuilder.FromPrincipal(User);
 
             string fileName = Path.GetFileName(file.FileName);
             string relativePath = $"assets/events/{currentEvent.EventId}/{user.DisplayId}{Path.GetExtension(fileName)}";
