@@ -24,7 +24,7 @@ namespace VoteMyst.ViewComponents
         public Task<IViewComponentResult> InvokeAsync() 
         {
             Event[] events = _helpers.Events.GetCurrentEvents();
-            UserData user = _profileBuilder.FromContext(HttpContext);
+            UserData user = _profileBuilder.FromPrincipal(UserClaimsPrincipal);
 
             ViewBag.HasCurrentEvent = events.Length > 0;
             ViewBag.IsAdmin = user.PermissionLevel == Permissions.Admin;

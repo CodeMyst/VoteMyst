@@ -47,7 +47,7 @@ namespace VoteMyst.Controllers
             if (targetUser == null)
                 return View("NotFound");
 
-            UserData selfUser = _profileBuilder.FromContext(HttpContext);
+            UserData selfUser = _profileBuilder.FromPrincipal(User);
             Entry[] entries = _helpers.Entries.GetEntriesFromUser(selfUser);
 
             ViewBag.IsSelf = targetUser.DisplayId == selfUser.DisplayId;
@@ -87,7 +87,7 @@ namespace VoteMyst.Controllers
             if (!User.Identity.IsAuthenticated)
                 return Forbid();
 
-            UserData selfUser = _profileBuilder.FromContext(HttpContext);
+            UserData selfUser = _profileBuilder.FromPrincipal(User);
             return Display(selfUser.DisplayId);
         }
 

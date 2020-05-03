@@ -8,11 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 
-using VoteMyst.Discord;
-using VoteMyst.Database;
-using VoteMyst.Database.Models;
-
-
 namespace VoteMyst.ViewComponents
 {
     public class UserWidgetViewComponent : ViewComponent
@@ -33,7 +28,7 @@ namespace VoteMyst.ViewComponents
 
             if (loggedIn)
             {
-                ViewBag.User = _profileBuilder.FromContext(HttpContext);
+                ViewBag.User = _profileBuilder.FromPrincipal(UserClaimsPrincipal);
             }
 
             return Task.FromResult<IViewComponentResult>(View());
