@@ -65,11 +65,10 @@
     align-items: center;
     height: 48px;
 }
-.post .post-user img {
-    height: 70%;
-    margin: 10% 5px;
-    border-radius: 50%;
-    display: inline-block;
+.post .post-user .avatar {
+    height: calc(0.7 * 48px);
+    width: calc(0.7 * 48px);
+    margin: auto 5px;
 }
 .post .post-user .username {
     font-size: 0.9rem;

@@ -25,8 +25,7 @@ namespace VoteMyst.ViewComponents
 
             // TODO: Display the user that posted the entry
             ViewBag.DisplayUser = displayUser;
-            ViewBag.Username = author.Username;
-            ViewBag.Avatar = $"/assets/avatars/{author.DisplayId}.png";
+            ViewBag.User = author;
             ViewBag.Entry = entry;
             
             return Task.FromResult<IViewComponentResult>(View());
