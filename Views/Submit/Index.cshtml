@@ -1,30 +1,51 @@
 ﻿@{
     Layout = "_Layout";
     ViewData["Title"] = "Submit";
+
+    string entryUrl = string.Empty;
+    if (ViewBag.Entry != null && ViewBag.Event != null)
+        entryUrl = $"events/{ViewBag.Event.EventId}#{ViewBag.Entry.EntryId}";
 }
 
 <h1>Submit a new entry</h1>
 
-<!-- TODO: Check if an event is current happening -->
-
-<!-- TODO: Check if the user has already 
-    uploaded for the current event -->
-
-<p>
-    You're submitting to <b>Event Name Here</b>.
-</p>
-
-<form method="post" enctype="multipart/form-data">
-    <label for="file">File @(VoteMyst.Controllers.SubmitController.MaxFileSize / 1000000)MB:</label>
-    <input type="file" id="file" name="file" /> <br>
-    <button type="submit">Submit!</button>
-</form>
-
-@if(ViewBag.Message != null) 
+@if (ViewBag.SubmitSuccessful ?? false) 
 {
-    <p>@ViewBag.Message</p>
+    // A submission was entered
+    <p>Your submission was successful!</p>
+    <p>Click <a href="@entryUrl">here</a> to view it!</p>
 }
+else
+{
+    if (ViewBag.Event != null)
+    {
+        if (ViewBag.Entry != null)
+        {
+            <div class="warning">
+                You already uploaded a <a href="@entryUrl">submission</a> for this event.
+                Submitting a new entry will remove your existing one. This can not be undone.
+            </div>
+        }
 
-<p class="disclaimer">
-    Some disclaimer legal stuff about uploading.
-</p>
+        <p>
+            You're submitting to <a href="/events/@ViewBag.Event.EventId"><b>@ViewBag.Event.Title</b></a>.
+        </p>
+
+        <form method="post" enctype="multipart/form-data">
+            <label for="file">Submission File (max. @(VoteMyst.Controllers.SubmitController.MaxFileSize / 1000000)MB):</label>
+            <input type="file" id="file" name="file" /> <br>
+            <button type="submit">Submit!</button>
+        </form>
+
+        @if(ViewBag.Message != null) 
+        {
+            <p>@ViewBag.Message</p>
+        }
+
+        @* TODO: Add disclaimer referring to the legal terms. *@
+    }
+    else 
+    {
+        <p>There are no events you can currently submit to.</p>
+    }
+}
