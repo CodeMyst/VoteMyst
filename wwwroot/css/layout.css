@@ -1,9 +1,10 @@
 body {
-    background-color: var(--color-nano);
-    font-family: 'Raleway', sans-serif;
-    color: var(--color-white);
-    overflow-y: scroll;
     margin: 0;
+    font-family: 'Raleway', sans-serif;
+    overflow-y: scroll;
+    color: var(--color-white);
+    background-color: var(--color-nano);
+    line-height: 1.4rem;
 }
 
 a {
@@ -72,6 +73,7 @@ nav .admin {
 }
 
 footer {
+    margin: 2rem 0;
     text-align: center;
     font-size: 0.9em;
 }
