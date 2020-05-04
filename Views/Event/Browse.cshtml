@@ -1,6 +1,48 @@
+@using VoteMyst.Database.Models;
 @{
     ViewData["Title"] = "Browse";
     Layout = "_Layout";
+
+    Event[] currentEvents = ViewBag.Current;
+    Event[] planned = ViewBag.Planned;
+    Event[] history = ViewBag.History;
 }
 
-Browsing old events!
+<div class="events">
+    @if (currentEvents.Length > 0)
+    {
+        <div class="events-active">
+            <h1>Active events</h1>
+            <div class="event-container">
+                @foreach (Event e in currentEvents)
+                {
+                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                }
+            </div>
+        </div>
+    }
+    @if (planned.Length > 0)
+    {
+        <div class="events-planned">
+            <h1>Planned events</h1>
+            <div class="event-container">
+                @foreach (Event e in planned)
+                {
+                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                }
+            </div>
+        </div>
+    }
+    @if (history.Length > 0)
+    {
+        <div class="events-finished">
+            <h1>Finished events</h1>
+            <div class="event-container">
+                @foreach (Event e in history)
+                {
+                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                }
+            </div>
+        </div>
+    }
+</div>

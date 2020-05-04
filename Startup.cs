@@ -151,10 +151,14 @@ namespace VoteMyst
                     pattern: "users/{*displayId}",
                     defaults: new { controller = "User", action = "Display" });
 
-                // Browse events / Create event / Edit event
+                // Browse events
+                endpoints.MapControllerRoute(name: "browseEvents",
+                    pattern: "events",
+                    defaults: new { controller = "Event", action = "Browse" });
+                // Create event / Edit event
                 endpoints.MapControllerRoute(name: "newEvent",
                     pattern: "events/{action:alpha}",
-                    defaults: new { controller = "Event", action = "Browse" });
+                    defaults: new { controller = "Event", action = "Create" });
                 // View event by ID
                 endpoints.MapControllerRoute(name: "viewEvent",
                     pattern: "events/{eventId:int}",

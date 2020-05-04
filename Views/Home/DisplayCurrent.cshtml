@@ -1,6 +1,9 @@
+@using VoteMyst
 @{
     ViewData["Title"] = "Home";
     Layout = "_Layout";
+
+    ulong endUnix = ((DateTime)ViewBag.SubmissionEnd).ToUnixSeconds();
 }
 
 <div class="home-container current-event">
@@ -9,7 +12,7 @@
 
     <p class="current-event-timer">
         Submissions will be closed in
-        <span class="timer" --timer-end-unix="@(new DateTimeOffset(ViewBag.SubmissionEnd).ToUnixTimeSeconds())">0:00:00:00</span>.
+        <span class="timer" --unix-timestamp="@endUnix"></span>.
     </p>
 
     <div class="current-event-metadata">
@@ -23,7 +26,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script type="text/javascript" src="~/js/timer.js"></script>
-}

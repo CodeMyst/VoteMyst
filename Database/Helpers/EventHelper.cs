@@ -40,12 +40,6 @@ namespace VoteMyst.Database
             => context.Events
                 .FirstOrDefault(x => x.EventId == eventId);
 
-        public Event[] GetCurrentEvents()
-            => context.Events
-                .Where(x => x.StartDate <= DateTime.UtcNow)
-                .Where(x => x.VoteEndDate > DateTime.UtcNow)
-                .ToArray();
-
         public Event[] GetEventLikeName(string name)
             => context.Events
                 .Where(x => x.Title.Contains(name, StringComparison.InvariantCultureIgnoreCase))
@@ -74,6 +68,26 @@ namespace VoteMyst.Database
         public Event[] GetAllEventsBefore(DateTime date)
             => context.Events
                 .Where(x => x.StartDate <= date)
+                .ToArray();
+
+        public Event[] GetAllEventsFinishedBefore(DateTime date)
+            => context.Events
+                .Where(x => x.VoteEndDate < date)
+                .OrderByDescending(x => x.StartDate)
+                .ToArray();
+
+        public Event[] GetCurrentEvents()
+            => context.Events
+                .Where(x => x.StartDate <= DateTime.UtcNow)
+                .Where(x => x.VoteEndDate > DateTime.UtcNow)
+                .OrderBy(x => x.VoteEndDate)
+                .ToArray();
+        
+        public Event[] GetVisiblePlannedEvents()
+            => context.Events
+                .Where(x => x.StartDate > DateTime.UtcNow)
+                .Where(x => x.RevealDate <= DateTime.UtcNow)
+                .OrderBy(x => x.StartDate)
                 .ToArray();
     }
 
