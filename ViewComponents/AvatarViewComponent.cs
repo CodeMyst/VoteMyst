@@ -1,27 +1,22 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication;
 
-using VoteMyst.Database;
 using VoteMyst.Database.Models;
 
 namespace VoteMyst.ViewComponents
 {
     public class AvatarViewComponent : ViewComponent
     {
-        private readonly UserProfileBuilder _profileBuilder;
+        private readonly AvatarHelper _avatarHelper;
 
-        public AvatarViewComponent(UserProfileBuilder profileBuilder)
+        public AvatarViewComponent(AvatarHelper avatarHelper)
         {
-            _profileBuilder = profileBuilder;
+            _avatarHelper = avatarHelper;
         }
 
         public Task<IViewComponentResult> InvokeAsync(UserData user) 
         {
-            ViewBag.AvatarUrl = _profileBuilder.GetAvatarUrl(user, out string initials);
+            ViewBag.AvatarUrl = _avatarHelper.GetRelativeAvatarUrl(user, out string initials);
             ViewBag.AvatarInitials = initials;
 
             return Task.FromResult<IViewComponentResult>(View());

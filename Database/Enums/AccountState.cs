@@ -1,0 +1,18 @@
+using System;
+
+namespace VoteMyst.Database
+{
+    public enum AccountState
+    {
+        Banned = 0,
+
+        Deleted = 10,
+
+        Active = 100,
+
+        Moderator = 1000,
+        
+        Admin = 10000
+        
+    }
+}

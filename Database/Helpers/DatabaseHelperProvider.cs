@@ -8,10 +8,10 @@ namespace VoteMyst.Database
         public UserDataHelper Users { get; }
         public VoteHelper Votes { get; }
 
-        public DatabaseHelperProvider(VoteMystContext context)
+        public DatabaseHelperProvider(VoteMystContext context, AvatarHelper avatarHelper)
         {
-            Users = new UserDataHelper(context);
-            Authorization = new AuthorizationHelper(context, Users);
+            Authorization = new AuthorizationHelper(context);
+            Users = new UserDataHelper(context, Authorization, avatarHelper);
             Entries = new EntryHelper(context);
             Events = new EventHelper(context);
             Votes = new VoteHelper(context);

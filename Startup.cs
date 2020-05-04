@@ -99,6 +99,8 @@ namespace VoteMyst
 
             services.AddDbContext<VoteMystContext>(options => options.UseMySql(Configuration["MySQLConnection"]));
 
+            // Avatar Helper is used by the UserDataHelper which gets instantiated by DatabaseHelperProvider
+            services.AddScoped<AvatarHelper>();
             services.AddScoped<DatabaseHelperProvider>();
             services.AddScoped<UserProfileBuilder>();
         }

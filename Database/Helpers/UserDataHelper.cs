@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using VoteMyst.Database.Models;
 
@@ -6,12 +7,17 @@ namespace VoteMyst.Database
 {
     public class UserDataHelper
     {
-        private const string DEFAULT_AVATAR = "defaultAvatar";
-        private readonly VoteMystContext context;
+        private const string GUEST_USER_NAME = "Deleted User";
+        private const string DELETED_USER_NAME = "Deleted User";
+        private readonly VoteMystContext _context;
+        private readonly AuthorizationHelper _authHelper;
+        private readonly AvatarHelper _avatarHelper;
 
-        public UserDataHelper(VoteMystContext context) 
+        public UserDataHelper(VoteMystContext context, AuthorizationHelper authHelper, AvatarHelper avatarHelper) 
         {
-            this.context = context;
+            this._context = context;
+            this._authHelper = authHelper;
+            this._avatarHelper = avatarHelper;
         }
 
         public UserData NewUser()
@@ -23,12 +29,12 @@ namespace VoteMyst.Database
                 JoinDate = DateTime.UtcNow,
                 PermissionLevel = Permissions.Default,
                 Username = guid,
-                Avatar = DEFAULT_AVATAR
+                AccountState = AccountState.Active
             };
 
-            context.UserData.Add(user);
+            _context.UserData.Add(user);
 
-            context.SaveChanges();
+            _context.SaveChanges();
 
             return user;
         }
@@ -38,18 +44,18 @@ namespace VoteMyst.Database
             {
                 UserId = -1,
                 DisplayId = null,
-                Username = "Guest",
+                Username = GUEST_USER_NAME,
                 PermissionLevel = Permissions.Guest,
                 JoinDate = DateTime.Today,
-                Avatar = "defaultAvatar",
+                AccountState = AccountState.Active
             };
 
         public UserData GetUser(string displayId)
-            => context.UserData
+            => _context.UserData
                 .FirstOrDefault(x => x.DisplayId.Equals(displayId));
 
         public UserData GetUser(int userId)
-            => context.UserData
+            => _context.UserData
                 .FirstOrDefault(x => x.UserId == userId);
 
         public UserData GetOrCreateUser(string displayId)
@@ -58,42 +64,81 @@ namespace VoteMyst.Database
         public UserData GetOrCreateUser(int userId)
             => GetUser(userId) ?? NewUser();
 
-        public bool DeleteUser(int userId)
-            => DeleteUser(GetUser(userId));
-
-        public bool DeleteUser(UserData user)
+        public bool WipeUser(int userId) 
         {
-            if (user != null) 
-                context.UserData.Remove(user);
+            UserData user = GetUser(userId);
 
-            return context.SaveChanges() > 0;
+            user.Username = DELETED_USER_NAME;
+
+            string avatarUrl = _avatarHelper.GetAbsoluteAvatarUrl(user);
+            
+            if (avatarUrl != null && File.Exists(avatarUrl))
+                File.Delete(avatarUrl); 
+
+            Authorization[] auths = _authHelper.GetAllAuthorizationsOfUser(user.UserId);
+            
+            foreach (Authorization auth in auths)
+                auth.Valid = false;
+
+            return _context.SaveChanges() > 0;
         }
 
         public bool AddPermission(UserData user, Permissions permissions)
         {
             user.PermissionLevel |= permissions;
 
-            context.UserData.Update(user);
+            _context.UserData.Update(user);
 
-            return context.SaveChanges() > 0;
+            return _context.SaveChanges() > 0;
         }
 
         public bool RemovePermission(UserData user, Permissions permissions)
         {
             user.PermissionLevel ^= permissions;
 
-            context.UserData.Update(user);
+            _context.UserData.Update(user);
 
-            return context.SaveChanges() > 0;
+            return _context.SaveChanges() > 0;
         }
 
         public bool SetPermission(UserData user, Permissions permissions)
         {
             user.PermissionLevel = permissions;
 
-            context.UserData.Update(user);
+            _context.UserData.Update(user);
 
-            return context.SaveChanges() > 0;
+            return _context.SaveChanges() > 0;
+        }
+
+        public bool SetAccountState(UserData user, AccountState accountState)
+        {
+            user.AccountState = accountState;
+            user.PermissionLevel = ResolvePermissions(user, accountState);
+
+            return _context.SaveChanges() > 0;
+        }
+
+        private Permissions ResolvePermissions(UserData user, AccountState accountState)
+        {
+            Permissions perms;
+
+            switch(accountState)
+            {
+                case AccountState.Admin:
+                    perms = Permissions.Admin;
+                    break;
+                case AccountState.Moderator:
+                    perms = Permissions.Moderator;
+                    break;
+                case AccountState.Banned:
+                    perms = Permissions.Banned;
+                    break;
+                default:
+                    perms = user.PermissionLevel;
+                    break;
+            }
+
+            return perms;
         }
     }
 
