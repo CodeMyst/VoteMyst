@@ -1,0 +1,41 @@
+@using System;
+
+<div class="event">
+    <div class="event-container">
+        
+        <div class="event-title">@ViewBag.EventName</div>
+        <div class="event-desciption">@ViewBag.Description</div>
+
+        <div class="event-dates">
+            <div class="start-date">@ViewBag.StartDate</div>
+            <div class="submit-end-date">@ViewBag.SubmitEndDate</div>
+            <div class="vote-end-date">@ViewBag.VoteEndDate</div>
+        </div>
+
+        @if(ViewBag.Finished)
+        {
+            <div>Event is finished!</div>
+        }
+        else
+        {
+            @if(ViewBag.StartDate > DateTime.UtcNow)
+            {
+                <div>Time left until event starts
+                    <span class="timer" --timer-end-unix="@(new DateTimeOffset(ViewBag.StartDate).ToUnixTimeSeconds())">0.00:00:00</span>
+                </div>
+            }
+            else if(ViewBag.SubmitEndDate > DateTime.UtcNow)
+            {
+                <div>Time left until submissions close
+                    <span class="timer" --timer-end-unix="@(new DateTimeOffset(ViewBag.SubmitEndDate).ToUnixTimeSeconds())">0.00:00:00</span>
+                </div>
+            }
+            else if(ViewBag.VoteEndDate > DateTime.UtcNow)
+            {
+                <div>Time left until voting closes
+                    <span class="timer" --timer-end-unix="@(new DateTimeOffset(ViewBag.VoteEndDate).ToUnixTimeSeconds())">0.00:00:00</span>
+                </div>
+            }
+        }
+    </div>
+</div>

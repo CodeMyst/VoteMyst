@@ -25,8 +25,9 @@ input:focus, select:focus, textarea:focus {
     outline: none;
 }
 
-button {
+button, .button {
     display: inline-block;
+    margin: 1rem 0;
     height: 38px;
     line-height: 38px;
     padding: 0 30px;
@@ -38,15 +39,16 @@ button {
     font-weight: bold;
     letter-spacing: 0.1rem;
     text-transform: uppercase;
+    text-align: center;
     cursor: pointer;
+    white-space: nowrap;
 }
-button:hover {
+button:hover, .button:hover {
     background-color: var(--color-nanolight);
     color: var(--color-white);
 }
 
 .form-submit {
-    margin: 1.5rem 0;
 }
 .form-submit span {
     margin: auto 30px;

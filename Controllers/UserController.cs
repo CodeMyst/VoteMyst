@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Dynamic;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -10,27 +11,22 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using VoteMyst.Discord;
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
+using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
 {
     public class UserController : Controller
     {
-        public class UserDisplay
-        {
-            public bool IsSelf { get; set; }
-            public string Username { get; set; }
-            public string DisplayId { get; set; }
-            public string PermissionGroup { get; set; }
-            public DateTime JoinDate { get; set; }
-        }
+        private readonly UserProfileBuilder _profileBuilder;
+        private readonly DatabaseHelperProvider _helpers;
 
-        private UserProfileBuilder _profileBuilder;
-
-        public UserController(UserProfileBuilder profileBuilder) 
+        public UserController(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers) 
         {
             _profileBuilder = profileBuilder;
+            _helpers = helpers;
         }
 
+        [RequirePermissions(Permissions.ViewUsers)]
         public IActionResult Search() 
         {
             return View();
@@ -47,24 +43,46 @@ namespace VoteMyst.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [RequirePermissions(Permissions.ViewUsers)]
         public IActionResult Display(string displayId) 
         {
-            UserData user = _profileBuilder.FromId(displayId);
-            if (user == null)
+            UserData targetUser = _profileBuilder.FromId(displayId);
+            if (targetUser == null)
                 return View("NotFound");
 
-            UserData selfUser = _profileBuilder.FromContext(HttpContext);
+            UserData selfUser = _profileBuilder.FromPrincipal(User);
+            Entry[] entries = _helpers.Entries.GetEntriesFromUser(selfUser);
 
-            // TODO: Make sure the page has the information needed to display the profile
-            ViewBag.User = new UserDisplay 
+            ViewBag.IsSelf = targetUser.DisplayId == selfUser.DisplayId;
+
+            ViewBag.SelfUser = selfUser;
+            ViewBag.InspectedUser = targetUser;
+
+            ViewBag.InspectedUserGroup = targetUser.DeterminePermissionGroup();
+            ViewBag.InspectedTotalEntries = entries.Length;
+            ViewBag.InspectedTotalVotes = entries.Select(e => _helpers.Votes.GetAllVotesForEntry(e).Length).Sum();
+
+            bool allowAdminDashboard = targetUser.DisplayId != selfUser.DisplayId
+                && selfUser.IsAdmin() && !targetUser.IsAdmin();
+            ViewBag.AllowAdminDashboard = allowAdminDashboard;
+            if (allowAdminDashboard)
             {
-                IsSelf = user.DisplayId == selfUser.DisplayId,
-                Username = user.Username,
-                DisplayId = user.DisplayId,
-                PermissionGroup = user.PermissionLevel.ToString(),
-                JoinDate = user.JoinDate
-            };
-            return View(nameof(Display));
+                Permissions[] permissions = Enum.GetValues(typeof(Permissions)).Cast<Permissions>().ToArray();
+                Permissions[] groups = new Permissions[] {
+                    Permissions.Banned, Permissions.Guest, Permissions.Default, Permissions.Moderator, Permissions.Admin
+                };
+                Permissions[] permissionsNoGroups = permissions.Except(groups).ToArray();
+                
+                ViewBag.UserPermissions = (ulong)targetUser.PermissionLevel;
+                ViewBag.PermissionEntries = permissionsNoGroups
+                    .Select(p => (p.ToString(), (ulong)p, targetUser.PermissionLevel.HasFlag(p)))
+                    .ToArray();
+                ViewBag.PermissionGroups = groups
+                    .Select(g => (g.ToString(), (ulong)g))
+                    .ToArray();
+            }
+
+            return View("Display");
         }
 
         public IActionResult DisplaySelf()
@@ -72,13 +90,27 @@ namespace VoteMyst.Controllers
             if (!User.Identity.IsAuthenticated)
                 return Forbid();
 
-            UserData selfUser = _profileBuilder.FromContext(HttpContext);
+            UserData selfUser = _profileBuilder.FromPrincipal(User);
             return Display(selfUser.DisplayId);
         }
 
+        [RequirePermissions(Permissions.ModifyUsers)]
         public IActionResult BanUser(int id)
         {
             throw new NotImplementedException();
+        }
+
+        [HttpPost]
+        [RequirePermissions(Permissions.ModifyUsers)]
+        public IActionResult Display(string displayId, 
+            string username = null,
+            string avatar = null,
+            ulong? permissions = 0)
+        {
+            if (permissions.HasValue)
+                _helpers.Users.SetPermission(_helpers.Users.GetUser(displayId), (Permissions)permissions.Value);
+
+            return Display(displayId);
         }
     }
 }

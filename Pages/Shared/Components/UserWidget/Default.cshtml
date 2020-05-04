@@ -1,8 +1,8 @@
 @if (@ViewBag.IsLoggedIn)
 {
     <a href="/users/me" class="widget user-widget">
-        <img class="avatar" src="/assets/avatars/@(ViewBag.DisplayId).png" />
-        <p class="username">@ViewBag.Username</p>
+        @await Component.InvokeAsync("Avatar", @ViewBag.User)
+        <p class="username">@ViewBag.User.Username</p>
     </a>
 }
 else 

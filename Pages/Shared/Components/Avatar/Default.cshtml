@@ -1,0 +1,10 @@
+@if(ViewBag.AvatarUrl != null) 
+{
+    <img class="avatar" src="@ViewBag.AvatarUrl" />
+}
+else
+{
+    <div class="avatar avatar-default">
+        <p>@ViewBag.AvatarInitials</p>
+    </div>
+}

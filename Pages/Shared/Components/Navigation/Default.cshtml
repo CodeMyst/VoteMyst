@@ -1,0 +1,17 @@
+<nav>
+    <a href="/">Home</a>
+    <a href="/events">Browse Events</a>
+
+    @if (ViewBag.HasCurrentEvent)
+    {
+        <a href="/vote">Current Event</a>
+        <a href="/submit">Submit Entry</a>
+    }
+
+    @if (ViewBag.IsAdmin)
+    {
+        <div class="admin">
+            <a href="/events/new">Create Event</a>
+        </div>
+    }
+</nav>
