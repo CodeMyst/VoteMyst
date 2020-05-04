@@ -1,0 +1,68 @@
+@using System;
+@using VoteMyst;
+
+@{
+    ulong startUnix = ((DateTime)ViewBag.Event.StartDate).ToUnixSeconds();
+    ulong endUnix = ((DateTime)ViewBag.Event.EndDate).ToUnixSeconds();
+    ulong voteEndUnix = ((DateTime)ViewBag.Event.VoteEndDate).ToUnixSeconds();
+
+    bool hasStarted = ViewBag.Event.StartDate <= DateTime.UtcNow;
+    bool haveSubmissionsClosed = ViewBag.Event.EndDate <= DateTime.UtcNow;
+    bool haveVotingsClosed = ViewBag.Event.VoteEndDate <= DateTime.UtcNow;
+}
+
+<div class="event">
+    <div class="event-info">
+        <a href="/events/@ViewBag.Event.EventId" class="event-title">@ViewBag.Event.Title</a>
+        @if (ViewBag.Event.StartDate <= DateTime.UtcNow) 
+        {
+            <p class="event-description">@ViewBag.Event.Description</p>
+        }
+    </div>
+
+    <table class="event-dates">
+        <tr>
+            <th>@(hasStarted ? "Event started" : "Event start")</th>
+            <td class="start-date local-date" --unix-timestamp="@startUnix"></td>
+        </tr>
+        <tr>
+            <th>@(haveSubmissionsClosed ? "Submissions closed" : "Submissions close")</th>
+            <td class="start-date local-date" --unix-timestamp="@endUnix"></td>
+        </tr>
+        <tr>
+            <th>@(haveVotingsClosed ? "Votings closed" : "Votings close")</th>
+            <td class="start-date local-date" --unix-timestamp="@voteEndUnix"></td>
+        </tr>
+    </table>
+
+    <div class="event-state">
+        @if(ViewBag.Finished)
+        {
+            <span>The event is over!</span>
+        }
+        else
+        {
+            @if(!hasStarted)
+            {
+                <span>
+                    The event starts in
+                    <span class="timer" --unix-timestamp="@startUnix">0.00:00:00</span>.
+                </span>
+            }
+            else if(!haveSubmissionsClosed)
+            {
+                <span>
+                    Submissions will be closed in
+                    <span class="timer" --unix-timestamp="@endUnix">0.00:00:00</span>.
+                </span>
+            }
+            else if(!haveVotingsClosed)
+            {
+                <span>
+                    Voting will be closed in
+                    <span class="timer" --unix-timestamp="@voteEndUnix">0.00:00:00</span>.
+                </span>
+            }
+        }
+    </div>
+</div>
