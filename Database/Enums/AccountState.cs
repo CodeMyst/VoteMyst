@@ -8,6 +8,8 @@ namespace VoteMyst.Database
 
         Deleted = 10,
 
+        Guest = 50,
+
         Active = 100,
 
         Moderator = 1000,

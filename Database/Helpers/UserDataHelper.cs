@@ -7,7 +7,7 @@ namespace VoteMyst.Database
 {
     public class UserDataHelper
     {
-        private const string GUEST_USER_NAME = "Deleted User";
+        private const string GUEST_USER_NAME = "Guest User";
         private const string DELETED_USER_NAME = "Deleted User";
         private readonly VoteMystContext _context;
         private readonly AuthorizationHelper _authHelper;
@@ -26,9 +26,9 @@ namespace VoteMyst.Database
             UserData user = new UserData()
             {
                 DisplayId = guid,
-                JoinDate = DateTime.UtcNow,
-                PermissionLevel = Permissions.Default,
                 Username = guid,
+                PermissionLevel = AccountState.Active.GetDefaultPermissions(),
+                JoinDate = DateTime.UtcNow,
                 AccountState = AccountState.Active
             };
 
@@ -45,9 +45,9 @@ namespace VoteMyst.Database
                 UserId = -1,
                 DisplayId = null,
                 Username = GUEST_USER_NAME,
-                PermissionLevel = Permissions.Guest,
+                PermissionLevel = AccountState.Guest.GetDefaultPermissions(),
                 JoinDate = DateTime.Today,
-                AccountState = AccountState.Active
+                AccountState = AccountState.Guest
             };
 
         public UserData GetUser(string displayId)
@@ -113,32 +113,8 @@ namespace VoteMyst.Database
         public bool SetAccountState(UserData user, AccountState accountState)
         {
             user.AccountState = accountState;
-            user.PermissionLevel = ResolvePermissions(user, accountState);
 
             return _context.SaveChanges() > 0;
-        }
-
-        private Permissions ResolvePermissions(UserData user, AccountState accountState)
-        {
-            Permissions perms;
-
-            switch(accountState)
-            {
-                case AccountState.Admin:
-                    perms = Permissions.Admin;
-                    break;
-                case AccountState.Moderator:
-                    perms = Permissions.Moderator;
-                    break;
-                case AccountState.Banned:
-                    perms = Permissions.Banned;
-                    break;
-                default:
-                    perms = user.PermissionLevel;
-                    break;
-            }
-
-            return perms;
         }
     }
 

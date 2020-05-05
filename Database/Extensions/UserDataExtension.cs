@@ -20,7 +20,7 @@ namespace VoteMyst.Database
         public static bool IsAdmin(this UserData user)
             => user.AccountState == AccountState.Admin;
 
-        public static string DeterminePermissionGroup(this UserData user)
+        public static string GetAccountState(this UserData user)
             =>  user.AccountState.ToString();
     }    
 

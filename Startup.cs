@@ -20,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 
 using VoteMyst.Discord;
 using VoteMyst.Database;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VoteMyst
 {

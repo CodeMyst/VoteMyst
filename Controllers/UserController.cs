@@ -17,6 +17,9 @@ namespace VoteMyst.Controllers
 {
     public class UserController : Controller
     {
+        private static Permissions[] _permissions = Enum.GetValues(typeof(Permissions)).Cast<Permissions>().ToArray();
+        private static AccountState[] _groups = Enum.GetValues(typeof(AccountState)).Cast<AccountState>().ToArray();
+
         private readonly UserProfileBuilder _profileBuilder;
         private readonly DatabaseHelperProvider _helpers;
 
@@ -51,33 +54,25 @@ namespace VoteMyst.Controllers
                 return View("NotFound");
 
             UserData selfUser = _profileBuilder.FromPrincipal(User);
-            Entry[] entries = _helpers.Entries.GetEntriesFromUser(selfUser);
+            Entry[] entries = _helpers.Entries.GetEntriesFromUser(targetUser);
 
             ViewBag.IsSelf = targetUser.DisplayId == selfUser.DisplayId;
 
             ViewBag.SelfUser = selfUser;
             ViewBag.InspectedUser = targetUser;
 
-            ViewBag.InspectedUserGroup = targetUser.DeterminePermissionGroup();
+            ViewBag.InspectedUserGroup = targetUser.GetAccountState();
             ViewBag.InspectedTotalEntries = entries.Length;
             ViewBag.InspectedTotalVotes = entries.Select(e => _helpers.Votes.GetAllVotesForEntry(e).Length).Sum();
+            ViewBag.AllowAdminDashboard = selfUser.IsAdmin();
 
-            bool allowAdminDashboard = targetUser.DisplayId != selfUser.DisplayId
-                && selfUser.IsAdmin() && !targetUser.IsAdmin();
-            ViewBag.AllowAdminDashboard = allowAdminDashboard;
-            if (allowAdminDashboard)
-            {
-                Permissions[] permissions = Enum.GetValues(typeof(Permissions)).Cast<Permissions>().ToArray();
-                Permissions[] groups = new Permissions[] {
-                    Permissions.Banned, Permissions.Guest, Permissions.Default, Permissions.Moderator, Permissions.Admin
-                };
-                Permissions[] permissionsNoGroups = permissions.Except(groups).ToArray();
-                
+            if (selfUser.IsAdmin())
+            {                
                 ViewBag.UserPermissions = (ulong)targetUser.PermissionLevel;
-                ViewBag.PermissionEntries = permissionsNoGroups
+                ViewBag.PermissionEntries = _permissions
                     .Select(p => (p.ToString(), (ulong)p, targetUser.PermissionLevel.HasFlag(p)))
                     .ToArray();
-                ViewBag.PermissionGroups = groups
+                ViewBag.AccountGroups = _groups
                     .Select(g => (g.ToString(), (ulong)g))
                     .ToArray();
             }
@@ -91,13 +86,11 @@ namespace VoteMyst.Controllers
                 return Forbid();
 
             UserData selfUser = _profileBuilder.FromPrincipal(User);
-            return Display(selfUser.DisplayId);
-        }
 
-        [RequirePermissions(Permissions.ModifyUsers)]
-        public IActionResult BanUser(int id)
-        {
-            throw new NotImplementedException();
+            if (selfUser.IsBanned())
+                return Forbid();
+
+            return Display(selfUser.DisplayId);
         }
 
         [HttpPost]
