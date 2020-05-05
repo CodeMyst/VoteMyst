@@ -62,6 +62,12 @@ namespace VoteMyst.Database
             => context.Entries
                 .Where(x => x.UserId == userId)
                 .FirstOrDefault(x => x.EventId == eventId);
+
+        public bool DeleteEntry(Entry entry)
+        {
+            context.Entries.Remove(entry);
+            return context.SaveChanges() > 0;
+        }
     }
 
 }
