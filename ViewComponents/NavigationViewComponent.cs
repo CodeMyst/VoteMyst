@@ -24,10 +24,15 @@ namespace VoteMyst.ViewComponents
         public Task<IViewComponentResult> InvokeAsync() 
         {
             Event[] events = _helpers.Events.GetCurrentEvents();
+            Event[] planned = _helpers.Events.GetVisiblePlannedEvents();
             UserData user = _profileBuilder.FromPrincipal(UserClaimsPrincipal);
 
+            ViewBag.HasBrowseableEvents = events.Length > 0 || planned.Length > 0;
             ViewBag.HasCurrentEvent = events.Length > 0;
-            ViewBag.IsAdmin = user.IsAdmin();
+
+            ViewBag.CanCreateEvents = user.HasPermission(Permissions.CreateEvents);
+            ViewBag.CanModifyUser = user.HasPermission(Permissions.ModifyUsers);
+            ViewBag.HasOutlineEntries = ViewBag.CanCreateEvents || ViewBag.CanModifyUser;
             
             return Task.FromResult<IViewComponentResult>(View());
         }

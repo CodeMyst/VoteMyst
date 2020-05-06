@@ -43,39 +43,43 @@
 
 @if(ViewBag.AllowAdminDashboard)
 {
-    <form class="panel user-admin-panel" method="post">
-        <table class="user-permission-table">
-            @foreach(var entry in ViewBag.PermissionEntries)
-            {
-                <tr>
-                    <td>
-                        <p class="permission-label">@entry.Item1</p>
-                    </td>
-                    <td>
-                        <div class="permission-checkbox" 
-                            --permissionflag="@entry.Item2"
-                            @(entry.Item3 ? "checked" : "")>
-                            <div class="knob"></div>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </table>
-        <table class="user-groups-table">
-            @foreach(var entry in ViewBag.AccountGroups)
-            {
-                <tr>
-                    <td>
-                        <div class="button permission-button"
-                            --permissionflag="@entry.Item2">Apply @entry.Item1</div>
-                    </td>
-                </tr>
-            }
-        </table>
-        <input type="hidden" name="userId" value="@ViewBag.InspectedUser.DisplayId" />
-        <input type="hidden" name="permissions" value="0" />
-        <button type="submit">Update Permissions</button>
-    </form>
+    <div class="panel">
+        <form id="permissionsForm" class="user-admin-panel" method="post" action="@ViewBag.InspectedUser.DisplayId">
+            <table class="user-permission-table">
+                @foreach(var entry in ViewBag.PermissionEntries)
+                {
+                    <tr>
+                        <td>
+                            <p class="permission-label">@entry.Item1</p>
+                        </td>
+                        <td>
+                            <div class="permission-checkbox" 
+                                --permissionflag="@entry.Item2"
+                                @(entry.Item3 ? "checked" : "")>
+                                <div class="knob"></div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </table>
+            <table class="user-groups-table">
+                @foreach(var entry in ViewBag.AccountGroups)
+                {
+                    <tr>
+                        <td>
+                            <div class="button group-button"
+                                --permissionflag="@entry.Item2">Apply @entry.Item1</div>
+                        </td>
+                    </tr>
+                }
+            </table>
+            <input type="hidden" name="userId" value="@ViewBag.InspectedUser.DisplayId" />
+            <input type="hidden" name="permissions" value="0" />
+            <input type="hidden" name="group" value="@ViewBag.InspectedUserGroupLevel" />
+            <button type="submit">Update Permissions</button>
+        </form>
+    </div>
+    
 
     <script>
         function recalculatePermissions() {
@@ -86,7 +90,7 @@
                         permissions += BigInt(c.getAttribute("--permissionflag"));
                     }
                 });
-            document.forms[0]["permissions"].value = permissions;
+            document.querySelectorAll("#permissionsForm")[0]["permissions"].value = permissions;
         }
         function applyPermissions(permissions) {
             document.querySelectorAll(".permission-checkbox")
@@ -99,7 +103,7 @@
                         c.removeAttribute("checked");
                     }
                 });
-            document.forms[0]["permissions"].value = permissions;
+            document.querySelectorAll("#permissionsForm")[0]["permissions"].value = permissions;
         }
         recalculatePermissions();
 
@@ -108,9 +112,12 @@
                 c.toggleAttribute("checked");
                 recalculatePermissions();
             }));
-        document.querySelectorAll(".permission-button")
+        document.querySelectorAll(".group-button")
             .forEach(c => c.addEventListener("click", e => {
-                applyPermissions(BigInt(c.getAttribute("--permissionflag")));
+                let val = BigInt(c.getAttribute("--permissionflag"));
+                let form = document.querySelectorAll("#permissionsForm")[0];
+                form["group"].value = val; 
+                form.submit();
             }));
     </script>
 }

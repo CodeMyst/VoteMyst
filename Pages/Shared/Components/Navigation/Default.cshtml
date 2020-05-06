@@ -1,6 +1,10 @@
 <nav>
     <a href="/">Home</a>
-    <a href="/events">Browse Events</a>
+
+    @if (ViewBag.HasBrowseableEvents)
+    {
+        <a href="/events">Browse Events</a>
+    }
 
     @if (ViewBag.HasCurrentEvent)
     {
@@ -8,10 +12,18 @@
         <a href="/submit">Submit Entry</a>
     }
 
-    @if (ViewBag.IsAdmin)
+    @if (ViewBag.HasOutlineEntries)
     {
         <div class="admin">
-            <a href="/events/new">Create Event</a>
+            @if (ViewBag.CanCreateEvents)
+            {
+                <a href="/events/new">Create Event</a>
+            }
+            @if (ViewBag.CanModifyUser)
+            {
+                <a href="/users">Find User</a>
+            }
         </div>
     }
+
 </nav>

@@ -20,7 +20,8 @@ namespace VoteMyst.Database
             {
                 UserId = userId,
                 ServiceUserId = ComputeSha256Hash(serviceUserId),
-                ServiceType = serviceType
+                ServiceType = serviceType,
+                Valid = true
             };
 
             context.Authorizations.Add(authorization);

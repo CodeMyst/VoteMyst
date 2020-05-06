@@ -15,6 +15,5 @@ namespace VoteMyst.Database
         Moderator = 1000,
         
         Admin = 10000
-        
     }
 }

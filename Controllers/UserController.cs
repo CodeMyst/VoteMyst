@@ -18,18 +18,34 @@ namespace VoteMyst.Controllers
     public class UserController : Controller
     {
         private static Permissions[] _permissions = Enum.GetValues(typeof(Permissions)).Cast<Permissions>().ToArray();
-        private static AccountState[] _groups = Enum.GetValues(typeof(AccountState)).Cast<AccountState>().ToArray();
+        private static AccountState[] _groups =  AccountStateExtension.ApplyableStates;
 
         private readonly UserProfileBuilder _profileBuilder;
         private readonly DatabaseHelperProvider _helpers;
+        private readonly TestDataCreator _testData;
 
-        public UserController(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers) 
+        public UserController(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers, TestDataCreator testData) 
         {
             _profileBuilder = profileBuilder;
             _helpers = helpers;
+            _testData = testData;
         }
 
-        [RequirePermissions(Permissions.ViewUsers)]
+        public IActionResult CreateTestData()
+        {
+            _testData.CreateUserData();
+
+            return DisplaySelf();
+        }
+
+        public IActionResult WipeAccount() 
+        {
+            UserData selfUser = _profileBuilder.FromPrincipal(User);
+            _helpers.Users.WipeUser(selfUser.UserId);
+            return Logout();
+        }
+
+        [RequirePermissions(Permissions.ModifyUsers)]
         public IActionResult Search() 
         {
             return View();
@@ -62,11 +78,12 @@ namespace VoteMyst.Controllers
             ViewBag.InspectedUser = targetUser;
 
             ViewBag.InspectedUserGroup = targetUser.GetAccountState();
+            ViewBag.InspectedUserGroupLevel = (int) targetUser.AccountState;
             ViewBag.InspectedTotalEntries = entries.Length;
             ViewBag.InspectedTotalVotes = entries.Select(e => _helpers.Votes.GetAllVotesForEntry(e).Length).Sum();
-            ViewBag.AllowAdminDashboard = selfUser.IsAdmin();
+            ViewBag.AllowAdminDashboard = selfUser.HasPermission(Permissions.ModifyUsers);
 
-            if (selfUser.IsAdmin())
+            if (ViewBag.AllowAdminDashboard)
             {                
                 ViewBag.UserPermissions = (ulong)targetUser.PermissionLevel;
                 ViewBag.PermissionEntries = _permissions
@@ -95,15 +112,24 @@ namespace VoteMyst.Controllers
 
         [HttpPost]
         [RequirePermissions(Permissions.ModifyUsers)]
-        public IActionResult Display(string displayId, 
+        public IActionResult Display( 
+            string userId,
             string username = null,
             string avatar = null,
-            ulong? permissions = 0)
+            ulong? permissions = 0,
+            int? group = 0)
         {
-            if (permissions.HasValue)
-                _helpers.Users.SetPermission(_helpers.Users.GetUser(displayId), (Permissions)permissions.Value);
+            UserData user = _helpers.Users.GetUser(userId);
+            
+            if (permissions.HasValue && (ulong) user.PermissionLevel != permissions) 
+                _helpers.Users.SetPermission(_helpers.Users.GetUser(userId), (Permissions) permissions.Value);
 
-            return Display(displayId);
+            if (group.HasValue && (int) user.AccountState != group) {
+                _helpers.Users.SetPermission(user, ((AccountState) group).GetDefaultPermissions());
+                _helpers.Users.SetAccountState(user, (AccountState) group.Value);
+            }
+
+            return Display(userId);
         }
     }
 }

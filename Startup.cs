@@ -104,6 +104,7 @@ namespace VoteMyst
             services.AddScoped<AvatarHelper>();
             services.AddScoped<DatabaseHelperProvider>();
             services.AddScoped<UserProfileBuilder>();
+            services.AddScoped<TestDataCreator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -141,6 +142,12 @@ namespace VoteMyst
                     pattern: "logout",
                     defaults: new { controller = "User", action = "Logout" });
                     
+                // Test DAta
+                endpoints.MapControllerRoute(name: "createTestData",
+                    pattern: "createData",
+                    defaults: new { controller = "User", action = "CreateTestData" });
+
+
                 // User searching
                 endpoints.MapControllerRoute(name: "searchUser",
                     pattern: "users",
