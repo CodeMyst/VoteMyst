@@ -78,6 +78,9 @@ footer a {
     font-weight: bold;
     letter-spacing: 0.05em;
 }
+footer span {
+    padding: 0 0.4rem;
+}
 
 table {
     white-space: nowrap;
