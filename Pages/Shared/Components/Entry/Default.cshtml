@@ -1,17 +1,18 @@
-<div class="post">
-    <div class="post-container">
-        @if(ViewBag.DisplayUser)
-        {
-            <div class="post-user">
-                <a href="/users/@ViewBag.User.DisplayId">
-                    @await Component.InvokeAsync("Avatar", @ViewBag.User)
-                    <p class="username">@ViewBag.User.Username</p>
-                </a>
-                <p class="post-date">@ViewBag.Entry.SubmitDate.ToString("dd/MM/yyyy")</p>
-            </div>
-        }
-        <div class="post-image">
-            <img src="@ViewBag.Entry.Content" />
+<div class="post" entry-id="@ViewBag.Entry.EntryId" @(ViewBag.HasVoted ? "voted" : "")>
+    @if(ViewBag.DisplayUser)
+    {
+        <div class="post-user">
+            <a href="/users/@ViewBag.User.DisplayId">
+                @await Component.InvokeAsync("Avatar", @ViewBag.User)
+                <p class="username">@ViewBag.User.Username</p>
+            </a>
+            <p class="post-date">@ViewBag.Entry.SubmitDate.ToString("dd/MM/yyyy")</p>
         </div>
+    }
+    <div class="post-image">
+        <img src="@ViewBag.Entry.Content" />
     </div>
+    
+    <img class="post-absolute-element post-vote" src="/img/heart.png"/>
+    <img class="post-absolute-element post-has-voted" src="/img/heart.png"/>
 </div>

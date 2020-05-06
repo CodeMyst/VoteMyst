@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,10 +13,28 @@ namespace VoteMyst.Controllers
 {
     public class VoteController : Controller
     {
+        public class VoteActionData 
+        {
+            public int EntryId { get; set; }
+        }
+        public class VoteActionResult
+        {
+            public bool ActionSuccess { get; set; }
+            public bool HasVote { get; set; }
+
+            public VoteActionResult(bool success, bool hasVote)
+            {
+                ActionSuccess = success;
+                HasVote = hasVote;
+            }
+        }
+
+        private readonly UserProfileBuilder _builder;
         private readonly DatabaseHelperProvider _helpers;
 
-        public VoteController(DatabaseHelperProvider helpers)
+        public VoteController(UserProfileBuilder builder, DatabaseHelperProvider helpers)
         {
+            _builder = builder;
             _helpers = helpers;
         }
 
@@ -38,6 +57,38 @@ namespace VoteMyst.Controllers
             ViewBag.RandomizedEntries = randomizedEntries;
 
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Cast([FromBody] VoteActionData data)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+
+            UserData user = _builder.FromPrincipal(User);
+            Vote vote = _helpers.Votes.GetVoteByUserOnEntry(user.UserId, data.EntryId);
+
+            if (vote != null)
+                return Ok(new VoteActionResult(false, true));
+            
+            _helpers.Votes.AddVote(data.EntryId, user.UserId);
+            return Ok(new VoteActionResult(true, true));
+        }
+        
+        [HttpPost]
+        public IActionResult Remove([FromBody] VoteActionData data)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+
+            UserData user = _builder.FromPrincipal(User);
+            Vote vote = _helpers.Votes.GetVoteByUserOnEntry(user.UserId, data.EntryId);
+
+            if (vote == null)
+                return Ok(new VoteActionResult(false, false));
+
+            _helpers.Votes.DeleteVote(data.EntryId, user.UserId);
+            return Ok(new VoteActionResult(true, false));
         }
     }
 }
