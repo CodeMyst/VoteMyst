@@ -28,6 +28,7 @@ namespace VoteMyst.Controllers
                 // TODO: Maybe support multiple events?
                 Event currentEvent = currentEvents[0];
 
+                ViewBag.Id = currentEvent.EventId;
                 ViewBag.Name = currentEvent.Title;
                 ViewBag.Description = currentEvent.Description;
                 ViewBag.SubmissionEnd = currentEvent.EndDate;

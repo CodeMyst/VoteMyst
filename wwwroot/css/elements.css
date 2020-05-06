@@ -1,0 +1,27 @@
+.panel {
+    display: block;
+    box-sizing: border-box;
+
+    padding: 1rem;
+    margin: 1rem 0;
+    width: 100%;
+    
+    background-color: var(--color-dark-gray);
+    border-radius: var(--panel-border-radius);
+}
+.panel.small {
+    width: 100%;
+    max-width: 640px;
+}
+.panel.message {
+    padding: 0.8rem 1.6rem;
+}
+.message.success {
+    background-color: var(--color-success-panel);
+}
+.message.warning {
+    background-color: var(--color-warning-panel);
+}
+.message.error {
+    background-color: var(--color-error-panel);
+}

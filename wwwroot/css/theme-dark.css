@@ -1,0 +1,15 @@
+:root
+{
+    --color-nano: #141414;
+    --color-dark-gray: #222222;
+    --color-gray: #525252;
+    --color-light-gray: #a6a6a6;
+    --color-white: #ffffff;
+
+    --color-success-text: #b1dd5e;
+    --color-success-panel: #b1dd5e44;
+    --color-warning-text: #ddbb5e;
+    --color-warning-panel: #ddbb5e55;
+    --color-error-text: #dd5e5e;
+    --color-error-panel: #dd5e5e55;
+}

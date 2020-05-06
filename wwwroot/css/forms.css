@@ -2,8 +2,8 @@ form {
     width: 100%;
 }
 
-input[type=text], input[type="date"], select, textarea {
-    background-color: var(--color-nanolight);
+input[type=text], input[type="date"], input[type="datetime"], input[type="datetime-local"], select, textarea {
+    background-color: var(--color-dark-gray);
     color: var(--color-white);
     border: none;
     border-radius: 0.5rem;
@@ -16,9 +16,6 @@ input[type=text], textarea {
     max-height: 200px;
     min-height: 1.1rem;
     resize: vertical;
-}
-input[type=text][--search] {
-    
 }
 
 input:focus, select:focus, textarea:focus {
@@ -44,15 +41,16 @@ button, .button {
     white-space: nowrap;
 }
 button:hover, .button:hover {
-    background-color: var(--color-nanolight);
+    background-color: var(--color-mystlue);
     color: var(--color-white);
 }
 
 .form-submit {
+    display: flex;
 }
-.form-submit span {
+.form-submit div {
     margin: auto 30px;
-    color: red;
+    color: var(--color-mysted);
 }
 
 form table th {

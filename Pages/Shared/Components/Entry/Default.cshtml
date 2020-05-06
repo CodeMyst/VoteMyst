@@ -3,8 +3,10 @@
         @if(ViewBag.DisplayUser)
         {
             <div class="post-user">
-                @await Component.InvokeAsync("Avatar", @ViewBag.User)
-                <p class="username">@ViewBag.User.Username</p>
+                <a href="/users/@ViewBag.User.DisplayId">
+                    @await Component.InvokeAsync("Avatar", @ViewBag.User)
+                    <p class="username">@ViewBag.User.Username</p>
+                </a>
                 <p class="post-date">@ViewBag.Entry.SubmitDate.ToString("dd/MM/yyyy")</p>
             </div>
         }

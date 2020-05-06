@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using System.Dynamic;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
@@ -75,7 +75,7 @@ namespace VoteMyst.Controllers
                 
                 ViewBag.UserPermissions = (ulong)targetUser.PermissionLevel;
                 ViewBag.PermissionEntries = permissionsNoGroups
-                    .Select(p => (p.ToString(), (ulong)p, targetUser.PermissionLevel.HasFlag(p)))
+                    .Select(p => (string.Join(' ', (Regex.Split(p.ToString(), "(?=[A-Z][^A-Z])"))), (ulong)p, targetUser.PermissionLevel.HasFlag(p)))
                     .ToArray();
                 ViewBag.PermissionGroups = groups
                     .Select(g => (g.ToString(), (ulong)g))

@@ -1,0 +1,26 @@
+:root 
+{
+    /* The following colors are constant and should not be changed by theme sheets. */
+
+    --color-mystge: #ee720d;
+    --color-mystlue: #1eaedb;
+    --color-mysted: #ff4c4c;
+    --color-badge-admin: #9a90ff;
+    --color-badge-moderator: #90ff99;
+    --color-badge-banned: #bd1c1c;
+    --color-service-discord: #7289DA;
+
+    --user-widget-height: 48px;
+    --panel-border-radius: 0.3rem;
+
+    font-size: 16px;
+    line-height: 24px;
+}
+
+@media (max-width: 640px)
+{
+    :root 
+    {
+        --user-widget-height: 40px;
+    }
+}
