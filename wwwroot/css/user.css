@@ -1,20 +1,15 @@
 .widget {
-    display: block;
+    display: flex;
+
     margin: auto 0 auto auto;
     height: var(--user-widget-height);
-    border-radius: 25px;
+
+    border-radius: calc(var(--user-widget-height) / 2);
     cursor: pointer;
 }
 
-@media (max-width: 640px) {
-    .widget {
-        margin: 10px auto 10px 10px;
-    }
-}
-
 .user-widget {
-    display: flex;
-    background-color: var(--color-nanolight);
+    background-color: var(--color-dark-gray);
 }
 .user-widget .avatar {
     height: var(--user-widget-height);
@@ -30,11 +25,10 @@
 }
 
 .login-widget {
-    display: flex;
-    background-color: var(--color-discord-blurple);
+    background-color: var(--color-service-discord);
 }
 .login-widget:hover {
-    background-color: var(--color-nanolight);
+    background-color: var(--color-dark-gray);
 }
 .login-widget img {
     height: 80%;
@@ -42,7 +36,7 @@
 }
 .login-widget p {
     margin: auto 0px auto 15px;
-    color: white;
+    color: var(--color-white);
 }
 
 .avatar {
@@ -60,12 +54,13 @@
     font-weight: bolder;
     line-height: 100%;
     margin: auto;
-    color: black;
+    color: var(--color-nano);
 }
 
 .user-info {
     display: flex;
     flex-direction: row;
+    margin: 3rem 0;
 }
 
 .user-info .user-info-column {
@@ -93,6 +88,7 @@
     font-size: 1rem;
     text-align: center;
     overflow-wrap: break-word;
+    letter-spacing: 0.1rem;
 }
 
 .user-info .user-badge {
@@ -111,57 +107,54 @@
     text-align: center;
     text-transform: uppercase;
 }
-.user-info .user-badge.admin {
+
+.user-badge.admin {
     border-color: var(--color-badge-admin);
     color: var(--color-badge-admin);
 }
-.user-info .user-badge.banned {
+.user-badge.moderator {
+    border-color: var(--color-badge-moderator);
+    color: var(--color-badge-moderator);
+}
+.user-badge.banned {
     border-color: var(--color-badge-banned);
     color: var(--color-badge-banned);
 }
 
 .user-info .user-info-table {
     margin: 30px 10px;
-    white-space: nowrap;
-}
-.user-info .user-info-table tr {
-    line-height: 1.5rem;
-    color: var(--color-nanobrightest);
-}
-.user-info .user-info-table th {
-    text-align: right;
-    padding-right: 0.3rem;
+    color: var(--color-light-gray);
 }
 
 .user-info .logout-button {
-    padding: 6px 18px;
+    padding: 0.1rem 1rem;
     margin: auto 0 0 auto;
-    background-color: #8d3d3d;
-    color: var(--color-nanolight);
+
+    color: var(--color-gray);
+    border: 1px solid transparent;
     border-radius: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.06rem;
+
     font-size: 0.8rem;
     font-weight: bold;
+    letter-spacing: 0.06rem;
+    text-transform: uppercase;
 }
 .user-info .logout-button:hover {
-    background-color: #a81313;
-    color: white;
+    color: var(--color-mysted);
+    border-color: var(--color-mysted);
 }
 
 .user-admin-panel {
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row;
     box-sizing: border-box;
 }
 .user-admin-panel > * {
-    margin: 5px 25px;
+    margin: 0.5rem 1.5rem;
 }
 .user-admin-panel button[type=submit] {
     margin: auto 0 0 auto;
-}
-.user-permission-table {
-
 }
 .user-admin-panel .permission-label {
     padding-right: 1rem;
@@ -189,7 +182,7 @@
     width: 1rem;
     height: 1rem;
     border-radius: 50%;
-    background-color: white;
+    background-color: var(--color-white);
 }
 .user-admin-panel .permission-checkbox[checked] .knob {
     left: 50%;
@@ -205,7 +198,15 @@
     box-sizing: border-box;
 }
 
+.user-admin-panel .user-groups-table {
+    margin: 1.5rem 1.5rem;
+}
+
 @media (max-width: 640px) {
+    .widget {
+        margin: 10px auto 10px 10px;
+    }
+
     .user-info {
         flex-wrap: wrap;
     }

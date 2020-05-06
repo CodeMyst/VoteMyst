@@ -2,18 +2,36 @@
     Layout = "_Layout";
     ViewData["Title"] = "Submit";
 
+    string eventUrl = string.Empty;
     string entryUrl = string.Empty;
-    if (ViewBag.Entry != null && ViewBag.Event != null)
-        entryUrl = $"events/{ViewBag.Event.EventId}#{ViewBag.Entry.EntryId}";
+
+    if (ViewBag.Event != null)
+    {
+        eventUrl = $"/events/{ViewBag.Event.EventId}";
+        if (ViewBag.Entry != null)
+        {
+            entryUrl = eventUrl + $"#{ViewBag.Entry.EntryId}";
+        }
+    }
 }
 
 <h1>Submit a new entry</h1>
 
-@if (ViewBag.SubmitSuccessful ?? false) 
+@if (ViewBag.SubmitAttempted ?? false) 
 {
-    // A submission was entered
-    <p>Your submission was successful!</p>
-    <p>Click <a href="@entryUrl">here</a> to view it!</p>
+    if (ViewBag.SubmitFileTooLarge ?? false)
+    {
+        <div class="panel small message error">
+            The file was too large!
+        </div>
+    }
+    if (ViewBag.SubmitSuccessful ?? false)
+    {
+        <div class="panel small message success">
+            Your submission was successful! <br>
+            Click <a href="@entryUrl">here</a> to view it!
+        </div>   
+    }
 }
 else
 {
@@ -21,7 +39,7 @@ else
     {
         if (ViewBag.Entry != null)
         {
-            <div class="warning">
+            <div class="panel small message warning">
                 You already uploaded a <a href="@entryUrl">submission</a> for this event.
                 Submitting a new entry will remove your existing one. This can not be undone.
             </div>
@@ -36,11 +54,6 @@ else
             <input type="file" id="file" name="file" /> <br>
             <button type="submit">Submit!</button>
         </form>
-
-        @if(ViewBag.Message != null) 
-        {
-            <p>@ViewBag.Message</p>
-        }
 
         @* TODO: Add disclaimer referring to the legal terms. *@
     }

@@ -1,12 +1,18 @@
+.events h1 {
+    margin: 2.5rem 0 1.5rem;
+}
+
 .event {
     display: flex;
     flex-wrap: wrap;
-    box-sizing: border-box;
+
     width: 100%;
     margin: 0.8rem 0;
     padding: 0.8rem;
-    border-radius: 1rem;
-    background-color: var(--color-nanolight);
+    box-sizing: border-box;
+
+    border-radius: var(--panel-border-radius);
+    background-color: var(--color-dark-gray);
 }
 .event .event-info {
     margin: 0 auto 1rem 0;
@@ -17,23 +23,26 @@
 }
 .event .event-info .event-title {
     display: block;
-    padding: 0.4rem;
+    margin: 0.5rem 0.5rem 1rem;
     font-size: 1.5rem;
     font-weight: bold;
 }
 .event .event-info .event-description {
-    color: var(--color-nanolightlight);
-    padding-left: 0.4rem;
+    color: var(--color-light-gray);
+    margin-left: 0.5rem;
     font-style: italic;
-    font-size: 1.15rem;
-    line-height: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.4rem;
 }
-.event .event-dates {
+.event table.event-dates {
     margin: 0 0 auto auto;
     max-width: 50%;
+    white-space: normal;
+    font-size: 0.9rem;
+    line-height: 1.3rem;
 }
 .event table.event-dates tr > * {
-    color: var(--color-nanolightlight);
+    color: var(--color-gray);
 }
 .event table.event-dates th {
     text-align: right;
@@ -42,15 +51,11 @@
 .event .event-state {
     margin: auto auto 0 0;
     width: 100%;
-    color: var(--color-nanolightlight);
+    color: var(--color-gray);
 }
 
 @media (max-width: 640px) {
-    .event {
-        flex-direction: column;
-    }
     .event > * {
-        width: 100%;
         max-width: 100% !important;
         margin: 0.3rem 0 !important;
     }
