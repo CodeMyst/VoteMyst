@@ -32,9 +32,9 @@ namespace VoteMyst.Controllers
         }
 
         [RequirePermissions(Permissions.ViewEntries)]
-        public IActionResult Display(int userId) 
+        public IActionResult Display(int eventId) 
         {
-            ViewBag.ID = userId;
+            ViewBag.ID = eventId;
             return View();
         }
 

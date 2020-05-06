@@ -1,30 +1,64 @@
 ﻿@{
     Layout = "_Layout";
     ViewData["Title"] = "Submit";
+
+    string eventUrl = string.Empty;
+    string entryUrl = string.Empty;
+
+    if (ViewBag.Event != null)
+    {
+        eventUrl = $"/events/{ViewBag.Event.EventId}";
+        if (ViewBag.Entry != null)
+        {
+            entryUrl = eventUrl + $"#{ViewBag.Entry.EntryId}";
+        }
+    }
 }
 
 <h1>Submit a new entry</h1>
 
-<!-- TODO: Check if an event is current happening -->
-
-<!-- TODO: Check if the user has already 
-    uploaded for the current event -->
-
-<p>
-    You're submitting to <b>Event Name Here</b>.
-</p>
-
-<form method="post" enctype="multipart/form-data">
-    <label for="file">File @(VoteMyst.Controllers.SubmitController.MaxFileSize / 1000000)MB:</label>
-    <input type="file" id="file" name="file" /> <br>
-    <button type="submit">Submit!</button>
-</form>
-
-@if(ViewBag.Message != null) 
+@if (ViewBag.SubmitAttempted ?? false) 
 {
-    <p>@ViewBag.Message</p>
+    if (ViewBag.SubmitFileTooLarge ?? false)
+    {
+        <div class="panel small message error">
+            The file was too large!
+        </div>
+    }
+    if (ViewBag.SubmitSuccessful ?? false)
+    {
+        <div class="panel small message success">
+            Your submission was successful! <br>
+            Click <a href="@entryUrl">here</a> to view it!
+        </div>   
+    }
 }
+else
+{
+    if (ViewBag.Event != null)
+    {
+        if (ViewBag.Entry != null)
+        {
+            <div class="panel small message warning">
+                You already uploaded a <a href="@entryUrl">submission</a> for this event.
+                Submitting a new entry will remove your existing one. This can not be undone.
+            </div>
+        }
 
-<p class="disclaimer">
-    Some disclaimer legal stuff about uploading.
-</p>
+        <p>
+            You're submitting to <a href="/events/@ViewBag.Event.EventId"><b>@ViewBag.Event.Title</b></a>.
+        </p>
+
+        <form method="post" enctype="multipart/form-data">
+            <label for="file">Submission File (max. @(VoteMyst.Controllers.SubmitController.MaxFileSize / 1000000)MB):</label>
+            <input type="file" id="file" name="file" /> <br>
+            <button type="submit">Submit!</button>
+        </form>
+
+        @* TODO: Add disclaimer referring to the legal terms. *@
+    }
+    else 
+    {
+        <p>There are no events you can currently submit to.</p>
+    }
+}

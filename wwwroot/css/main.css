@@ -1,13 +1,20 @@
-/* 
-    NOTE: CSS Variables are imported dynamically through the
-          layout header, to allow theme switching.
-*/
-
+/* Load CSS variables and fonts */
+@import url(variables.css);
 @import url(fonts.css);
 
+/* Stylings for default HTML elements */
 @import url(layout.css);
-@import url(home.css);
-@import url(user.css);
-@import url(posts.css);
-@import url(submit.css);
 @import url(forms.css);
+@import url(elements.css);
+
+/* Styling for user-related elements, such as the widget, the avatar, username or info page */
+@import url(user.css);
+
+/* Styling for the home page */
+@import url(home.css);
+
+/* Styling for entry posts */
+@import url(posts.css);
+
+/* Styling for event displays */
+@import url(events.css);

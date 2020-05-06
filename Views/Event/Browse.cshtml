@@ -9,40 +9,40 @@
 }
 
 <div class="events">
-    <div class="events-active">
-        @if(currentEvents.Length == 0) 
-        {
-            <div class="no-event">No active events found!</div>
-        }
-        else 
-        {
-            @foreach (Event e in currentEvents)
-            {
-                @await Component.InvokeAsync("Event", new { ev = e });
-            }
-        }
-    </div>
-    <div class="events-planned">
-        @if(planned.Length == 0) 
-        {
-            <div class="no-event">No planned events found!</div>
-        }
-        else 
-        {
-            @foreach (Event e in planned)
-            {
-                @await Component.InvokeAsync("Event", new { ev = e });
-            }
-        }
-    </div>
-    <div class="events-finished">
-        @foreach (Event e in history)
-        {
-            @await Component.InvokeAsync("Event", new { ev = e });
-        }
-    </div>
+    @if (currentEvents.Length > 0)
+    {
+        <div class="events-active">
+            <h1>Active events</h1>
+            <div class="event-container">
+                @foreach (Event e in currentEvents)
+                {
+                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                }
+            </div>
+        </div>
+    }
+    @if (planned.Length > 0)
+    {
+        <div class="events-planned">
+            <h1>Planned events</h1>
+            <div class="event-container">
+                @foreach (Event e in planned)
+                {
+                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                }
+            </div>
+        </div>
+    }
+    @if (history.Length > 0)
+    {
+        <div class="events-finished">
+            <h1>Finished events</h1>
+            <div class="event-container">
+                @foreach (Event e in history)
+                {
+                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                }
+            </div>
+        </div>
+    }
 </div>
-
-@section Scripts {
-    <script type="text/javascript" src="~/js/timer.js"></script>
-}
