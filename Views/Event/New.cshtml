@@ -25,8 +25,10 @@
             <th>Type:</th>
             <td>
                 <select name="type">
-                    <option value="art">Art</option>
-                    <option value="text">Text</option>
+                    @foreach(var value in Enum.GetValues(typeof(VoteMyst.Database.EventType))) 
+                    {
+                        <option value="@((int)value)">@value.ToString()</option>
+                    }
                 </select>
             </td>
         </tr>
@@ -36,20 +38,20 @@
                 <div class="row-layout">
                     <div>
                         <p>Reveal</p>
-                        <input name="revealDate" type="date" />
+                        <input name="revealDate" type="datetime-local" />
                     </div>
                     <div>
                         <p>Start</p>
-                        <input name="startDate" type="date" />
+                        <input name="startDate" type="datetime-local" />
                     </div>
                     <div class="break"></div>
                     <div>
                         <p>Submission End</p>
-                        <input name="endDate" type="date" />
+                        <input name="endDate" type="datetime-local" />
                     </div>
                     <div>
                         <p>Voting End</p>
-                        <input name="voteEndDate" type="date" />
+                        <input name="voteEndDate" type="datetime-local" />
                     </div>
                 </table>
             </td>
@@ -57,7 +59,7 @@
     </table>
     <div class="form-submit">
         <button type="submit">Create Event</button>
-        <span></span>
+        <div></div>
     </div>
     @if (ViewBag.SuccessfullyCreated == true)
     {
@@ -68,7 +70,7 @@
 </form>
 
 <script>
-    const alertOutput = document.querySelector(".form-submit span");
+    const alertOutput = document.querySelector(".form-submit div");
     function alertError(message) {
         alertOutput.innerHTML = message;
         return false;

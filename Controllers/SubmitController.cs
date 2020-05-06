@@ -31,6 +31,16 @@ namespace VoteMyst.Controllers
         [RequirePermissions(Permissions.SubmitEntries)]
         public IActionResult Index()
         {
+            UserData currentUser = _profileBuilder.FromPrincipal(User);
+            Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
+            ViewBag.Event = currentEvent;
+
+            if (currentEvent != null)
+            {
+                Entry currentEntry = _helpers.Entries.GetEntryOfUserInEvent(currentEvent, currentUser);
+                ViewBag.Entry = currentEntry;
+            }
+
             return View();
         }
 
@@ -38,8 +48,11 @@ namespace VoteMyst.Controllers
         [RequirePermissions(Permissions.SubmitEntries)]
         public IActionResult Index(IFormFile file)
         {
-            if (file.Length > MaxFileSize) {
-                ViewBag.Message = "File too large!";
+            ViewBag.SubmitAttempted = true;
+
+            if (file.Length > MaxFileSize) 
+            {
+                ViewBag.SubmitFileTooLarge = true;
                 return View();
             }
 
@@ -51,6 +64,21 @@ namespace VoteMyst.Controllers
 
             Event currentEvent = currentEvents[0];
             UserData user = _profileBuilder.FromPrincipal(User);
+
+            Entry existingEntry = _helpers.Entries.GetEntryOfUserInEvent(currentEvent, user);
+            if (existingEntry != null)
+            {
+                _helpers.Entries.DeleteEntry(existingEntry);
+
+                // Ensure that all previous submission files are removed
+                foreach (string submissionFile in Directory.GetFiles(Path.Combine(_environment.WebRootPath, $"assets/events/{currentEvent.EventId}")))
+                {
+                    if (Path.GetFileNameWithoutExtension(submissionFile).StartsWith(user.DisplayId)) 
+                    {
+                        System.IO.File.Delete(submissionFile);
+                    }
+                }
+            }
 
             string fileName = Path.GetFileName(file.FileName);
             string relativePath = $"assets/events/{currentEvent.EventId}/{user.DisplayId}{Path.GetExtension(fileName)}";
@@ -64,9 +92,11 @@ namespace VoteMyst.Controllers
                 uploadedFile.CopyTo(localFile);
             }
 
-            _helpers.Entries.CreateEntry(currentEvent, user, EntryType.File, relativePath);
+            Entry entry = _helpers.Entries.CreateEntry(currentEvent, user, EntryType.File, relativePath);
 
-            ViewBag.Message = "Your entry was submitted!";
+            ViewBag.SubmitSuccessful = true;
+            ViewBag.Event = currentEvent;
+            ViewBag.Entry = entry;
 
             return View();
         }

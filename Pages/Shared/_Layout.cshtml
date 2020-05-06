@@ -4,23 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - VoteMyst</title>
-    <link rel="stylesheet" href="~/css/variables-dark.css" --theme-css />
+    <link rel="stylesheet" href="~/css/theme-dark.css" --theme />
     <link rel="stylesheet" href="~/css/main.css" />
     <link rel="icon" type="image/png" href="/img/trophy.png"/>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1 class="heading">
+            <h1>
                 <img src="/img/trophy.png"/>
                 <a href="/">votemyst</a>
             </h1>
             @await Component.InvokeAsync("UserWidget")
         </header>
         
-        @await Component.InvokeAsync("Navigation")
-
         <p class="subheading">a simple website for event voting.</p>
+
+        @await Component.InvokeAsync("Navigation")
 
         @RenderBody()
 
