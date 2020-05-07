@@ -25,3 +25,9 @@
 .message.error {
     background-color: var(--color-error-panel);
 }
+.disclaimer {
+    margin: 1rem 0;
+    padding: 0 2rem;
+    font-size: 0.9rem;
+    color: var(--color-gray);
+}
