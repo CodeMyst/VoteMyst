@@ -33,6 +33,10 @@ namespace VoteMyst.Controllers
         {
             UserData currentUser = _profileBuilder.FromPrincipal(User);
             Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
+
+            if (DateTime.UtcNow < currentEvent.StartDate || DateTime.UtcNow > currentEvent.EndDate)
+                return NotFound();
+
             ViewBag.Event = currentEvent;
 
             if (currentEvent != null)
@@ -56,13 +60,12 @@ namespace VoteMyst.Controllers
                 return View();
             }
 
-            Event[] currentEvents = _helpers.Events.GetCurrentEvents();
-            if (currentEvents.Length == 0)
+            Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
+            if (currentEvent == null)
                 return NotFound();
 
             // TODO: Maybe support multiple events?
 
-            Event currentEvent = currentEvents[0];
             UserData user = _profileBuilder.FromPrincipal(User);
 
             Entry existingEntry = _helpers.Entries.GetEntryOfUserInEvent(currentEvent, user);
@@ -92,7 +95,7 @@ namespace VoteMyst.Controllers
                 uploadedFile.CopyTo(localFile);
             }
 
-            Entry entry = _helpers.Entries.CreateEntry(currentEvent, user, EntryType.File, relativePath);
+            Entry entry = _helpers.Entries.CreateEntry(currentEvent, user, EntryType.File, "/" + relativePath);
 
             ViewBag.SubmitSuccessful = true;
             ViewBag.Event = currentEvent;

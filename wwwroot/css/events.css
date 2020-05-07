@@ -54,6 +54,40 @@
     color: var(--color-gray);
 }
 
+.leaderboard {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem auto;
+    width: 100%;
+}
+.leaderboard > div {
+    display: flex;
+    margin: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 1rem auto;
+    width: 80%;
+}
+.leaderboard .place {
+    margin: auto 8%;
+    font-size: 2rem;
+    font-weight: bold;
+    object-fit: contain;
+    color: var(--color-gray);
+    max-width: 5rem;
+    width: 10%;
+}
+.leaderboard .top-3 {
+    width: 100%;
+}
+.leaderboard .top-3 .place {
+    width: 20%;
+}
+.leaderboard .post {
+}
+.leaderboard .top-3 .post {
+}
+
 @media (max-width: 640px) {
     .event > * {
         max-width: 100% !important;

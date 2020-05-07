@@ -10,60 +10,63 @@
 // ~~ Attributes ~~
 const votedAttribute = "voted";
 const entryIdAttribute = "entry-id";
+const eventIdAttribute = "event-id";
 
 // Returns the JSON body of the fetch response
-function json(response) {
+function toJson(response) {
     return response.json();
 }
 
+function getEntryId(post) {
+    return parseInt(post.getAttribute(entryIdAttribute));
+}
+function getEventId() {
+    return parseInt(document.querySelector(".posts").getAttribute(eventIdAttribute));
+}
+
 // Constructs the POST body, using the entryId of the given element
-function buildPostBody(element) {
+function buildPostBody(post) {
     return {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         }, 
         body: JSON.stringify({ 
-            entryId: parseInt(element.getAttribute(entryIdAttribute))
+            entryId: getEntryId(post),
+            eventId: getEventId()
         })
     }
 }
 
-// Register the voting events
-document.querySelectorAll(".post")
-    .forEach(post => post.addEventListener("click", e => {
-        if (!post.hasAttribute(votedAttribute)) {
-            fetch("/vote/cast", buildPostBody(post))
-                .then(json)
-                .then(json => {
-                    if (json.hasVote) {
-                        post.setAttribute(votedAttribute, '');
-                    }
-                    
-                    if (!json.actionSuccess) {
-                        console.log("Error: The post already had a vote.");
-                    }
-                })
-                .catch();
-        }
-    }));
-
-// Register the unvote events
-document.querySelectorAll(".post-has-voted")
-    .forEach(hasVoted => hasVoted.addEventListener("click", e => {
-        let post = hasVoted.parentElement;
-        if (post.hasAttribute(votedAttribute)) {
-            fetch("/vote/remove", buildPostBody(post))
-                .then(json)
-                .then(json => {
-                    if (!json.hasVote) {
-                        post.removeAttribute(votedAttribute);
-                    }
-                    
-                    if (!json.actionSuccess) {
-                        console.log("Error: The post did not have a vote.");
-                    }
-                })
-                .catch(e => console.log(e));
-        }
-    }));
+function castVote(element) {
+    const post = element;
+    if (!post.hasAttribute(votedAttribute)) {
+        fetch("/vote/cast", buildPostBody(post))
+            .then(toJson)
+            .then(result => {
+                if (result.hasVote) {
+                    post.setAttribute(votedAttribute, '');
+                }
+                if (!result.actionSuccess) {
+                    console.log("Error: The post already had a vote.");
+                }
+            })
+            .catch();
+    }
+}
+function removeVote(element) {
+    const post = element.parentElement;
+    if (post.hasAttribute(votedAttribute)) {
+        fetch("/vote/remove", buildPostBody(post))
+            .then(toJson)
+            .then(result => {
+                if (!result.hasVote) {
+                    post.removeAttribute(votedAttribute);
+                }
+                if (!result.actionSuccess) {
+                    console.log("Error: The post did not have a vote.");
+                }
+            })
+            .catch();
+    }
+}

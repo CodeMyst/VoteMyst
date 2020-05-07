@@ -35,21 +35,30 @@ namespace VoteMyst.Controllers
         public IActionResult Display(int eventId) 
         {
             Event e = _helpers.Events.GetEvent(eventId);
-            if (e.StartDate < DateTime.UtcNow && e.VoteEndDate > DateTime.UtcNow) 
+
+            bool beforeEnd = DateTime.UtcNow < e.EndDate;
+            bool inVote = DateTime.UtcNow > e.EndDate && DateTime.UtcNow < e.VoteEndDate;
+            bool afterVoteEnd = DateTime.UtcNow > e.VoteEndDate;
+
+            if (inVote) 
             {
                 // If the event voting phase has started and not ended yet, redirect to the vote page
                 return Redirect("/vote");
             }
 
-            // Otherwise display general vote information
+            // Otherwise display general event information
             ViewBag.Event = e;
 
-            if (e.VoteEndDate <= DateTime.UtcNow)
+            if (beforeEnd)
+            {
+                ViewBag.Entries = _helpers.Entries.GetEntriesInEvent(e);
+            }
+            if (afterVoteEnd)
             {
                 // If voting has ended, display the winners in order
                 ViewBag.Leaderboard = _helpers.Entries.GetEntriesInEvent(e)
-                    .Select(e => (_helpers.Votes.GetAllVotesForEntry(e), e))
-                    .OrderBy(e => e.Item1)
+                    .Select(e => (_helpers.Votes.GetAllVotesForEntry(e).Length, e))
+                    .OrderByDescending(e => e.Item1)
                     .ThenBy(e => e.Item2.EntryId)
                     .ToArray();
             }

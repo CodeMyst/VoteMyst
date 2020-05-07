@@ -101,7 +101,7 @@
     transform: scale(0);
     transition: transform 0.3s, opacity 0.3s;
 }
-.post:not([voted]) {
+.post[allow-vote]:not([voted]) {
     cursor: pointer;
 }
 .post-has-voted {
@@ -109,16 +109,18 @@
     bottom: 0;
     margin: 3%;
     width: 6%;
-    cursor: pointer;
     filter: drop-shadow(3px 3px 6px rgb(0, 0, 0, 0.5));
     transition: opacity 0.4s;
 }
+.post[allow-vote] .post-has-voted {
+    cursor: pointer;
+}
 
-.post:not([voted]):hover .post-vote {
+.post[allow-vote]:not([voted]):not([self-post]):hover .post-vote {
     transform: scale(1);
     opacity: 1;
 }
-.post[voted] .post-vote {
+.post[allow-vote][voted] .post-vote {
     filter: hue-rotate(-30deg) saturate(1.6);
     transition-duration: 0.5s;
     transition-timing-function: cubic-bezier(.14,-0.19,.52,-0.76);
@@ -127,6 +129,6 @@
 .post[voted] .post-has-voted {
     opacity: 1;
 }
-.post:not([voted]) .post-has-voted, .post-has-voted:hover {
+.post[allow-vote]:not([voted]) .post-has-voted:hover {
     filter: saturate(0);
 }
