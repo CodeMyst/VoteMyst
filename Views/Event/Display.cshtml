@@ -3,5 +3,42 @@
     Layout = "_Layout";
 }
 
-<h1>Event</h1>
-<p>@ViewBag.ID</p>
+<h1>@ViewBag.Event.Title</h1>
+
+@if (ViewBag.Entries != null)
+{
+    <div class="posts">
+        @foreach (var e in ViewBag.Entries)
+        {
+            @await Component.InvokeAsync("Entry", new { entry = e })
+        }
+    </div>
+}
+@if (ViewBag.Leaderboard != null)
+{
+    <div class="leaderboard">
+        @{
+            int currentPlace = 0;
+            int currentVotes = -1;
+        }
+        @foreach (var place in ViewBag.Leaderboard)
+        {
+            if (place.Item1 != currentVotes) {
+                currentPlace++;
+                currentVotes = place.Item1;
+            }
+
+            <div class="@(currentPlace <= 3 ? "top-3" : "")">
+                @if (currentPlace <= 3) 
+                {
+                    <img class="place" src="/img/place-@(currentPlace).png" />
+                }
+                else 
+                {
+                    <p class="place">@(currentPlace).</p>
+                }
+                @await Component.InvokeAsync("Entry", new { entry = place.Item2, displayUser = true })
+            </div>
+        }
+    </div>
+}

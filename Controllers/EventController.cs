@@ -34,7 +34,35 @@ namespace VoteMyst.Controllers
         [RequirePermissions(Permissions.ViewEntries)]
         public IActionResult Display(int eventId) 
         {
-            ViewBag.ID = eventId;
+            Event e = _helpers.Events.GetEvent(eventId);
+
+            bool beforeEnd = DateTime.UtcNow < e.EndDate;
+            bool inVote = DateTime.UtcNow > e.EndDate && DateTime.UtcNow < e.VoteEndDate;
+            bool afterVoteEnd = DateTime.UtcNow > e.VoteEndDate;
+
+            if (inVote) 
+            {
+                // If the event voting phase has started and not ended yet, redirect to the vote page
+                return Redirect("/vote");
+            }
+
+            // Otherwise display general event information
+            ViewBag.Event = e;
+
+            if (beforeEnd)
+            {
+                ViewBag.Entries = _helpers.Entries.GetEntriesInEvent(e);
+            }
+            if (afterVoteEnd)
+            {
+                // If voting has ended, display the winners in order
+                ViewBag.Leaderboard = _helpers.Entries.GetEntriesInEvent(e)
+                    .Select(e => (_helpers.Votes.GetAllVotesForEntry(e).Length, e))
+                    .OrderByDescending(e => e.Item1)
+                    .ThenBy(e => e.Item2.EntryId)
+                    .ToArray();
+            }
+
             return View();
         }
 

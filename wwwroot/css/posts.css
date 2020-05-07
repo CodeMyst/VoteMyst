@@ -46,10 +46,8 @@
 }
 
 .post {
-    margin: auto 0;
-}
-.post .post-container {
     display: flex;
+    position: relative;
     flex-direction: column;
     background-color: var(--color-dark-gray);
     margin: auto 0;
@@ -89,6 +87,48 @@
     width: 100%;
     height: auto;
     box-sizing: border-box;
-    max-width: 100vw;
-    max-height: 50vh;
+}
+.post-absolute-element {
+    display: block;
+    position: absolute;
+    opacity: 0;
+}
+.post-vote {
+    left: 50%;
+    top: 50%;
+    width: 16%;
+    margin: -8% auto auto -8%;
+    transform: scale(0);
+    transition: transform 0.3s, opacity 0.3s;
+}
+.post[allow-vote]:not([voted]) {
+    cursor: pointer;
+}
+.post-has-voted {
+    right: 0;
+    bottom: 0;
+    margin: 3%;
+    width: 6%;
+    filter: drop-shadow(3px 3px 6px rgb(0, 0, 0, 0.5));
+    transition: opacity 0.4s;
+}
+.post[allow-vote] .post-has-voted {
+    cursor: pointer;
+}
+
+.post[allow-vote]:not([voted]):not([self-post]):hover .post-vote {
+    transform: scale(1);
+    opacity: 1;
+}
+.post[allow-vote][voted] .post-vote {
+    filter: hue-rotate(-30deg) saturate(1.6);
+    transition-duration: 0.5s;
+    transition-timing-function: cubic-bezier(.14,-0.19,.52,-0.76);
+}
+
+.post[voted] .post-has-voted {
+    opacity: 1;
+}
+.post[allow-vote]:not([voted]) .post-has-voted:hover {
+    filter: saturate(0);
 }

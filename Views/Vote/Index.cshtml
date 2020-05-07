@@ -10,13 +10,14 @@
     <div id="post-display-option-small"><img src="/img/post-display-smallest.svg"/></div>
 </div>
 
-<div class="posts">
+<div class="posts" event-id="@ViewBag.Event.EventId">
 @foreach (Entry e in ViewBag.RandomizedEntries)
 {
-    @await Component.InvokeAsync("Entry", new { entry = e, displayUser = true });
+    @await Component.InvokeAsync("Entry", new { entry = e, displayUser = false, canVote = true })
 }
 </div>
 
 @section Scripts {
     <script type="text/javascript" src="~/js/entry-grid.js"></script>
+    <script type="text/javascript" src="~/js/vote.js"></script>
 }
