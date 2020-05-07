@@ -104,7 +104,6 @@ namespace VoteMyst
             services.AddScoped<AvatarHelper>();
             services.AddScoped<DatabaseHelperProvider>();
             services.AddScoped<UserProfileBuilder>();
-            services.AddScoped<TestDataCreator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -121,6 +120,8 @@ namespace VoteMyst
                 app.UseHsts();
             }
 
+            app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
+            
             // TODO: add https redirection later, but might not even be needed, this should be handled by the web server like nginx
             // app.UseHttpsRedirection();
             app.UseStaticFiles();

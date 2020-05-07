@@ -2,9 +2,11 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using VoteMyst.Controllers;
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
 
@@ -17,7 +19,7 @@ namespace VoteMyst.PermissionSystem
             Arguments = new[] { new PermissionAuthorizationRequirement(permissions) };
         }
 
-        private class RequirePermissionsAttributeImpl : Attribute, IAsyncResourceFilter
+        private class RequirePermissionsAttributeImpl : Attribute, IActionFilter
         {
             private readonly PermissionAuthorizationRequirement permissions;
             private readonly DatabaseHelperProvider dbhelper;
@@ -32,7 +34,11 @@ namespace VoteMyst.PermissionSystem
                 this.profileBuilder = profileBuilder;
             }
 
-            public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
+            public void OnActionExecuted(ActionExecutedContext context)
+            {
+            }
+
+            public void OnActionExecuting(ActionExecutingContext context)
             {
                 UserData user;
                 if (!context.HttpContext.User.Identity.IsAuthenticated)
@@ -46,11 +52,11 @@ namespace VoteMyst.PermissionSystem
 
                 if (!user.IsBanned() && user.PermissionLevel.HasFlag(permissions.Permissions))
                 {
-                    await next();
+                    context.Result = new ViewResult();
                 }
                 else
                 {
-                    return;
+                    context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
                 }
             }
         }

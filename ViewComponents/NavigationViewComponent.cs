@@ -28,7 +28,16 @@ namespace VoteMyst.ViewComponents
             UserData user = _profileBuilder.FromPrincipal(UserClaimsPrincipal);
 
             ViewBag.HasBrowseableEvents = events.Length > 0 || planned.Length > 0;
-            ViewBag.HasCurrentEvent = events.Length > 0;
+
+            Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
+
+            ViewBag.HasCurrentEvent = currentEvent != null;
+            if (currentEvent != null)
+            {
+                ViewBag.CurrentEventId = currentEvent.EventId;
+                ViewBag.IsVotingOpen = DateTime.UtcNow > currentEvent.EndDate && DateTime.UtcNow < currentEvent.VoteEndDate;
+                ViewBag.IsSubmissionOpen = DateTime.UtcNow > currentEvent.StartDate && DateTime.UtcNow < currentEvent.EndDate;
+            }
 
             ViewBag.CanCreateEvents = user.HasPermission(Permissions.CreateEvents);
             ViewBag.CanModifyUser = user.HasPermission(Permissions.ModifyUsers);

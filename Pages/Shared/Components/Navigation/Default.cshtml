@@ -8,8 +8,11 @@
 
     @if (ViewBag.HasCurrentEvent)
     {
-        <a href="/vote">Current Event</a>
-        <a href="/submit">Submit Entry</a>
+        <a href=@(ViewBag.IsVotingOpen ? "/vote" : $"/events/{ViewBag.CurrentEventId}")>Current Event</a>
+        if (ViewBag.IsSubmissionOpen) 
+        {
+            <a href="/submit">Submit Entry</a>
+        }
     }
 
     @if (ViewBag.HasOutlineEntries)
