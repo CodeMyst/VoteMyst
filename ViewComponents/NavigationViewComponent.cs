@@ -23,8 +23,13 @@ namespace VoteMyst.ViewComponents
 
         public Task<IViewComponentResult> InvokeAsync() 
         {
-            Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
+            Event[] events = _helpers.Events.GetCurrentEvents();
+            Event[] planned = _helpers.Events.GetVisiblePlannedEvents();
             UserData user = _profileBuilder.FromPrincipal(UserClaimsPrincipal);
+
+            ViewBag.HasBrowseableEvents = events.Length > 0 || planned.Length > 0;
+
+            Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
 
             ViewBag.HasCurrentEvent = currentEvent != null;
             if (currentEvent != null)
@@ -33,7 +38,10 @@ namespace VoteMyst.ViewComponents
                 ViewBag.IsVotingOpen = DateTime.UtcNow > currentEvent.EndDate && DateTime.UtcNow < currentEvent.VoteEndDate;
                 ViewBag.IsSubmissionOpen = DateTime.UtcNow > currentEvent.StartDate && DateTime.UtcNow < currentEvent.EndDate;
             }
-            ViewBag.IsAdmin = user.IsAdmin();
+
+            ViewBag.CanCreateEvents = user.HasPermission(Permissions.CreateEvents);
+            ViewBag.CanModifyUser = user.HasPermission(Permissions.ModifyUsers);
+            ViewBag.HasOutlineEntries = ViewBag.CanCreateEvents || ViewBag.CanModifyUser;
             
             return Task.FromResult<IViewComponentResult>(View());
         }

@@ -50,7 +50,7 @@ namespace VoteMyst.PermissionSystem
                     user = profileBuilder.FromPrincipal(context.HttpContext.User);
                 }
 
-                if (user.PermissionLevel.HasFlag(permissions.Permissions))
+                if (!user.IsBanned() && user.PermissionLevel.HasFlag(permissions.Permissions))
                 {
                     context.Result = new ViewResult();
                 }

@@ -14,9 +14,9 @@ namespace VoteMyst.Database.Models
         public DateTime JoinDate { get; set; }
         [Column("permissions")]
         public Permissions PermissionLevel { get; set; }
+        [Column("account_state")]
+        public AccountState AccountState { get; set; }
         [Column("username")]
         public string Username { get; set; }
-        [Column("avatar")]
-        public string Avatar { get; set; }
     }
 }

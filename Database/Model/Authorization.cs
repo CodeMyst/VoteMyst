@@ -13,5 +13,7 @@ namespace VoteMyst.Database.Models
         public string ServiceUserId { get; set; }
         [Column("service_type")]
         public ServiceType ServiceType { get; set; }
+        [Column("valid")]
+        public bool Valid { get; set; }
     }
 }

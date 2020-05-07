@@ -24,12 +24,5 @@ namespace VoteMyst.Database
         CreateEvents = 1uL << 48,
         EditEvents = 1uL << 49,
         DeleteEvents = 1uL << 50,
-
-        // Groups
-        Banned = 0,
-        Guest = ViewEntries | ViewEvents,
-        Default = Guest | SubmitEntries | SubmitVotes | EditEntries | ViewUsers | AllowWinning,
-        Moderator = (Default | DeleteEntries | DeleteVotes) ^ AllowWinning,
-        Admin = ulong.MaxValue ^ AllowWinning
     }
 }

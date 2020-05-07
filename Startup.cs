@@ -20,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 
 using VoteMyst.Discord;
 using VoteMyst.Database;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VoteMyst
 {
@@ -99,6 +100,8 @@ namespace VoteMyst
 
             services.AddDbContext<VoteMystContext>(options => options.UseMySql(Configuration["MySQLConnection"]));
 
+            // Avatar Helper is used by the UserDataHelper which gets instantiated by DatabaseHelperProvider
+            services.AddScoped<AvatarHelper>();
             services.AddScoped<DatabaseHelperProvider>();
             services.AddScoped<UserProfileBuilder>();
         }
@@ -142,6 +145,12 @@ namespace VoteMyst
                     pattern: "logout",
                     defaults: new { controller = "User", action = "Logout" });
                     
+                // Test DAta
+                endpoints.MapControllerRoute(name: "createTestData",
+                    pattern: "createData",
+                    defaults: new { controller = "User", action = "CreateTestData" });
+
+
                 // User searching
                 endpoints.MapControllerRoute(name: "searchUser",
                     pattern: "users",

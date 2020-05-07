@@ -17,6 +17,9 @@ namespace VoteMyst.Controllers
 {
     public class UserController : Controller
     {
+        private static Permissions[] _permissions = Enum.GetValues(typeof(Permissions)).Cast<Permissions>().ToArray();
+        private static AccountState[] _groups =  AccountStateExtension.ApplyableStates;
+
         private readonly UserProfileBuilder _profileBuilder;
         private readonly DatabaseHelperProvider _helpers;
 
@@ -26,7 +29,14 @@ namespace VoteMyst.Controllers
             _helpers = helpers;
         }
 
-        [RequirePermissions(Permissions.ViewUsers)]
+        public IActionResult WipeAccount() 
+        {
+            UserData selfUser = _profileBuilder.FromPrincipal(User);
+            _helpers.Users.WipeUser(selfUser.UserId);
+            return Logout();
+        }
+
+        [RequirePermissions(Permissions.ModifyUsers)]
         public IActionResult Search() 
         {
             return View();
@@ -51,33 +61,26 @@ namespace VoteMyst.Controllers
                 return View("NotFound");
 
             UserData selfUser = _profileBuilder.FromPrincipal(User);
-            Entry[] entries = _helpers.Entries.GetEntriesFromUser(selfUser);
+            Entry[] entries = _helpers.Entries.GetEntriesFromUser(targetUser);
 
             ViewBag.IsSelf = targetUser.DisplayId == selfUser.DisplayId;
 
             ViewBag.SelfUser = selfUser;
             ViewBag.InspectedUser = targetUser;
 
-            ViewBag.InspectedUserGroup = targetUser.DeterminePermissionGroup();
+            ViewBag.InspectedUserGroup = targetUser.GetAccountState();
+            ViewBag.InspectedUserGroupLevel = (int) targetUser.AccountState;
             ViewBag.InspectedTotalEntries = entries.Length;
             ViewBag.InspectedTotalVotes = entries.Select(e => _helpers.Votes.GetAllVotesForEntry(e).Length).Sum();
+            ViewBag.AllowAdminDashboard = selfUser.HasPermission(Permissions.ModifyUsers);
 
-            bool allowAdminDashboard = targetUser.DisplayId != selfUser.DisplayId
-                && selfUser.IsAdmin() && !targetUser.IsAdmin();
-            ViewBag.AllowAdminDashboard = allowAdminDashboard;
-            if (allowAdminDashboard)
-            {
-                Permissions[] permissions = Enum.GetValues(typeof(Permissions)).Cast<Permissions>().ToArray();
-                Permissions[] groups = new Permissions[] {
-                    Permissions.Banned, Permissions.Guest, Permissions.Default, Permissions.Moderator, Permissions.Admin
-                };
-                Permissions[] permissionsNoGroups = permissions.Except(groups).ToArray();
-                
+            if (ViewBag.AllowAdminDashboard)
+            {                
                 ViewBag.UserPermissions = (ulong)targetUser.PermissionLevel;
-                ViewBag.PermissionEntries = permissionsNoGroups
+                ViewBag.PermissionEntries = _permissions
                     .Select(p => (string.Join(' ', (Regex.Split(p.ToString(), "(?=[A-Z][^A-Z])"))), (ulong)p, targetUser.PermissionLevel.HasFlag(p)))
                     .ToArray();
-                ViewBag.PermissionGroups = groups
+                ViewBag.AccountGroups = _groups
                     .Select(g => (g.ToString(), (ulong)g))
                     .ToArray();
             }
@@ -91,26 +94,33 @@ namespace VoteMyst.Controllers
                 return Forbid();
 
             UserData selfUser = _profileBuilder.FromPrincipal(User);
-            return Display(selfUser.DisplayId);
-        }
 
-        [RequirePermissions(Permissions.ModifyUsers)]
-        public IActionResult BanUser(int id)
-        {
-            throw new NotImplementedException();
+            if (selfUser.IsBanned())
+                return Forbid();
+
+            return Display(selfUser.DisplayId);
         }
 
         [HttpPost]
         [RequirePermissions(Permissions.ModifyUsers)]
-        public IActionResult Display(string displayId, 
+        public IActionResult Display( 
+            string userId,
             string username = null,
             string avatar = null,
-            ulong? permissions = 0)
+            ulong? permissions = 0,
+            int? group = 0)
         {
-            if (permissions.HasValue)
-                _helpers.Users.SetPermission(_helpers.Users.GetUser(displayId), (Permissions)permissions.Value);
+            UserData user = _helpers.Users.GetUser(userId);
+            
+            if (permissions.HasValue && (ulong) user.PermissionLevel != permissions) 
+                _helpers.Users.SetPermission(_helpers.Users.GetUser(userId), (Permissions) permissions.Value);
 
-            return Display(displayId);
+            if (group.HasValue && (int) user.AccountState != group) {
+                _helpers.Users.SetPermission(user, ((AccountState) group).GetDefaultPermissions());
+                _helpers.Users.SetAccountState(user, (AccountState) group.Value);
+            }
+
+            return Display(userId);
         }
     }
 }

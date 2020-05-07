@@ -1,20 +1,8 @@
 using System.IO;
-using System.Linq;
-using System.Security;
 using System.Security.Claims;
-using System.Security.Principal;
 
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-using VoteMyst.Discord;
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
 
@@ -63,15 +51,5 @@ namespace VoteMyst
 
         public UserData FromId(string displayId)
             => _helpers.Users.GetUser(displayId);
-
-        public string GetAvatarUrl(UserData user, out string initials)
-        {
-            initials = string.Concat(user.Username.Where(c => c >= 'A' && c <= 'Z').Take(2));
-
-            string relativeAvatarUrl = $"assets/avatars/{user.DisplayId}.png";
-            bool hasAvatar = File.Exists(Path.Combine(_environment.WebRootPath, relativeAvatarUrl));
-            
-            return hasAvatar ? "/" + relativeAvatarUrl : null;
-        }
     }
 }
