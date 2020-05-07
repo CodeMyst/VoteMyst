@@ -128,6 +128,8 @@ namespace VoteMyst
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapRazorPages();
+                
                 // Consult the wiki about page information
                 
                 // Login/Logout Pages
