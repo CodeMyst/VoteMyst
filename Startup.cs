@@ -117,6 +117,8 @@ namespace VoteMyst
                 app.UseHsts();
             }
 
+            app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
+            
             // TODO: add https redirection later, but might not even be needed, this should be handled by the web server like nginx
             // app.UseHttpsRedirection();
             app.UseStaticFiles();
