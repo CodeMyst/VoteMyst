@@ -22,20 +22,11 @@ namespace VoteMyst.Controllers
 
         private readonly UserProfileBuilder _profileBuilder;
         private readonly DatabaseHelperProvider _helpers;
-        private readonly TestDataCreator _testData;
 
-        public UserController(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers, TestDataCreator testData) 
+        public UserController(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers) 
         {
             _profileBuilder = profileBuilder;
             _helpers = helpers;
-            _testData = testData;
-        }
-
-        public IActionResult CreateTestData()
-        {
-            _testData.CreateUserData();
-
-            return DisplaySelf();
         }
 
         public IActionResult WipeAccount() 
