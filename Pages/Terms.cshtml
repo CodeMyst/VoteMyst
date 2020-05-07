@@ -60,7 +60,9 @@
 
     <ol>
         <li>Using the hashed Unique User Id of the connected services we can always guarantee we interact with the expected user.</li>
-        <li>Your username and avatar is used to display your name and an image of your choice to identify you for other users.</li>
+        <li>Your username and avatar is used to display your name and an image of your choice to identify you for other users. 
+            VoteMyst copies your username and downloads your avatar from the connected service and binds it to your profile the first time you connect.
+             After initial setup we only look in the VoteMyst data for your username and avatar.</li>
     </ol>
 
     <h1>Data Deletion</h1>
@@ -82,7 +84,9 @@
     <p>Why do we not delete the data;</p>
 
     <ol>
-        <li>Because the Unique User Id is hashed it is no longer possible to trace back your details through that service. As such the hashed version of your Unique User Id is not deemed personalised data. Furthermore is this User Id used to determine account state (Banned for example)</li>
+        <li>Since the Unique User ID is hashed, personal details cannot be traced back with it. 
+            This means that the hashed value is not deemed personalised data, and will be permanently stored to determine the account state of the user. 
+            This is used to prevent ban circumvention and determine deleted accounts.</li>
         <li>By uploading you give us rights to use, distribute, alter, and display your content. This extends after your account is gone.</li>
         <li>Voting does not store personal data.</li>
     </ol>
