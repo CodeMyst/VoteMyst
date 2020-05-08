@@ -14,6 +14,10 @@
 <div class="event">
     <div class="event-info">
         <a href="/events/@ViewBag.Event.EventId" class="event-title">@ViewBag.Event.Title</a>
+        @if (ViewBag.Event.RevealDate > DateTime.UtcNow)
+        {
+            <h4>HIDDEN</h4>
+        }
         @if (ViewBag.Event.StartDate <= DateTime.UtcNow) 
         {
             <p class="event-description">@ViewBag.Event.Description</p>

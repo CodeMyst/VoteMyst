@@ -23,9 +23,9 @@ namespace VoteMyst.ViewComponents
 
         public Task<IViewComponentResult> InvokeAsync() 
         {
-            Event[] events = _helpers.Events.GetCurrentEvents();
-            Event[] planned = _helpers.Events.GetVisiblePlannedEvents();
             UserData user = _profileBuilder.FromPrincipal(UserClaimsPrincipal);
+            Event[] events = _helpers.Events.GetCurrentEvents();
+            Event[] planned = _helpers.Events.GetPlannedEvents(user.HasPermission(Permissions.CreateEvents));
 
             ViewBag.HasBrowseableEvents = events.Length > 0 || planned.Length > 0;
 

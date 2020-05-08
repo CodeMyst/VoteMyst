@@ -10,18 +10,21 @@ namespace VoteMyst.Controllers
 {
     public class EventController : Controller
     {
+        private readonly UserProfileBuilder _profile;
         private readonly DatabaseHelperProvider _helpers;
 
-        public EventController(DatabaseHelperProvider helpers) 
+        public EventController(UserProfileBuilder profile, DatabaseHelperProvider helpers) 
         {
+            _profile = profile;
             _helpers = helpers;
         }
 
         [RequirePermissions(Permissions.ViewEvents)]
         public IActionResult Browse()
         {
+            UserData user = _profile.FromPrincipal(User);
             Event[] finishedEvents = _helpers.Events.GetAllEventsFinishedBefore(DateTime.UtcNow);
-            Event[] plannedEvents = _helpers.Events.GetVisiblePlannedEvents();
+            Event[] plannedEvents = _helpers.Events.GetPlannedEvents(user.HasPermission(Permissions.CreateEvents));
             Event[] ongoingEvents = _helpers.Events.GetCurrentEvents();
 
             ViewBag.History = finishedEvents;

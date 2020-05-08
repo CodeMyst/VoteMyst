@@ -83,10 +83,10 @@ namespace VoteMyst.Database
                 .OrderBy(x => x.VoteEndDate)
                 .ToArray();
         
-        public Event[] GetVisiblePlannedEvents()
+        public Event[] GetPlannedEvents(bool ignoreRevealDate = false)
             => context.Events
                 .Where(x => x.StartDate > DateTime.UtcNow)
-                .Where(x => x.RevealDate <= DateTime.UtcNow)
+                .Where(x => ignoreRevealDate || x.RevealDate <= DateTime.UtcNow)
                 .OrderBy(x => x.StartDate)
                 .ToArray();
     }
