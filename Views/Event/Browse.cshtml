@@ -9,7 +9,7 @@
 }
 
 <div class="events">
-    @if (currentEvents.Length > 0)
+    @if ((currentEvents?.Length ?? 0) > 0)
     {
         <div class="events-active">
             <h1>Active events</h1>
@@ -21,7 +21,7 @@
             </div>
         </div>
     }
-    @if (planned.Length > 0)
+    @if ((planned?.Length ?? 0) > 0)
     {
         <div class="events-planned">
             <h1>Planned events</h1>
@@ -33,7 +33,7 @@
             </div>
         </div>
     }
-    @if (history.Length > 0)
+    @if ((history?.Length ?? 0) > 0)
     {
         <div class="events-finished">
             <h1>Finished events</h1>

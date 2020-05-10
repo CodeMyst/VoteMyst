@@ -121,6 +121,10 @@
     color: var(--color-badge-banned);
 }
 
+.user-info .own-display-id {
+    color: var(--color-gray);
+}
+
 .user-info .user-info-table {
     margin: 30px 10px;
     color: var(--color-light-gray);
