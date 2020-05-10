@@ -39,9 +39,16 @@ namespace VoteMyst.Controllers
         {
             Event e = _helpers.Events.GetEvent(eventId);
 
+            if (e == null)
+                return NotFound();
+
+            bool beforeReveal = DateTime.Now < e.RevealDate;
             bool beforeEnd = DateTime.UtcNow < e.EndDate;
             bool inVote = DateTime.UtcNow > e.EndDate && DateTime.UtcNow < e.VoteEndDate;
             bool afterVoteEnd = DateTime.UtcNow > e.VoteEndDate;
+
+            if (beforeReveal)
+                return NotFound();
 
             if (inVote) 
             {

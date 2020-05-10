@@ -6,6 +6,7 @@ using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
@@ -52,19 +53,26 @@ namespace VoteMyst.Controllers
         [RequirePermissions(Permissions.SubmitEntries)]
         public IActionResult Index(IFormFile file)
         {
-            ViewBag.SubmitAttempted = true;
+            if (file == null)
+                return ShowSubmissionError("Something needs to be uploaded.");
 
             if (file.Length > MaxFileSize) 
-            {
-                ViewBag.SubmitFileTooLarge = true;
-                return View();
-            }
-
+                return ShowSubmissionError("The file is too large.");
+            
+            // TODO: Maybe support multiple events?
             Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
             if (currentEvent == null)
                 return NotFound();
 
-            // TODO: Maybe support multiple events?
+            // Make sure that the type to upload is valid
+            var typeProvider = new FileExtensionContentTypeProvider();
+            if (!typeProvider.TryGetContentType(file.FileName, out string contentType))
+                return ShowSubmissionError("Unknown file type.");
+
+            if (currentEvent.EventType == EventType.Art && !contentType.StartsWith("image/"))
+                return ShowSubmissionError("Only image files are allowed for this event.");
+
+            // TODO: Validate other event types
 
             UserData user = _profileBuilder.FromPrincipal(User);
 
@@ -73,12 +81,13 @@ namespace VoteMyst.Controllers
             {
                 _helpers.Entries.DeleteEntry(existingEntry);
 
-                // Ensure that all previous submission files are removed
-                foreach (string submissionFile in Directory.GetFiles(Path.Combine(_environment.WebRootPath, $"assets/events/{currentEvent.EventId}")))
+                if (existingEntry.EntryType == EntryType.File)
                 {
-                    if (Path.GetFileNameWithoutExtension(submissionFile).StartsWith(user.DisplayId)) 
+                    // Retrieve the previous entry path, making sure to make the path relative instead of absolute
+                    string entryAssetPath = Path.Combine(_environment.WebRootPath, existingEntry.Content.Substring(1));
+                    if (System.IO.File.Exists(entryAssetPath)) 
                     {
-                        System.IO.File.Delete(submissionFile);
+                        System.IO.File.Delete(entryAssetPath);
                     }
                 }
             }
@@ -102,6 +111,12 @@ namespace VoteMyst.Controllers
             ViewBag.Entry = entry;
 
             return View();
+        }
+
+        private IActionResult ShowSubmissionError(string message)
+        {
+            ViewBag.ErrorMessage = message;
+            return Index();
         }
     }
 }
