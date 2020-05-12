@@ -16,7 +16,7 @@
             <div class="event-container">
                 @foreach (Event e in currentEvents)
                 {
-                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                    <partial name="_EventInfo" for="@e" />
                 }
             </div>
         </div>
@@ -28,7 +28,7 @@
             <div class="event-container">
                 @foreach (Event e in planned)
                 {
-                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                    <partial name="_EventInfo" for="@e" />
                 }
             </div>
         </div>
@@ -40,7 +40,7 @@
             <div class="event-container">
                 @foreach (Event e in history)
                 {
-                    @await Component.InvokeAsync("EventInfo", new { ev = e });
+                    <partial name="_EventInfo" for="@e" />
                 }
             </div>
         </div>

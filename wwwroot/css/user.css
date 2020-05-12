@@ -123,6 +123,9 @@
 
 .user-info .own-display-id {
     color: var(--color-gray);
+    font-size: 0.7rem;
+    line-height: 1rem;
+    text-align: center;
 }
 
 .user-info .user-info-table {
@@ -192,18 +195,13 @@
     left: 50%;
 }
 
-.user-admin-panel .permission-button {
+.user-admin-panel .group-button {
     margin: auto;
     width: 100%;
-    height: 28px;
-    line-height: 28px;
-    letter-spacing: 0.06rem;
-    padding: 0 15px;
-    box-sizing: border-box;
 }
 
 .user-admin-panel .user-groups-table {
-    margin: 1.5rem 1.5rem;
+    margin: 1rem;
 }
 
 @media (max-width: 640px) {

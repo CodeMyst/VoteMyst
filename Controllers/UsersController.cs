@@ -1,67 +1,75 @@
 using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
-using VoteMyst.Discord;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
+
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
 using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
 {
-    public class UserController : Controller
+    /// <summary>
+    /// Provides a controller to handle users (including self).
+    /// </summary>
+    public class UsersController : VoteMystController
     {
-        private static Permissions[] _permissions = Enum.GetValues(typeof(Permissions)).Cast<Permissions>().ToArray();
-        private static AccountState[] _groups =  AccountStateExtension.ApplyableStates;
+        private static readonly Permissions[] _permissions = (Permissions[])Enum.GetValues(typeof(Permissions));
+        private static readonly AccountState[] _groups =  AccountStateExtension.ApplyableStates;
 
-        private readonly UserProfileBuilder _profileBuilder;
-        private readonly DatabaseHelperProvider _helpers;
+        public UsersController(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        public UserController(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers) 
-        {
-            _profileBuilder = profileBuilder;
-            _helpers = helpers;
-        }
-
+        /// <summary>
+        /// Wipes the data of the current user and subsequentially logs him out.
+        /// </summary>
         public IActionResult WipeAccount() 
         {
-            UserData selfUser = _profileBuilder.FromPrincipal(User);
-            _helpers.Users.WipeUser(selfUser.UserId);
+            UserData selfUser = GetCurrentUser();
+            DatabaseHelpers.Users.WipeUser(selfUser.UserId);
             return Logout();
         }
 
-        [RequirePermissions(Permissions.ModifyUsers)]
+        /// <summary>
+        /// Provides the page to search for users.
+        /// </summary>
         public IActionResult Search() 
         {
-            return View();
+            throw new NotImplementedException();
         }
         
+        /// <summary>
+        /// Provides the endpoint to log in via authorization methods. Redirects to "/users/me" afterwards.
+        /// </summary>
+        [Route("login")]
         public IActionResult Login()
         {
             return Challenge(new AuthenticationProperties { RedirectUri = "/users/me" });
         }
 
+        /// <summary>
+        /// Provides the endpoint to log out from the current session. This also clears the session cookies.
+        /// </summary>
+        [Route("logout")]
         public IActionResult Logout()
         {
             Response.Cookies.Delete("DiscordCookie");
             return RedirectToAction("Index", "Home");
         }
 
+        /// <summary>
+        /// Displays the user with the specified ID.
+        /// </summary>
         [RequirePermissions(Permissions.ViewUsers)]
-        public IActionResult Display(string displayId) 
+        public IActionResult Display(string id) 
         {
-            UserData targetUser = _profileBuilder.FromId(displayId);
+            UserData targetUser = ProfileBuilder.FromId(id);
             if (targetUser == null)
-                return View("NotFound");
+                return NotFound();
 
-            UserData selfUser = _profileBuilder.FromPrincipal(User);
-            Entry[] entries = _helpers.Entries.GetEntriesFromUser(targetUser);
+            UserData selfUser = ProfileBuilder.FromPrincipal(User);
+            Entry[] entries = DatabaseHelpers.Entries.GetEntriesFromUser(targetUser);
 
             ViewBag.IsSelf = targetUser.DisplayId == selfUser.DisplayId;
 
@@ -71,7 +79,7 @@ namespace VoteMyst.Controllers
             ViewBag.InspectedUserGroup = targetUser.GetAccountState();
             ViewBag.InspectedUserGroupLevel = (int) targetUser.AccountState;
             ViewBag.InspectedTotalEntries = entries.Length;
-            ViewBag.InspectedTotalVotes = entries.Select(e => _helpers.Votes.GetAllVotesForEntry(e).Length).Sum();
+            ViewBag.InspectedTotalVotes = entries.Select(e => DatabaseHelpers.Votes.GetAllVotesForEntry(e).Length).Sum();
             ViewBag.AllowAdminDashboard = selfUser.HasPermission(Permissions.ModifyUsers);
 
             if (ViewBag.AllowAdminDashboard)
@@ -88,12 +96,15 @@ namespace VoteMyst.Controllers
             return View("Display");
         }
 
-        public IActionResult DisplaySelf()
+        /// <summary>
+        /// Displays the user page for the currently authenticated user.
+        /// </summary>
+        public IActionResult Me()
         {
             if (!User.Identity.IsAuthenticated)
                 return Forbid();
 
-            UserData selfUser = _profileBuilder.FromPrincipal(User);
+            UserData selfUser = ProfileBuilder.FromPrincipal(User);
 
             if (selfUser.IsBanned())
                 return Forbid();
@@ -101,26 +112,29 @@ namespace VoteMyst.Controllers
             return Display(selfUser.DisplayId);
         }
 
+        /// <summary>
+        /// Provides the endpoint to edit a user.
+        /// </summary>
         [HttpPost]
         [RequirePermissions(Permissions.ModifyUsers)]
-        public IActionResult Display( 
-            string userId,
+        public IActionResult Edit( 
+            string id,
             string username = null,
             string avatar = null,
             ulong? permissions = 0,
             int? group = 0)
         {
-            UserData user = _helpers.Users.GetUser(userId);
+            UserData user = DatabaseHelpers.Users.GetUser(id);
             
             if (permissions.HasValue && (ulong) user.PermissionLevel != permissions) 
-                _helpers.Users.SetPermission(_helpers.Users.GetUser(userId), (Permissions) permissions.Value);
+                DatabaseHelpers.Users.SetPermission(DatabaseHelpers.Users.GetUser(id), (Permissions) permissions.Value);
 
             if (group.HasValue && (int) user.AccountState != group) {
-                _helpers.Users.SetPermission(user, ((AccountState) group).GetDefaultPermissions());
-                _helpers.Users.SetAccountState(user, (AccountState) group.Value);
+                DatabaseHelpers.Users.SetPermission(user, ((AccountState) group).GetDefaultPermissions());
+                DatabaseHelpers.Users.SetAccountState(user, (AccountState) group.Value);
             }
 
-            return Display(userId);
+            return RedirectToAction("display", new { id = id });
         }
     }
 }

@@ -1,3 +1,5 @@
+@using VoteMyst.Database.Models
+
 @{
     ViewData["Title"] = "Event";
     Layout = "_Layout";
@@ -10,7 +12,7 @@
     <div class="posts">
         @foreach (var e in ViewBag.Entries)
         {
-            @await Component.InvokeAsync("Entry", new { entry = e })
+            <partial name="_Entry" for="@e" />
         }
     </div>
 }
@@ -27,6 +29,7 @@
                 currentPlace++;
                 currentVotes = place.Item1;
             }
+            Entry entry = place.Item2;
 
             <div class="@(currentPlace <= 3 ? "top-3" : "")">
                 @if (currentPlace <= 3) 
@@ -37,7 +40,7 @@
                 {
                     <p class="place">@(currentPlace).</p>
                 }
-                @await Component.InvokeAsync("Entry", new { entry = place.Item2, displayUser = true })
+                <partial name="_Entry" for="@entry" />
             </div>
         }
     </div>

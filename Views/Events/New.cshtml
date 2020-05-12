@@ -1,3 +1,4 @@
+@model VoteMyst.Database.Models.Event
 @{
     ViewData["Title"] = "Event";
     Layout = "_Layout";
@@ -11,7 +12,7 @@
         <tr>
             <th>Title:</th>
             <td>
-                <input name="title" type="text" placeholder="My Event Title!" />
+                <input name="title" type="text" placeholder="My Event Title!" value="@Model.Title" />
             </td>
         </tr>
         <tr>

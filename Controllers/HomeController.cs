@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 
 using VoteMyst.Database;
@@ -9,18 +7,25 @@ using VoteMyst.Database.Models;
 
 namespace VoteMyst.Controllers
 {
-    public class HomeController : Controller
+    /// <summary>
+    /// Provides the homepage for the site.
+    /// </summary>
+    public class HomeController : VoteMystController
     {
-        private readonly DatabaseHelperProvider _helpers;
+        public HomeController(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        public HomeController(DatabaseHelperProvider helpers) 
-        {
-            _helpers = helpers;
-        }
-
+        /// <summary>
+        /// The index page for the site.
+        /// </summary>
+        [Route("")]
         public IActionResult Index()
         {
-            Event[] currentEvents = _helpers.Events.GetCurrentEvents();
+            return View();
+        }
+
+        public IActionResult IndexOLD()
+        {
+            Event[] currentEvents = DatabaseHelpers.Events.GetCurrentEvents();
 
             // If an event is currently happening, display information about it
             if (currentEvents.Length > 0) 
@@ -33,13 +38,13 @@ namespace VoteMyst.Controllers
                 ViewBag.Description = currentEvent.Description;
                 ViewBag.SubmissionEnd = currentEvent.EndDate;
                 ViewBag.VoteEnd = currentEvent.VoteEndDate;
-                ViewBag.TotalEntries = _helpers.Entries.GetEntriesInEvent(currentEvent).Length;
-                ViewBag.TotalVotes = _helpers.Votes.GetAllVotesInEvent(currentEvent).Length;
+                ViewBag.TotalEntries = DatabaseHelpers.Entries.GetEntriesInEvent(currentEvent).Length;
+                ViewBag.TotalVotes = DatabaseHelpers.Votes.GetAllVotesInEvent(currentEvent).Length;
 
                 return View("DisplayCurrent");
             }
             
-            Event[] upcomingEvents = _helpers.Events.GetAllEventsAfter(DateTime.UtcNow);
+            Event[] upcomingEvents = DatabaseHelpers.Events.GetAllEventsAfter(DateTime.UtcNow);
 
             // If an event is coming up, display information about it
             if (upcomingEvents.Length > 0)

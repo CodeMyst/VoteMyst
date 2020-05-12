@@ -17,12 +17,11 @@
                     <span>votemyst</span>
                 </h1>
             </a>
-            @await Component.InvokeAsync("UserWidget")
+            <partial name="_UserWidget.cshtml" />
         </header>
         
         <p class="subheading">a simple website for event voting.</p>
-
-        @await Component.InvokeAsync("Navigation")
+        <partial name="_Navigation" />
 
         @RenderBody()
 

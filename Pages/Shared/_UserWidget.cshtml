@@ -1,0 +1,24 @@
+@using VoteMyst
+@using VoteMyst.Database.Models
+
+@inject UserProfileBuilder _profileBuilder
+
+@{
+    bool loggedIn = User.Identity.IsAuthenticated;
+    UserData user = loggedIn ? _profileBuilder.FromPrincipal(User) : null;
+}
+
+@if (loggedIn)
+{
+    <a href="/users/me" class="widget user-widget">
+        <partial name="_Avatar" for="@user" />
+        <p class="username">@user.Username</p>
+    </a>
+}
+else 
+{
+    <a href="/login" class="widget login-widget">
+        <p>Log in with Discord</p>
+        <img class="discord-logo" src="https://discordapp.com/assets/1c8a54f25d101bdc607cec7228247a9a.svg" />
+    </a>
+}

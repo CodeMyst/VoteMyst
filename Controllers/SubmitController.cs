@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 
 using VoteMyst.Database;
@@ -14,109 +12,118 @@ using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
 {
-    public class SubmitController : Controller
+    /// <summary>
+    /// Provides a controller that handles submissions to events.
+    /// </summary>
+    public class SubmitController : VoteMystController
     {
-        public const int MaxFileSize = 4000000;
+        /// <summary>
+        /// The maximum size that a file can have (in megabytes).
+        /// </summary>
+        public const int MaxFileMB = 4;
 
-        private readonly UserProfileBuilder _profileBuilder;
-        private readonly DatabaseHelperProvider _helpers;
-        private readonly IWebHostEnvironment _environment;
+        public SubmitController(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        public SubmitController(UserProfileBuilder profileBuilder, DatabaseHelperProvider helpers, IWebHostEnvironment environment) 
-        {
-            _profileBuilder = profileBuilder;
-            _helpers = helpers;
-            _environment = environment;
-        }
-
+        /// <summary>
+        /// Shows the submission page for the event with the specified ID.
+        /// </summary>
+        [Route("submit/{id}")]
         [RequirePermissions(Permissions.SubmitEntries)]
-        public IActionResult Index()
+        public IActionResult Index(int id)
         {
-            UserData currentUser = _profileBuilder.FromPrincipal(User);
-            Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
+            UserData currentUser = GetCurrentUser();
+            Event currentEvent = DatabaseHelpers.Events.GetCurrentEvents().FirstOrDefault(e => e.EventId == id);
 
-            if (DateTime.UtcNow < currentEvent.StartDate || DateTime.UtcNow > currentEvent.EndDate)
+            bool validEvent = SetupValidation(validator => 
+            {
+                validator.Verify(currentEvent != null);
+                validator.Verify(DateTime.UtcNow >= currentEvent.StartDate && DateTime.UtcNow < currentEvent.EndDate);
+                // TODO: Switch to event state checking
+            }).Run();
+
+            if (!validEvent)
                 return NotFound();
 
+            ViewBag.MaxFileMB = MaxFileMB;
             ViewBag.Event = currentEvent;
 
-            if (currentEvent != null)
-            {
-                Entry currentEntry = _helpers.Entries.GetEntryOfUserInEvent(currentEvent, currentUser);
-                ViewBag.Entry = currentEntry;
-            }
+            Entry currentEntry = DatabaseHelpers.Entries.GetEntryOfUserInEvent(currentEvent, currentUser);
+            ViewBag.Entry = currentEntry;
 
             return View();
         }
 
+        /// <summary>
+        /// Provides the endpoint for submission POST requests.
+        /// </summary>
         [HttpPost]
+        [Route("submit/{id}")]
         [RequirePermissions(Permissions.SubmitEntries)]
-        public IActionResult Index(IFormFile file)
+        public IActionResult Index(int id, IFormFile file)
         {
-            if (file == null)
-                return ShowSubmissionError("Something needs to be uploaded.");
-
-            if (file.Length > MaxFileSize) 
-                return ShowSubmissionError("The file is too large.");
-            
             // TODO: Maybe support multiple events?
-            Event currentEvent = _helpers.Events.GetCurrentEvents().FirstOrDefault();
-            if (currentEvent == null)
+            Event currentEvent = DatabaseHelpers.Events.GetCurrentEvents().FirstOrDefault(e => e.EventId == id);
+            
+            bool validEvent = SetupValidation(validator => 
+            {
+                validator.Verify(currentEvent != null);
+                validator.Verify(DateTime.UtcNow >= currentEvent.StartDate && DateTime.UtcNow < currentEvent.EndDate);
+                // TODO: Switch to event state
+            }).Run();
+
+            if (!validEvent)
                 return NotFound();
 
-            // Make sure that the type to upload is valid
-            var typeProvider = new FileExtensionContentTypeProvider();
-            if (!typeProvider.TryGetContentType(file.FileName, out string contentType))
-                return ShowSubmissionError("Unknown file type.");
-
-            if (currentEvent.EventType == EventType.Art && !contentType.StartsWith("image/"))
-                return ShowSubmissionError("Only image files are allowed for this event.");
-
-            // TODO: Validate other event types
-
-            UserData user = _profileBuilder.FromPrincipal(User);
-
-            Entry existingEntry = _helpers.Entries.GetEntryOfUserInEvent(currentEvent, user);
-            if (existingEntry != null)
+            bool validForm = SetupValidation(validator =>
             {
-                _helpers.Entries.DeleteEntry(existingEntry);
+                validator.Verify(file != null, "A file to be uploaded needs to be specified.");
+                validator.Verify(file.Length <= MaxFileMB * 1000000, "The specified file is too large.");
 
-                if (existingEntry.EntryType == EntryType.File)
+                var typeProvider = new FileExtensionContentTypeProvider();
+                validator.Verify(typeProvider.TryGetContentType(file.FileName, out string contentType), "Unknown file type.");
+                validator.Verify(currentEvent.EventType == EventType.Art && contentType.StartsWith("image/"), "Only image files are allowed for this event.");
+                // TODO: Validate other event types
+
+            }).HandleInvalid(InjectResultIntoView).Run();
+
+            if (validForm)
+            {
+                UserData user = GetCurrentUser();
+
+                Entry existingEntry = DatabaseHelpers.Entries.GetEntryOfUserInEvent(currentEvent, user);
+                if (existingEntry != null)
                 {
-                    // Retrieve the previous entry path, making sure to make the path relative instead of absolute
-                    string entryAssetPath = Path.Combine(_environment.WebRootPath, existingEntry.Content.Substring(1));
-                    if (System.IO.File.Exists(entryAssetPath)) 
+                    DatabaseHelpers.Entries.DeleteEntry(existingEntry);
+
+                    if (existingEntry.EntryType == EntryType.File)
                     {
-                        System.IO.File.Delete(entryAssetPath);
+                        // Retrieve the previous entry path, making sure to make the path relative instead of absolute
+                        string entryAssetPath = PathBuilder.GetEntryUrl(existingEntry);
+
+                        if (System.IO.File.Exists(entryAssetPath)) 
+                        {
+                            System.IO.File.Delete(entryAssetPath);
+                        }
                     }
                 }
+
+                string relativePath = PathBuilder.GetEntryUrlRelative(currentEvent, user, file.FileName);
+                string absolutePath = PathBuilder.GetEntryUrlAbsolute(currentEvent, user, file.FileName);
+
+                // Ensure that the directory exists
+                Directory.CreateDirectory(Path.GetDirectoryName(absolutePath));
+
+                using (var localFile = System.IO.File.OpenWrite(absolutePath))
+                using (var uploadedFile = file.OpenReadStream())
+                {
+                    uploadedFile.CopyTo(localFile);
+                }
+
+                Entry entry = DatabaseHelpers.Entries.CreateEntry(currentEvent, user, EntryType.File, relativePath);
+                ViewBag.UploadedEntry = entry;
             }
-
-            string fileName = Path.GetFileName(file.FileName);
-            string relativePath = $"assets/events/{currentEvent.EventId}/{user.DisplayId}{Path.GetExtension(fileName)}";
-            string absolutePath = Path.Combine(_environment.WebRootPath, relativePath);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(absolutePath));
-
-            using (var localFile = System.IO.File.OpenWrite(absolutePath))
-            using (var uploadedFile = file.OpenReadStream())
-            {
-                uploadedFile.CopyTo(localFile);
-            }
-
-            Entry entry = _helpers.Entries.CreateEntry(currentEvent, user, EntryType.File, "/" + relativePath);
-
-            ViewBag.SubmitSuccessful = true;
-            ViewBag.Event = currentEvent;
-            ViewBag.Entry = entry;
-
-            return View();
-        }
-
-        private IActionResult ShowSubmissionError(string message)
-        {
-            ViewBag.ErrorMessage = message;
-            return Index();
+            
+            return Index(id);
         }
     }
 }

@@ -1,26 +1,26 @@
-@using System;
-@using VoteMyst;
+@using VoteMyst.Database.Models
 
+@model Event
 @{
-    ulong startUnix = ((DateTime)ViewBag.Event.StartDate).ToUnixSeconds();
-    ulong endUnix = ((DateTime)ViewBag.Event.EndDate).ToUnixSeconds();
-    ulong voteEndUnix = ((DateTime)ViewBag.Event.VoteEndDate).ToUnixSeconds();
+    ulong startUnix = ((DateTime)Model.StartDate).ToUnixSeconds();
+    ulong endUnix = ((DateTime)Model.EndDate).ToUnixSeconds();
+    ulong voteEndUnix = ((DateTime)Model.VoteEndDate).ToUnixSeconds();
 
-    bool hasStarted = ViewBag.Event.StartDate <= DateTime.UtcNow;
-    bool haveSubmissionsClosed = ViewBag.Event.EndDate <= DateTime.UtcNow;
-    bool haveVotingsClosed = ViewBag.Event.VoteEndDate <= DateTime.UtcNow;
+    bool hasStarted = Model.StartDate <= DateTime.UtcNow;
+    bool haveSubmissionsClosed = Model.EndDate <= DateTime.UtcNow;
+    bool haveVotingsClosed = Model.VoteEndDate <= DateTime.UtcNow;
 }
 
 <div class="event">
     <div class="event-info">
-        <a href="/events/@ViewBag.Event.EventId" class="event-title">@ViewBag.Event.Title</a>
-        @if (ViewBag.Event.RevealDate > DateTime.UtcNow)
+        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.EventId">@Model.Title</a>
+        @if (Model.RevealDate > DateTime.UtcNow)
         {
             <h4>HIDDEN</h4>
         }
-        @if (ViewBag.Event.StartDate <= DateTime.UtcNow) 
+        @if (Model.StartDate <= DateTime.UtcNow) 
         {
-            <p class="event-description">@ViewBag.Event.Description</p>
+            <p class="event-description">@Model.Description</p>
         }
     </div>
 
@@ -40,7 +40,7 @@
     </table>
 
     <div class="event-state">
-        @if(ViewBag.Finished)
+        @if(haveVotingsClosed)
         {
             <span>The event is over!</span>
         }
