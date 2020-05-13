@@ -36,7 +36,7 @@ namespace VoteMyst.Controllers
         /// Sets up a <see cref="VoteMyst.Controllers.Validation.RequestValidator" /> that can used to validate data.
         /// <para>Inside the validation action the <see cref="VoteMyst.Controllers.Validation.RequestValidator.Verify(bool, string)" /> method should be used.</para>
         /// </summary>
-        protected RequestValidator SetupValidation(Action<RequestValidator> validation)
+        protected RequestValidator SetupValidation(Action<ValidationProvider> validation)
         {
             return new RequestValidator(validation);
         }

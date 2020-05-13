@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using VoteMyst.Database;
 using VoteMyst.Database.Models;
@@ -114,16 +115,21 @@ namespace VoteMyst.Controllers
         /// </summary>
         [HttpPost]
         [RequirePermissions(Permissions.CreateEvents)]
-        public IActionResult New(
-            string title, string description, EventType eventType,
-            DateTime revealDate, DateTime startDate,
-            DateTime endDate, DateTime voteEndDate)
+        public IActionResult New([FromForm] Event e)
         {
-            DatabaseHelpers.Events.CreateEvent(title, description, eventType,
-                revealDate, startDate, endDate, voteEndDate);
+            if (!ModelState.IsValid)
+            {
+                string[] errorMessages = ModelState.Values.SelectMany(value => value.Errors).Select(error => error.ErrorMessage).ToArray();
+                ViewBag.ErrorMessages = errorMessages;
 
-            ViewBag.SuccessfullyCreated = true;
-            return View();
+                return View(e);
+            }
+            else
+            {
+                DatabaseHelpers.Events.CreateEvent(e);
+
+                return View("Success", e);
+            }
         }
 
         [RequirePermissions(Permissions.ViewEntries)]
