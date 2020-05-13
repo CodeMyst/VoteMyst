@@ -60,5 +60,21 @@ namespace VoteMyst.Database.Models
                 yield return new ValidationResult("All dates must be in ascending order.");
             }
         }
+
+        public EventState GetStateForTime(DateTime dateTime)
+        {
+            if (dateTime < RevealDate)
+                return EventState.Hidden;
+            if (dateTime < StartDate)
+                return EventState.Revealed;
+            if (dateTime < EndDate)
+                return EventState.Ongoing;
+            if (dateTime < VoteEndDate)
+                return EventState.Voting;
+            
+            return EventState.Closed;
+        }
+        public EventState GetCurrentState()
+            => GetStateForTime(DateTime.UtcNow);
     }
 }

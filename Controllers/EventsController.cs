@@ -63,32 +63,29 @@ namespace VoteMyst.Controllers
         public IActionResult Display(int id) 
         {
             Event e = DatabaseHelpers.Events.GetEvent(id);
+            ViewBag.Event = e;
 
             if (e == null)
                 return NotFound();
+                
+            EventState eventState = e.GetCurrentState();
 
-            bool beforeReveal = DateTime.Now < e.RevealDate;
-            bool beforeEnd = DateTime.UtcNow < e.EndDate;
-            bool inVote = DateTime.UtcNow > e.EndDate && DateTime.UtcNow < e.VoteEndDate;
-            bool afterVoteEnd = DateTime.UtcNow > e.VoteEndDate;
-
-            if (beforeReveal)
+            if (eventState == EventState.Hidden)
+            {
+                // If the event is not revealed yet, don't allow to find it
                 return NotFound();
-
-            if (inVote) 
+            }
+            if (eventState == EventState.Ongoing)
+            {
+                // If submissions are still open, display all submissions so far
+                ViewBag.Entries = DatabaseHelpers.Entries.GetEntriesInEvent(e);
+            }
+            if (eventState == EventState.Voting) 
             {
                 // If the event voting phase has started and not ended yet, redirect to the vote page
                 return RedirectToAction("vote", new { id = id });
             }
-
-            // Otherwise display general event information
-            ViewBag.Event = e;
-
-            if (beforeEnd)
-            {
-                ViewBag.Entries = DatabaseHelpers.Entries.GetEntriesInEvent(e);
-            }
-            if (afterVoteEnd)
+            if (eventState == EventState.Closed)
             {
                 // If voting has ended, display the winners in order
                 ViewBag.Leaderboard = DatabaseHelpers.Entries.GetEntriesInEvent(e)
@@ -140,8 +137,8 @@ namespace VoteMyst.Controllers
 
             if (currentEvent == null)
                 return NotFound();
-            if (DateTime.UtcNow < currentEvent.EndDate || DateTime.UtcNow > currentEvent.VoteEndDate)
-                return NotFound();
+            if (currentEvent.GetCurrentState() != EventState.Voting)
+                return Unauthorized();
 
             Entry[] entries = DatabaseHelpers.Entries.GetEntriesInEvent(currentEvent);
 
@@ -160,7 +157,7 @@ namespace VoteMyst.Controllers
         {
             // Disallow anonymous voting
             if (!User.Identity.IsAuthenticated)
-                return Unauthorized();
+                return Forbid();
 
             Entry entry = DatabaseHelpers.Entries.GetEntry(entryId);
 
@@ -174,7 +171,7 @@ namespace VoteMyst.Controllers
             Event entryEvent = DatabaseHelpers.Events.GetEvent(eventId);
             
             // Only allow voting while its open
-            if (DateTime.UtcNow < entryEvent.EndDate || DateTime.UtcNow > entryEvent.VoteEndDate)
+            if (entryEvent.GetCurrentState() != EventState.Voting)
                 return Unauthorized();
 
             Vote vote = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user.UserId, entryId);
@@ -195,12 +192,12 @@ namespace VoteMyst.Controllers
         {
             // Disallow anonymous voting
             if (!User.Identity.IsAuthenticated)
-                return Unauthorized();
+                return Forbid();
                 
             Event entryEvent = DatabaseHelpers.Events.GetEvent(eventId);
 
             // Only allow deleting votes if voting is still open
-             if (DateTime.UtcNow < entryEvent.EndDate || DateTime.UtcNow > entryEvent.VoteEndDate)
+             if (entryEvent.GetCurrentState() != EventState.Voting)
                 return Unauthorized();
 
             UserData user = GetCurrentUser();

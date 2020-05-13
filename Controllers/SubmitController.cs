@@ -37,8 +37,7 @@ namespace VoteMyst.Controllers
             bool validEvent = SetupValidation(validator => 
             {
                 validator.Verify(currentEvent != null);
-                validator.Verify(DateTime.UtcNow >= currentEvent.StartDate && DateTime.UtcNow < currentEvent.EndDate);
-                // TODO: Switch to event state checking
+                validator.Verify(currentEvent.GetCurrentState() == EventState.Ongoing);
             }).Run();
 
             if (!validEvent)
@@ -67,8 +66,7 @@ namespace VoteMyst.Controllers
             bool validEvent = SetupValidation(validator => 
             {
                 validator.Verify(currentEvent != null);
-                validator.Verify(DateTime.UtcNow >= currentEvent.StartDate && DateTime.UtcNow < currentEvent.EndDate);
-                // TODO: Switch to event state
+                validator.Verify(currentEvent.GetCurrentState() == EventState.Ongoing);
             }).Run();
 
             if (!validEvent)
@@ -81,8 +79,12 @@ namespace VoteMyst.Controllers
 
                 var typeProvider = new FileExtensionContentTypeProvider();
                 validator.Verify(typeProvider.TryGetContentType(file.FileName, out string contentType), "Unknown file type.");
-                validator.Verify(currentEvent.EventType == EventType.Art && contentType.StartsWith("image/"), "Only image files are allowed for this event.");
-                // TODO: Validate other event types
+
+                switch(currentEvent.EventType)
+                {
+                    case EventType.Art: validator.Verify(contentType.StartsWith("image/"), "Only image files are allowed for this event."); break;
+                    // TODO: Validate other event types
+                }
 
             }).HandleInvalid(InjectResultIntoView).Run();
 
