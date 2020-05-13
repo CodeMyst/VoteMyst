@@ -1,35 +1,50 @@
-@using VoteMyst.Database.Models
+@inject DatabaseHelperProvider DatabaseHelpers
 
+@using VoteMyst.Database
+@using VoteMyst.Database.Models
+@using VoteMyst.Controllers;
+
+@model Event
 @{
     ViewData["Title"] = "Event";
     Layout = "_Layout";
+
+    EventState eventState = Model.GetCurrentState();
 }
 
-<h1>@ViewBag.Event.Title</h1>
+<h1>@Model.Title</h1>
 
-@if (ViewBag.Entries != null)
+@if (eventState == EventState.Ongoing)
 {
+    <p>
+        Submissions are open! Click
+        <a asp-controller="submit" asp-action="index" asp-route-id="@Model.EventId">here</a>
+        to submit an entry!
+    </p>
+
     <div class="posts">
-        @foreach (var e in ViewBag.Entries)
+        @foreach (var e in DatabaseHelpers.Entries.GetEntriesInEvent(Model))
         {
             <partial name="_Entry" for="@e" />
         }
     </div>
 }
-@if (ViewBag.Leaderboard != null)
+@if (eventState == EventState.Closed)
 {
+    EventsController.Leaderboard leaderboard = EventsController.Leaderboard.FromEvent(Model, DatabaseHelpers);
+
     <div class="leaderboard">
         @{
             int currentPlace = 0;
             int currentVotes = -1;
         }
-        @foreach (var place in ViewBag.Leaderboard)
+        @foreach (var place in leaderboard)
         {
-            if (place.Item1 != currentVotes) {
+            if (place.Votes != currentVotes) {
                 currentPlace++;
-                currentVotes = place.Item1;
+                currentVotes = place.Votes;
             }
-            Entry entry = place.Item2;
+            Entry entry = place.Entry;
 
             <div class="@(currentPlace <= 3 ? "top-3" : "")">
                 @if (currentPlace <= 3) 

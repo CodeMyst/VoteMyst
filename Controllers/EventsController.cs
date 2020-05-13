@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -34,6 +36,64 @@ namespace VoteMyst.Controllers
                 ActionSuccess = success;
                 HasVote = hasVote;
             }
+        }
+        public class Leaderboard : IEnumerable<Leaderboard.Place> 
+        {
+            public struct Place 
+            {
+                public int Number { get; set; }
+                public UserData Author { get; set; }
+                public Entry Entry { get; set; }
+                public int Votes { get; set; }
+
+                public static Place FromEntry(Entry entry, DatabaseHelperProvider helpers)
+                {
+                    return new Place
+                    {
+                        Number = -1,
+                        Author = helpers.Users.GetUser(entry.UserId),
+                        Entry = entry,
+                        Votes = helpers.Votes.GetAllVotesForEntry(entry).Length
+                    };
+                }
+            }
+
+            private readonly Place[] _places;
+
+            private Leaderboard(Place[] places)
+            {
+                _places = places;
+            }
+
+            public static Leaderboard FromEvent(Event ev, DatabaseHelperProvider helpers)
+            {
+                Place[] places = helpers.Entries.GetEntriesInEvent(ev)
+                    .Select(entry => Place.FromEntry(entry, helpers))
+                    .OrderByDescending(place => place.Votes)
+                    .ThenBy(place => place.Entry.EntryId)
+                    .ToArray();
+
+                int currentPlace = 0;
+                int currentVotes = -1;
+
+                for(int i = 0; i < places.Length; i++)
+                {
+                    if (places[i].Votes != currentVotes)
+                        currentPlace++;
+
+                    places[i].Number = currentPlace;
+                }
+
+                return new Leaderboard(places);
+            }
+
+            public IEnumerator<Place> GetEnumerator()
+            {
+                foreach (Place p in _places)
+                    yield return p;
+            }
+            IEnumerator IEnumerable.GetEnumerator()
+                => _places.GetEnumerator();
         }
 
         public EventsController(IServiceProvider serviceProvider) : base(serviceProvider) { }
@@ -75,27 +135,13 @@ namespace VoteMyst.Controllers
                 // If the event is not revealed yet, don't allow to find it
                 return NotFound();
             }
-            if (eventState == EventState.Ongoing)
-            {
-                // If submissions are still open, display all submissions so far
-                ViewBag.Entries = DatabaseHelpers.Entries.GetEntriesInEvent(e);
-            }
             if (eventState == EventState.Voting) 
             {
                 // If the event voting phase has started and not ended yet, redirect to the vote page
                 return RedirectToAction("vote", new { id = id });
             }
-            if (eventState == EventState.Closed)
-            {
-                // If voting has ended, display the winners in order
-                ViewBag.Leaderboard = DatabaseHelpers.Entries.GetEntriesInEvent(e)
-                    .Select(e => (DatabaseHelpers.Votes.GetAllVotesForEntry(e).Length, e))
-                    .OrderByDescending(e => e.Item1)
-                    .ThenBy(e => e.Item2.EntryId)
-                    .ToArray();
-            }
 
-            return View();
+            return View(e);
         }
 
         /// <summary>
