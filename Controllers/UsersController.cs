@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 
@@ -19,7 +20,12 @@ namespace VoteMyst.Controllers
         private static readonly Permissions[] _permissions = (Permissions[])Enum.GetValues(typeof(Permissions));
         private static readonly AccountState[] _groups =  AccountStateExtension.ApplyableStates;
 
-        public UsersController(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        private readonly ILogger _logger;
+
+        public UsersController(ILogger<UsersController> logger, IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// Wipes the data of the current user and subsequentially logs him out.
@@ -28,6 +34,9 @@ namespace VoteMyst.Controllers
         {
             UserData selfUser = GetCurrentUser();
             DatabaseHelpers.Users.WipeUser(selfUser.UserId);
+
+            _logger.LogWarning("User {0} wiped their account.", selfUser.Username);
+
             return Logout();
         }
 
@@ -133,6 +142,8 @@ namespace VoteMyst.Controllers
                 DatabaseHelpers.Users.SetPermission(user, ((AccountState) group).GetDefaultPermissions());
                 DatabaseHelpers.Users.SetAccountState(user, (AccountState) group.Value);
             }
+
+            _logger.LogInformation("{0} was modified (AccountState={1}, Permissions={2}).", user.Username, user.AccountState, user.PermissionLevel);
 
             return RedirectToAction("display", new { id = id });
         }

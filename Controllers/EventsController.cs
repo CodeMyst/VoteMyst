@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -96,7 +97,12 @@ namespace VoteMyst.Controllers
                 => _places.GetEnumerator();
         }
 
-        public EventsController(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        private readonly ILogger _logger;
+
+        public EventsController(ILogger<EventsController> logger, IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+            _logger = logger;
+        }
 
         /// <summary>
         /// Displays an overview of all events.
@@ -122,6 +128,7 @@ namespace VoteMyst.Controllers
         [RequirePermissions(Permissions.ViewEntries)]
         public IActionResult Display(int id) 
         {
+            UserData user = GetCurrentUser();
             Event e = DatabaseHelpers.Events.GetEvent(id);
             ViewBag.Event = e;
 
@@ -130,17 +137,20 @@ namespace VoteMyst.Controllers
                 
             EventState eventState = e.GetCurrentState();
 
-            if (eventState == EventState.Hidden)
+            // If the event is not revealed yet, don't allow to find it, except if the user is an admin
+            if (eventState == EventState.Hidden && user.AccountState != AccountState.Admin)
             {
-                // If the event is not revealed yet, don't allow to find it
+                _logger.LogWarning("User {0} attempted to access the event with ID {1}, but it is hidden. Sending a 404 response.", user.Username, id);
                 return NotFound();
             }
+            // If the event voting phase has started and not ended yet, redirect to the vote page
             if (eventState == EventState.Voting) 
             {
-                // If the event voting phase has started and not ended yet, redirect to the vote page
+                _logger.LogInformation("User {0} attempted to access the event with ID {1}, but voting is in progress. Redirecting to the vote page.", 
+                    user.Username, id);
                 return RedirectToAction("vote", new { id = id });
             }
-
+            
             return View(e);
         }
 
@@ -165,11 +175,16 @@ namespace VoteMyst.Controllers
                 string[] errorMessages = ModelState.Values.SelectMany(value => value.Errors).Select(error => error.ErrorMessage).ToArray();
                 ViewBag.ErrorMessages = errorMessages;
 
+                _logger.LogWarning("User {0} attempted to create an event, but failed with {1} validation errors.",
+                    GetCurrentUser().Username, ModelState.ErrorCount);
+
                 return View(e);
             }
             else
             {
                 DatabaseHelpers.Events.CreateEvent(e);
+
+                _logger.LogInformation("User {0} created the event '{1}'.", GetCurrentUser().Username, e.Title);
 
                 return View("Success", e);
             }
@@ -179,7 +194,7 @@ namespace VoteMyst.Controllers
         public IActionResult Vote(int id) 
         {
             // TODO: Maybe support multiple events?
-            Event currentEvent = DatabaseHelpers.Events.GetCurrentEvents().FirstOrDefault(e => e.EventId == id);
+            Event currentEvent = DatabaseHelpers.Events.GetEvent(id);
 
             if (currentEvent == null)
                 return NotFound();
@@ -229,6 +244,8 @@ namespace VoteMyst.Controllers
             // If all checks passed, cast the vote
             DatabaseHelpers.Votes.AddVote(entryId, user.UserId);
 
+            _logger.LogInformation("User {0} cast a vote on the entry with ID {1}.", user.Username, entryId);
+
             return Ok(new VoteActionResult(true, true));
         }
         
@@ -252,6 +269,8 @@ namespace VoteMyst.Controllers
             // Make sure a vote exists that can be deleted
             if (vote == null)
                 return Ok(new VoteActionResult(false, false));
+
+            _logger.LogInformation("User {0} removed their vote on the entry with ID {1}.", user.Username, entryId);
 
             DatabaseHelpers.Votes.DeleteVote(entryId, user.UserId);
             return Ok(new VoteActionResult(true, false));

@@ -159,6 +159,7 @@
 }
 .user-admin-panel > * {
     margin: 0.5rem 1.5rem;
+    width: auto;
 }
 .user-admin-panel button[type=submit] {
     margin: auto 0 0 auto;
