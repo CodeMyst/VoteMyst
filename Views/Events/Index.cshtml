@@ -8,6 +8,13 @@
     Event[] history = ViewBag.History;
 }
 
+@if (ViewBag.CanCreateEvents)
+{
+    <div>
+        <a class="button" asp-controller="events" asp-action="new">Create an event</a>
+    </div>
+}
+
 <div class="events">
     @if ((currentEvents?.Length ?? 0) > 0)
     {

@@ -111,10 +111,12 @@ namespace VoteMyst.Controllers
         public IActionResult Index()
         {
             UserData user = GetCurrentUser();
+
             Event[] finishedEvents = DatabaseHelpers.Events.GetAllEventsFinishedBefore(DateTime.UtcNow);
             Event[] plannedEvents = DatabaseHelpers.Events.GetPlannedEvents(user.HasPermission(Permissions.CreateEvents));
             Event[] ongoingEvents = DatabaseHelpers.Events.GetCurrentEvents();
 
+            ViewBag.CanCreateEvents = user.HasPermission(Permissions.CreateEvents);
             ViewBag.History = finishedEvents;
             ViewBag.Planned = plannedEvents;
             ViewBag.Current = ongoingEvents;

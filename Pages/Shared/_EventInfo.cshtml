@@ -1,72 +1,74 @@
+@using VoteMyst.Database
 @using VoteMyst.Database.Models
 
 @model Event
 @{
-    ulong startUnix = ((DateTime)Model.StartDate).ToUnixSeconds();
-    ulong endUnix = ((DateTime)Model.EndDate).ToUnixSeconds();
-    ulong voteEndUnix = ((DateTime)Model.VoteEndDate).ToUnixSeconds();
+    ulong revealUnix = Model.RevealDate.ToUnixSeconds();
+    ulong startUnix = Model.StartDate.ToUnixSeconds();
+    ulong endUnix = Model.EndDate.ToUnixSeconds();
+    ulong voteEndUnix = Model.VoteEndDate.ToUnixSeconds();
 
-    bool hasStarted = Model.StartDate <= DateTime.UtcNow;
-    bool haveSubmissionsClosed = Model.EndDate <= DateTime.UtcNow;
-    bool haveVotingsClosed = Model.VoteEndDate <= DateTime.UtcNow;
+    EventState eventState = Model.GetCurrentState();
 }
 
 <div class="event">
     <div class="event-info">
-        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.EventId">@Model.Title</a>
-        @if (Model.RevealDate > DateTime.UtcNow)
-        {
-            <h4>HIDDEN</h4>
-        }
-        @if (Model.StartDate <= DateTime.UtcNow) 
-        {
-            <p class="event-description">@Model.Description</p>
-        }
+        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.EventId">
+            @Model.Title
+            @if (eventState == EventState.Hidden) 
+            {
+                <span style="padding-left: 0.5rem; opacity: 0.5;">(hidden)</span>
+            }
+        </a>
+        
+        <p class="event-description">@Model.Description</p>
     </div>
 
     <table class="event-dates">
         <tr>
-            <th>@(hasStarted ? "Event started" : "Event start")</th>
+            <th>@(eventState >= EventState.Ongoing ? "Event started" : "Event start")</th>
             <td class="start-date local-date" --unix-timestamp="@startUnix"></td>
         </tr>
         <tr>
-            <th>@(haveSubmissionsClosed ? "Submissions closed" : "Submissions close")</th>
+            <th>@(eventState >= EventState.Voting ? "Submissions closed" : "Submissions close")</th>
             <td class="start-date local-date" --unix-timestamp="@endUnix"></td>
         </tr>
         <tr>
-            <th>@(haveVotingsClosed ? "Votings closed" : "Votings close")</th>
+            <th>@(eventState >= EventState.Closed ? "Votings closed" : "Votings close")</th>
             <td class="start-date local-date" --unix-timestamp="@voteEndUnix"></td>
         </tr>
     </table>
 
     <div class="event-state">
-        @if(haveVotingsClosed)
+        @switch(eventState)
         {
-            <span>The event is over!</span>
-        }
-        else
-        {
-            @if(!hasStarted)
-            {
+            case EventState.Hidden:
+                <span>
+                    The event will be revealed in
+                    <span class="timer" --unix-timestamp="@revealUnix">0.00:00:00</span>.
+                </span>
+                break;
+            case EventState.Revealed:
                 <span>
                     The event starts in
                     <span class="timer" --unix-timestamp="@startUnix">0.00:00:00</span>.
                 </span>
-            }
-            else if(!haveSubmissionsClosed)
-            {
+                break;
+            case EventState.Ongoing:
                 <span>
                     Submissions will be closed in
                     <span class="timer" --unix-timestamp="@endUnix">0.00:00:00</span>.
                 </span>
-            }
-            else if(!haveVotingsClosed)
-            {
+                break;
+            case EventState.Voting:
                 <span>
                     Voting will be closed in
                     <span class="timer" --unix-timestamp="@voteEndUnix">0.00:00:00</span>.
                 </span>
-            }
+                break;
+            case EventState.Closed:
+                <span>The event is over!</span>
+                break;
         }
     </div>
 </div>
