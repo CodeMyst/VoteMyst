@@ -28,11 +28,13 @@ namespace VoteMyst.Database
                 EndDate = endDate,
                 VoteEndDate = voteEndDate
             };
-
+            
+            return CreateEvent(ev);
+        }
+        public Event CreateEvent(Event ev)
+        {
             context.Events.Add(ev);
-
             context.SaveChanges();
-
             return ev;
         }
 

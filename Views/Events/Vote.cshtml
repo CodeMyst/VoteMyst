@@ -13,7 +13,7 @@
 <div class="posts" event-id="@ViewBag.Event.EventId">
 @foreach (Entry e in ViewBag.RandomizedEntries)
 {
-    @await Component.InvokeAsync("Entry", new { entry = e, displayUser = false, canVote = true })
+    <partial name="_Entry" for="@e" />
 }
 </div>
 

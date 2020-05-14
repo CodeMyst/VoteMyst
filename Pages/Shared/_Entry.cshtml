@@ -1,0 +1,40 @@
+@using VoteMyst.Database
+@using VoteMyst.Database.Models
+
+@inject UserProfileBuilder ProfileBuilder
+@inject DatabaseHelperProvider DatabaseHelpers
+
+@model Entry
+@{
+    UserData user = ProfileBuilder.FromPrincipal(User);
+    UserData author = DatabaseHelpers.Users.GetUser(Model.UserId);
+
+    Event e = DatabaseHelpers.Events.GetEvent(Model.EventId);
+    bool votingOpen = DateTime.UtcNow >= e.EndDate && DateTime.UtcNow < e.VoteEndDate;
+    bool displayUser = DateTime.UtcNow >= e.VoteEndDate;
+    bool isSelfPost = user.UserId == author.UserId;
+    bool canVote = votingOpen && !isSelfPost;
+    bool hasVoted = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, Model) != null;
+}
+
+<div class="post"
+    @(canVote ? $"entry-id={Model.EntryId} allow-vote onclick=castVote(this)" : "")
+    @(isSelfPost ? "self-post" : "")
+    @(hasVoted ? "voted" : "") >
+    @if(displayUser)
+    {
+        <div class="post-user">
+            <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayId">
+                <partial name="_Avatar" for="@author" />
+                <p class="username">@author.Username</p>
+            </a>
+            <p class="post-date">@Model.SubmitDate.ToString("dd/MM/yyyy")</p>
+        </div>
+    }
+    <div class="post-image">
+        <img src="/@Model.Content" />
+    </div>
+    
+    <img class="post-absolute-element post-vote" src="/img/heart.png"/>
+    <img class="post-absolute-element post-has-voted" src="/img/heart.png" @(canVote ? "onclick=removeVote(this)" : "") />
+</div>

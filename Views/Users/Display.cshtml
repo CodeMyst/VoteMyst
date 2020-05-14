@@ -1,7 +1,6 @@
 @using VoteMyst.Database.Models
 @{
     ViewData["Title"] = "User";
-    Layout = "_Layout";
 
     UserData inspectedUser = ViewBag.InspectedUser;
     UserData selfUser = ViewBag.SelfUser;
@@ -9,7 +8,7 @@
 
 <div class="panel user-info">
     <div class="user-info-column">
-        @await Component.InvokeAsync("Avatar", @ViewBag.InspectedUser)
+        <partial name="_Avatar" for="@inspectedUser" />
         <p class="username">@inspectedUser.Username</p>
         @if(ViewBag.InspectedUserGroup != null) 
         {
@@ -17,7 +16,7 @@
                 @ViewBag.InspectedUserGroup
             </p>
         }
-        <h6 class="own-display-id">Account Id:<br>@ViewBag.InspectedUser.DisplayId</h6>
+        <p class="own-display-id">Account ID:<br>@ViewBag.InspectedUser.DisplayId</p>
     </div>
     <table class="user-info-table">
         <tr>
@@ -45,7 +44,7 @@
 @if(ViewBag.AllowAdminDashboard)
 {
     <div class="panel">
-        <form id="permissionsForm" class="user-admin-panel" method="post" action="@ViewBag.InspectedUser.DisplayId">
+        <form id="permissionsForm" class="user-admin-panel" method="post" action="/users/edit/@ViewBag.InspectedUser.DisplayId">
             <table class="user-permission-table">
                 @foreach(var entry in ViewBag.PermissionEntries)
                 {

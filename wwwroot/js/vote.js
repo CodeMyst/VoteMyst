@@ -30,18 +30,17 @@ function buildPostBody(post) {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
-        }, 
-        body: JSON.stringify({ 
-            entryId: getEntryId(post),
-            eventId: getEventId()
-        })
+        }
     }
+}
+function buildUrlParameters(post) {
+    return getEventId() + "/" + getEntryId(post);
 }
 
 function castVote(element) {
     const post = element;
     if (!post.hasAttribute(votedAttribute)) {
-        fetch("/vote/cast", buildPostBody(post))
+        fetch(`/vote/cast/${buildUrlParameters(post)}`, buildPostBody(post))
             .then(toJson)
             .then(result => {
                 if (result.hasVote) {
@@ -57,7 +56,7 @@ function castVote(element) {
 function removeVote(element) {
     const post = element.parentElement;
     if (post.hasAttribute(votedAttribute)) {
-        fetch("/vote/remove", buildPostBody(post))
+        fetch(`/vote/remove/${buildUrlParameters(post)}`, buildPostBody(post))
             .then(toJson)
             .then(result => {
                 if (!result.hasVote) {

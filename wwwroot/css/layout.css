@@ -22,6 +22,7 @@ a:hover {
 
 h1 {
     font-weight: normal;
+    line-height: 2.5rem;
 }
 
 .container {
@@ -49,25 +50,26 @@ header {
 }
 
 nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: block;
 
-    margin: 1rem auto;
-    width: fit-content;
+    margin: 1rem auto 1rem 0;
 
     background-color: var(--color-dark-gray);
     border-radius: var(--panel-border-radius);
 }
-nav a {
-    display: inline-block;
-    padding: 0.4rem 1.5rem;
-    font-weight: bold;
-    letter-spacing: 0.05rem;
+nav ul {
+    padding: 0.8rem;
 }
-nav .admin {
-    border: 1px solid #7e1a1a;
-    border-radius: inherit;
+nav li {
+    display: inline;
+    font-size: 1.3rem;
+}
+nav li:after {
+    content: "-";
+    padding: 0 0.5rem;
+}
+nav li:last-child:after {
+    content: "";
 }
 
 footer {

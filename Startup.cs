@@ -41,6 +41,7 @@ namespace VoteMyst
             services.AddRazorPages();
           
             services.AddSingleton(Configuration);
+            services.AddRouting(options => options.LowercaseUrls = true );
             services.AddMvc(options => options.EnableEndpointRouting = false );
 
             services.AddAuthentication(options =>
@@ -104,6 +105,7 @@ namespace VoteMyst
             services.AddScoped<AvatarHelper>();
             services.AddScoped<DatabaseHelperProvider>();
             services.AddScoped<UserProfileBuilder>();
+            services.AddScoped<PathBuilder>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -134,58 +136,9 @@ namespace VoteMyst
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                
-                // Consult the wiki about page information
-                
-                // Login/Logout Pages
-                endpoints.MapControllerRoute(name: "login",
-                    pattern: "login",
-                    defaults: new { controller = "User", action = "Login" });
-                endpoints.MapControllerRoute(name: "logout",
-                    pattern: "logout",
-                    defaults: new { controller = "User", action = "Logout" });
-                    
-                // Test DAta
-                endpoints.MapControllerRoute(name: "createTestData",
-                    pattern: "createData",
-                    defaults: new { controller = "User", action = "CreateTestData" });
-
-
-                // User searching
-                endpoints.MapControllerRoute(name: "searchUser",
-                    pattern: "users",
-                    defaults: new { controller = "User", action = "Search" });
-                // Self user viewing (indirectly uses the 'other user' view)
-                endpoints.MapControllerRoute(name: "viewSelfUser",
-                    pattern: "users/me",
-                    defaults: new { controller = "User", action = "DisplaySelf" });
-                // View user by ID
-                endpoints.MapControllerRoute(name: "viewUser",
-                    pattern: "users/{*displayId}",
-                    defaults: new { controller = "User", action = "Display" });
-
-                // Browse events
-                endpoints.MapControllerRoute(name: "browseEvents",
-                    pattern: "events",
-                    defaults: new { controller = "Event", action = "Browse" });
-                // Create event / Edit event
-                endpoints.MapControllerRoute(name: "newEvent",
-                    pattern: "events/{action:alpha}",
-                    defaults: new { controller = "Event", action = "Create" });
-                // View event by ID
-                endpoints.MapControllerRoute(name: "viewEvent",
-                    pattern: "events/{eventId:int}",
-                    defaults: new { controller = "Event", action = "Display" });
-
-                // Vote on an event
-                endpoints.MapControllerRoute(name: "vote",
-                    pattern: "vote");
-                // Submit an entry to an event
-                endpoints.MapControllerRoute(name: "submit",
-                    pattern: "submit");
-
-                endpoints.MapControllerRoute(name: "default", 
-                    pattern: "{controller=Home}/{action=Index}");
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

@@ -53,6 +53,10 @@ button:hover, .button:hover {
     color: var(--color-mysted);
 }
 
+form table {
+    table-layout: fixed;
+    width: 100%;
+}
 form table th {
     text-align: right;
     font-weight: normal;
@@ -74,7 +78,7 @@ form .row-layout div.break {
     margin: 0;
 }
 form .row-layout > div {
-    margin: 0 20px 10px;
+    margin: 0 0.6rem 0.3rem;
 }
 form .row-layout p {
     margin: 0.2rem 0;
