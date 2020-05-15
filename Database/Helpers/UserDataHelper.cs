@@ -64,6 +64,11 @@ namespace VoteMyst.Database
         public UserData GetOrCreateUser(int userId)
             => GetUser(userId) ?? NewUser();
 
+        public UserData[] SearchUsers(string query)
+            => _context.UserData
+                .Where(x => x.Username.Contains(query, StringComparison.InvariantCultureIgnoreCase))
+                .ToArray();
+
         public bool WipeUser(int userId) 
         {
             UserData user = GetUser(userId);

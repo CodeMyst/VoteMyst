@@ -16,8 +16,8 @@
     <meta property="og:image" content="@avatarUrl" />
 }
 
-<div class="panel user-info">
-    <div class="user-info-column">
+<div class="panel user-profile">
+    <div class="user-profile-column">
         <partial name="_Avatar" for="@inspectedUser" />
         <p class="username">@inspectedUser.Username</p>
         @if(ViewBag.InspectedUserGroup != null) 
@@ -28,7 +28,7 @@
         }
         <p class="own-display-id">Account ID:<br>@ViewBag.InspectedUser.DisplayId</p>
     </div>
-    <table class="user-info-table">
+    <table class="user-profile-table">
         <tr>
             <th>Join Date:</th>
             <td>@inspectedUser.JoinDate.ToString("dd/MM/yyyy")</td>

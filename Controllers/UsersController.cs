@@ -45,7 +45,15 @@ namespace VoteMyst.Controllers
         /// </summary>
         public IActionResult Search() 
         {
-            throw new NotImplementedException();
+            string queryName = Request.Query["name"];
+            UserData[] queryResult = null;
+
+            if (!string.IsNullOrEmpty(queryName))
+            {
+                queryResult = DatabaseHelpers.Users.SearchUsers(queryName);
+            }
+
+            return View(queryResult);
         }
         
         /// <summary>

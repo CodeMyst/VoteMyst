@@ -28,7 +28,7 @@
                 <partial name="_Avatar" for="@author" />
                 <p class="username">@author.Username</p>
             </a>
-            <p class="post-date">@Model.SubmitDate.ToString("dd/MM/yyyy")</p>
+            <p class="post-date local-date" --unix-timestamp="@Model.SubmitDate.ToUnixSeconds()" --date-only>@Model.SubmitDate.ToString("dd/MM/yyyy")</p>
         </div>
     }
     <div class="post-image">

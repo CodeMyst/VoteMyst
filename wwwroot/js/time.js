@@ -16,11 +16,13 @@
 
 
 
-// ~~ Conversion Constants ~~
+// ~~ Constants ~~
 const msSecond = 1000;
 const msMinute = msSecond * 60;
 const msHour = msMinute * 60;
 const msDay = msHour * 24;
+const msWeek = msDay * 7;
+const timerLabels = [ "weeks", "days", "hours", "minutes", "seconds" ];
 
 // ~~ Defaults ~~
 const dateFormat = "dd/MM/yyyy";
@@ -57,10 +59,15 @@ function formatDates() {
 
 // Creates and initializes all timers on the page.
 // Timers will tick down until they reach the specified unix timestamp. 
-// The format always includes days, hours, minutes and seconds.
+// The format always includes weeks, days, hours, minutes and seconds.
 function createTimers() {
     document.querySelectorAll(timerClass).forEach(timer => {
         let targetTime = getDateFromElement(timer).getTime();
+
+        let html = `<div class="prefix"><span>${timer.innerText}</span></div>`
+        html += timerLabels.map(label => `<div class="fragment"><span>0</span><br><span>${label}</span></div>`).join('');
+
+        timer.innerHTML = html;
         
         // A function that recalculates and displays the distance to the target time.
         function timerTick() {
@@ -72,8 +79,10 @@ function createTimers() {
                 clearInterval(tickInterval);
             }
 
-            let formattedTimespan = formatTimespan(distance, timerFormat);
-            timer.innerHTML = formattedTimespan;
+            let components = extractTimespanComponents(distance);
+            for (var i = 0; i < components.length; i++) {
+                timer.childNodes[i+1].childNodes[0].innerText = components[i];
+            }
         }
     
         let tickInterval = setInterval(timerTick, 500);
@@ -117,15 +126,23 @@ function formatDate(date, format) {
 
 // Formats the given timespan (in milliseconds) using the given format string.
 // Formatting options include d, HH, mm, ss.
-function formatTimespan(totalMs, format) {    
-    let days = Math.floor(totalMs / msDay);
-    let hours = Math.floor(totalMs % msDay / msHour);
-    let minutes = Math.floor(totalMs % msHour / msMinute);
-    let seconds = Math.floor(totalMs % msMinute / msSecond);
-
+function formatTimespan(totalMs, format) {
+    let components = extractTimespanComponents(totalMs);
     return format
-        .replace("d", days)
-        .replace("HH", formatTwoDigits(hours))
-        .replace("mm", formatTwoDigits(minutes))
-        .replace("ss", formatTwoDigits(seconds));
+        .replace("d", components[1])
+        .replace("HH", formatTwoDigits(components[2]))
+        .replace("mm", formatTwoDigits(components[3]))
+        .replace("ss", formatTwoDigits(components[4]));
+}
+
+// Extracts the components of the given timespan (in milliseconds).
+// The result is an array with the components weeks, days, hours, minutes, seconds.
+function extractTimespanComponents(totalMs) {
+    return [ 
+        Math.floor(totalMs / msWeek),
+        Math.floor(totalMs % msWeek / msDay),
+        Math.floor(totalMs % msDay / msHour),
+        Math.floor(totalMs % msHour / msMinute),
+        Math.floor(totalMs % msMinute / msSecond)
+    ];
 }
