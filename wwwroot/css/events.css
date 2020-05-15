@@ -23,13 +23,12 @@
 }
 .event .event-info .event-title {
     display: block;
-    margin: 0.5rem 0.5rem 1rem;
+    margin: 0.5rem 0.2rem 1rem;
     font-size: 1.5rem;
     font-weight: bold;
 }
 .event .event-info .event-description {
     color: var(--color-light-gray);
-    margin-left: 0.5rem;
     font-style: italic;
     font-size: 0.9rem;
     line-height: 1.4rem;

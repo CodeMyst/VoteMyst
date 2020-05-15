@@ -21,7 +21,9 @@
             }
         </a>
         
-        <p class="event-description">@Model.Description</p>
+        <p class="event-description">
+            @(string.IsNullOrEmpty(Model.Description) ? "No description was provided." : Model.Description)
+        </p>
     </div>
 
     <table class="event-dates">
