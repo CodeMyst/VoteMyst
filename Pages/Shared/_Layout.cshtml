@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="~/css/main.css" />
     <link rel="icon" type="image/png" href="/img/trophy.png"/>
 
+    <script src="https://kit.fontawesome.com/f0bb3c2940.js" crossorigin="anonymous"></script>
+
     <meta property="og:site_name" content="VoteMyst" />
 
     @if (IsSectionDefined("ContentMeta"))
@@ -24,7 +26,9 @@
     }
 </head>
 <body>
-    <div class="container">
+    <partial name="_Sidebar" />
+    
+    <div id="container">
         <header>
             <a href="/">
                 <h1>
@@ -32,15 +36,17 @@
                     <span>VoteMyst</span>
                 </h1>
             </a>
-            <partial name="_UserWidget.cshtml" />
+            <partial name="_UserWidget" />
         </header>
-        
         <p class="subheading">a simple website for event voting</p>
-        <partial name="_Navigation" />
+
+        <nav class="desktop-nav">
+            <partial name="_NavigationItems" />
+        </nav>
 
         @RenderBody()
 
-        <partial name="_Footer.cshtml" />
+        <partial name="_Footer" />
     </div>
 
     <script src="~/js/site.js" asp-append-version="true"></script>

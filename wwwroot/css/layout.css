@@ -25,7 +25,7 @@ h1 {
     line-height: 2.5rem;
 }
 
-.container {
+#container {
     width: 90%;
     max-width: 960px;
     position: relative;
@@ -47,29 +47,6 @@ header {
     display: flex;
     flex-direction: row;
     margin: 10px 0 20px;
-}
-
-nav {
-    display: block;
-
-    margin: 1rem auto 1rem 0;
-
-    background-color: var(--color-dark-gray);
-    border-radius: var(--panel-border-radius);
-}
-nav ul {
-    padding: 0.8rem;
-}
-nav li {
-    display: inline;
-    font-size: 1.3rem;
-}
-nav li:after {
-    content: "-";
-    padding: 0 0.5rem;
-}
-nav li:last-child:after {
-    content: "";
 }
 
 hr {
@@ -95,10 +72,4 @@ table {
 table th {
     text-align: right;
     padding-right: 0.3rem;
-}
-
-@media (max-width: 640px) {
-    header {
-        flex-direction: column;
-    }
 }

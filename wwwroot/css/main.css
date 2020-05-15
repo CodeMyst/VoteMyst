@@ -6,6 +6,7 @@
 @import url(layout.css);
 @import url(forms.css);
 @import url(elements.css);
+@import url(navigation.css);
 
 /* Styling for user-related elements, such as the widget, the avatar, username or info page */
 @import url(user.css);
