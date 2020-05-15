@@ -80,9 +80,11 @@
     function generateUrl(e) {
         urlInput.placeholder = titleInput.value
             .toLowerCase()
-            .replace(/ /g, "-")
-            .replace(/[^a-zA-Z\d\-]/g, "")
-            .replace(/^\-+|\-+$/g, '');
+            .replace(/ /g, '-')          // replaces spaces with dashes
+            .replace(/[^a-z\d\-]/g, '')  // remove invalid characters
+            .replace(/^\-+|\-+$/g, '')   // trim dashes
+            .replace(/-{2,}/g, '-');     // remove duplicate dashes
     }
     titleInput.addEventListener("input", generateUrl);
+    generateUrl(null);
 </script>

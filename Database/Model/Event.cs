@@ -64,6 +64,12 @@ namespace VoteMyst.Database.Models
             {
                 yield return new ValidationResult("All dates must be in ascending order.");
             }
+
+            var provider = validationContext.GetService(typeof(DatabaseHelperProvider)) as DatabaseHelperProvider;
+            if (provider.Events.GetEvent(Url) != null)
+            {
+                yield return new ValidationResult("That URL is already in use.");
+            }
         }
 
         public EventState GetStateForTime(DateTime dateTime)

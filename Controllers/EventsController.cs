@@ -175,8 +175,8 @@ namespace VoteMyst.Controllers
         {
             if (string.IsNullOrEmpty(e.Url))
             {
-                e.Url = Regex.Replace(e.Title.ToLowerInvariant().Replace(" ", "-"), 
-                    @"[^a-zA-Z\d\-]", string.Empty).Trim('-');
+                e.Url = Regex.Replace(Regex.Replace(e.Title.ToLowerInvariant().Replace(" ", "-"), 
+                    @"[^a-zA-Z\d\-]", string.Empty).Trim('-'), @"-{2,}", "-");
             }
 
             ModelState.Clear();
