@@ -17,6 +17,11 @@ namespace VoteMyst.Database.Models
         [StringLength(64)]
         public string Title { get; set; }
 
+        [Column("url")]
+        [MinLength(4), StringLength(32)]
+        [RegularExpression(@"^[a-zA-Z\d\-]*$", ErrorMessage = "The event URL may only contain lowercase letters, digits and dashes.")]
+        public string Url { get; set; }
+
         [Column("description")]
         [StringLength(512)]
         public string Description { get; set; }

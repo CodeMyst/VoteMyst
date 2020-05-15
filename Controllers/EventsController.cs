@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -128,7 +129,7 @@ namespace VoteMyst.Controllers
         /// Displays the entry with the specified ID.
         /// </summary>
         [RequirePermissions(Permissions.ViewEntries)]
-        public IActionResult Display(int id) 
+        public IActionResult Display(string id) 
         {
             UserData user = GetCurrentUser();
             Event e = DatabaseHelpers.Events.GetEvent(id);
@@ -172,10 +173,18 @@ namespace VoteMyst.Controllers
         [RequirePermissions(Permissions.CreateEvents)]
         public IActionResult New([FromForm] Event e)
         {
+            if (string.IsNullOrEmpty(e.Url))
+            {
+                e.Url = Regex.Replace(e.Title.ToLowerInvariant().Replace(" ", "-"), 
+                    @"[^a-zA-Z\d\-]", string.Empty).Trim('-');
+            }
+
+            ModelState.Clear();
+            TryValidateModel(e);
+
             if (!ModelState.IsValid)
             {
-                string[] errorMessages = ModelState.Values.SelectMany(value => value.Errors).Select(error => error.ErrorMessage).ToArray();
-                ViewBag.ErrorMessages = errorMessages;
+                ViewBag.ErrorMessages = ModelState.Values.SelectMany(value => value.Errors).Select(error => error.ErrorMessage).ToArray();
 
                 _logger.LogWarning("User {0} attempted to create an event, but failed with {1} validation errors.",
                     GetCurrentUser().Username, ModelState.ErrorCount);

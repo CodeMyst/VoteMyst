@@ -1,18 +1,6 @@
 ﻿@{
     Layout = "_Layout";
     ViewData["Title"] = "Submit";
-
-    string eventUrl = string.Empty;
-    string entryUrl = string.Empty;
-
-    if (ViewBag.Event != null)
-    {
-        eventUrl = $"/events/display/{ViewBag.Event.EventId}";
-        if (ViewBag.Entry != null)
-        {
-            entryUrl = eventUrl + $"#{ViewBag.Entry.EntryId}";
-        }
-    }
 }
 
 <h1>Submit a new entry</h1>
@@ -30,14 +18,14 @@ else if (ViewBag.Event != null)
     if (ViewBag.Entry != null)
     {
         <div class="panel small message warning">
-            You already uploaded a <a href="@entryUrl">submission</a> for this event.
+            You already uploaded a submission for this event.
             Submitting a new entry will remove your existing one. This can not be undone.
         </div>
     }
     <p>
-        You're submitting to <a asp-controller="events" asp-action="display" asp-route-id="@ViewBag.Event.EventId"><b>@ViewBag.Event.Title</b></a>.
+        You're submitting to <a asp-controller="events" asp-action="display" asp-route-id="@ViewBag.Event.Url"><b>@ViewBag.Event.Title</b></a>.
     </p>
-    <form method="post" enctype="multipart/form-data" asp-controller="submit" asp-route-id="@ViewBag.Event.EventId">
+    <form method="post" enctype="multipart/form-data" asp-controller="submit" asp-route-id="@ViewBag.Event.Url">
         <label for="file">Submission File (max. @(ViewBag.MaxFileMB)MB):</label>
         <input type="file" id="file" name="file" /> <br>
         <button type="submit">Submit!</button>

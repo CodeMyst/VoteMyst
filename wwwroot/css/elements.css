@@ -16,6 +16,9 @@
 .panel.message {
     padding: 0.8rem 1.6rem;
 }
+.panel > * {
+    margin: 0;
+}
 .message.success {
     background-color: var(--color-success-panel);
 }

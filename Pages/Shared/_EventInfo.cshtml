@@ -13,7 +13,7 @@
 
 <div class="event">
     <div class="event-info">
-        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.EventId">
+        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.Url">
             @Model.Title
             @if (eventState == EventState.Hidden) 
             {
