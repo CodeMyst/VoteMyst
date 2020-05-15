@@ -202,7 +202,7 @@ namespace VoteMyst.Controllers
         }
 
         [RequirePermissions(Permissions.ViewEntries)]
-        public IActionResult Vote(int id) 
+        public IActionResult Vote(string id) 
         {
             // TODO: Maybe support multiple events?
             Event currentEvent = DatabaseHelpers.Events.GetEvent(id);
@@ -220,7 +220,7 @@ namespace VoteMyst.Controllers
             ViewBag.Event = currentEvent;
             ViewBag.RandomizedEntries = randomizedEntries;
 
-            return View();
+            return View(currentEvent);
         }
 
         [HttpPost]
