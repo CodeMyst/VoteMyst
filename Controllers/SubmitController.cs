@@ -35,10 +35,10 @@ namespace VoteMyst.Controllers
         /// </summary>
         [Route("submit/{id}")]
         [RequirePermissions(Permissions.SubmitEntries)]
-        public IActionResult Index(int id)
+        public IActionResult Index(string id)
         {
             UserData currentUser = GetCurrentUser();
-            Event currentEvent = DatabaseHelpers.Events.GetCurrentEvents().FirstOrDefault(e => e.EventId == id);
+            Event currentEvent = DatabaseHelpers.Events.GetEvent(id);
 
             bool validEvent = SetupValidation(validator => 
             {
@@ -64,7 +64,7 @@ namespace VoteMyst.Controllers
         [HttpPost]
         [Route("submit/{id}")]
         [RequirePermissions(Permissions.SubmitEntries)]
-        public IActionResult Index(int id, IFormFile file)
+        public IActionResult Index(string id, IFormFile file)
         {
             // TODO: Maybe support multiple events?
             Event ev = DatabaseHelpers.Events.GetEvent(id);

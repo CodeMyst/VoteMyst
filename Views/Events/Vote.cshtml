@@ -4,6 +4,13 @@
     Layout = "_Layout";
 }
 
+@section ContentMeta
+{
+    <meta property="og:title" content="@Model.Title" />
+    <meta property="og:description" content="@Model.Description" />
+    <meta property="og:image" content="/img/trophy.png" />
+}
+
 <div class="post-display-options">
     <div id="post-display-option-large"><img src="/img/post-display-large.svg"/></div>
     <div id="post-display-option-middle"><img src="/img/post-display-middle.svg"/></div>

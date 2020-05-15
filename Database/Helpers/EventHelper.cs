@@ -41,6 +41,9 @@ namespace VoteMyst.Database
         public Event GetEvent(int eventId)
             => context.Events
                 .FirstOrDefault(x => x.EventId == eventId);
+        public Event GetEvent(string vanityUrl)
+            => context.Events
+                .FirstOrDefault(x => x.Url == vanityUrl);
 
         public Event[] GetEventLikeName(string name)
             => context.Events

@@ -1,9 +1,19 @@
 @using VoteMyst.Database.Models
+@inject AvatarHelper AvatarHelper
 @{
     ViewData["Title"] = "User";
 
     UserData inspectedUser = ViewBag.InspectedUser;
     UserData selfUser = ViewBag.SelfUser;
+
+    string avatarUrl = AvatarHelper.GetRelativeAvatarUrl(inspectedUser, out _) ?? "/img/trophy.png";
+}
+
+@section ContentMeta
+{
+    <meta property="og:title" content="@inspectedUser.Username" />
+    <meta property="og:description" content="@ViewBag.InspectedUserGroup at VoteMyst." />
+    <meta property="og:image" content="@avatarUrl" />
 }
 
 <div class="panel user-info">

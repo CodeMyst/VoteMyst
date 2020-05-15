@@ -11,7 +11,12 @@
 @if (ViewBag.ErrorMessages != null)
 {
     <div class="panel small message error">
-        @string.Join("\n", ViewBag.ErrorMessages)
+        <ul>
+            @foreach (string error in ViewBag.ErrorMessages)
+            {
+                <li>@error</li>
+            }
+        </ul>
     </div>
 }
 
@@ -25,6 +30,10 @@
         <tr>
             <th><label asp-for="@Model.Title"></label></th>
             <td><input asp-for="@Model.Title" placeholder="My Event Title!"/></td>
+        </tr>
+        <tr>
+            <th><label asp-for="@Model.Url"></label></th>
+            <td><input asp-for="@Model.Url" /></td>
         </tr>
         <tr>
             <th><label asp-for="@Model.Description"></label></th>
@@ -64,3 +73,18 @@
         <div></div>
     </div>
 </form>
+
+<script>
+    let titleInput = document.querySelector("#Title");
+    let urlInput = document.querySelector("#Url");
+    function generateUrl(e) {
+        urlInput.placeholder = titleInput.value
+            .toLowerCase()
+            .replace(/ /g, '-')          // replaces spaces with dashes
+            .replace(/[^a-z\d\-]/g, '')  // remove invalid characters
+            .replace(/^\-+|\-+$/g, '')   // trim dashes
+            .replace(/-{2,}/g, '-');     // remove duplicate dashes
+    }
+    titleInput.addEventListener("input", generateUrl);
+    generateUrl(null);
+</script>

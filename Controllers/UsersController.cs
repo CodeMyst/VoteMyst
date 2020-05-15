@@ -145,7 +145,9 @@ namespace VoteMyst.Controllers
 
             _logger.LogInformation("{0} was modified (AccountState={1}, Permissions={2}).", user.Username, user.AccountState, user.PermissionLevel);
 
-            return RedirectToAction("display", new { id = id });
+            return user.UserId == GetCurrentUser().UserId
+                ? RedirectToAction("me")
+                : RedirectToAction("display", new { id = id });
         }
     }
 }

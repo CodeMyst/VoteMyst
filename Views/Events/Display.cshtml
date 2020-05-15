@@ -12,13 +12,20 @@
     EventState eventState = Model.GetCurrentState();
 }
 
+@section ContentMeta
+{
+    <meta property="og:title" content="@Model.Title" />
+    <meta property="og:description" content="@Model.Description" />
+    <meta property="og:image" content="/img/trophy.png" />
+}
+
 <h1>@Model.Title</h1>
 
 @if (eventState == EventState.Ongoing)
 {
     <p>
         Submissions are open! Click
-        <a asp-controller="submit" asp-action="index" asp-route-id="@Model.EventId">here</a>
+        <a asp-controller="submit" asp-action="index" asp-route-id="@Model.Url">here</a>
         to submit an entry!
     </p>
 
