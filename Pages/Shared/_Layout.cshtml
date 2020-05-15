@@ -1,12 +1,27 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>@ViewData["Title"] - VoteMyst</title>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - VoteMyst</title>
+
     <link rel="stylesheet" href="~/css/theme-dark.css" --theme />
     <link rel="stylesheet" href="~/css/main.css" />
     <link rel="icon" type="image/png" href="/img/trophy.png"/>
+
+    <meta property="og:site_name" content="VoteMyst" />
+
+    @if (IsSectionDefined("ContentMeta"))
+    {
+        @RenderSection("ContentMeta", required: false)
+    }
+    else 
+    {
+        <meta property="og:title" content="VoteMyst" />
+        <meta property="og:image" content="/img/trophy.png" />
+        <meta property="og:description" content="A simple website for event voting." />
+    }
 </head>
 <body>
     <div class="container">
