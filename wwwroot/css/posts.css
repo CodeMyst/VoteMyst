@@ -57,29 +57,29 @@
     overflow: hidden;
     box-sizing: border-box;
 }
-.post .post-user {
+.post .post-user, .post .post-toolbar {
     display: flex;
     flex-direction: row;
     cursor: default;
     align-items: center;
-    margin: 0.5rem;
+    margin: 0.4rem 0.8rem;
+    height: 32px;
 }
 .post .post-user > a {
     display: inherit;
 }
 .post .post-user .avatar {
-    height: calc(0.7 * 48px);
-    width: calc(0.7 * 48px);
-    margin: auto 5px;
+    height: 32px;
+    width: 32px;
 }
 .post .post-user .username {
     font-size: 0.9rem;
-    margin: auto 3px;
+    margin: auto 0.4rem;
     color: var(--color-white);
 }
 .post .post-user .post-date {
     font-size: 0.8rem;
-    margin: auto 10px auto auto;
+    margin: auto 0 auto auto;
     color: var(--color-light-gray);
 }
 .post .post-image img {
@@ -88,47 +88,56 @@
     height: auto;
     box-sizing: border-box;
 }
-.post-absolute-element {
-    display: block;
-    position: absolute;
-    opacity: 0;
+.post .post-toolbar .l {
+    margin: auto auto auto 0;
 }
-.post-vote {
-    left: 50%;
-    top: 50%;
-    width: 16%;
-    margin: -8% auto auto -8%;
-    transform: scale(0);
-    transition: transform 0.3s, opacity 0.3s;
+.post .post-toolbar .r {
+    margin: auto 0 auto auto;
 }
-.post[allow-vote]:not([voted]) {
+.post .post-toolbar .report {
+    color: var(--color-gray);
     cursor: pointer;
 }
-.post-has-voted {
-    right: 0;
-    bottom: 0;
-    margin: 3%;
-    width: 6%;
-    filter: drop-shadow(3px 3px 6px rgb(0, 0, 0, 0.5));
-    transition: opacity 0.4s;
+.post .post-toolbar .report:hover {
+    color: var(--color-error-text);
 }
-.post[allow-vote] .post-has-voted {
+.post .vote {
+    border: 1px solid var(--color-gray);
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    color: var(--color-gray);
     cursor: pointer;
+    user-select: none;
+    transition: border-color 0.2s, color 0.2s;
+}
+.post .vote > *:nth-child(3) {
+    padding-left: 0.2rem;
+}
+.post .vote > *:last-child {
+    margin-left: -0.25rem;
+    display: none;
 }
 
-.post[allow-vote]:not([voted]):not([self-post]):hover .post-vote {
-    transform: scale(1);
-    opacity: 1;
-}
-.post[allow-vote][voted] .post-vote {
-    filter: hue-rotate(-30deg) saturate(1.6);
-    transition-duration: 0.5s;
-    transition-timing-function: cubic-bezier(.14,-0.19,.52,-0.76);
-}
+.post .vote[voted] {
 
-.post[voted] .post-has-voted {
-    opacity: 1;
 }
-.post[allow-vote]:not([voted]) .post-has-voted:hover {
-    filter: saturate(0);
+.post .vote:hover, .post .vote[voted] {
+    border-color: var(--color-success-text);
+    color: var(--color-success-text);
+}
+.post .vote[voted]:hover {
+    border-color: var(--color-error-text);
+    color: var(--color-error-text);
+}
+.post .vote[voted] > *:last-child {
+    display: inline-block;
+}
+.post .vote[voted]:hover .heart {
+    display: none;
+}
+.post .vote[voted]:hover .broken-heart {
+    display: inline-block;
+}
+.post .broken-heart {
+    display: none;
 }
