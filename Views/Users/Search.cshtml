@@ -1,6 +1,27 @@
+@using VoteMyst.Database.Models
+
+@model UserData[]
 @{
     ViewData["Title"] = "Search User";
     Layout = "_Layout";
+
+    string queryParameter = Context.Request.Query["name"];
 }
 
-Searching for a user.
+<form class="user-search" asp-controller="Users" asp-action="Search" method="GET">
+    <label for="name">Username:</label>
+    <input name="name" value="@queryParameter" type="text" autocomplete="off" />
+    <button type="submit">Find User</button>
+</form>
+
+@if (Model != null)
+{
+    <hr>
+
+    <p>@Model.Length users found.</p>
+
+    foreach (UserData user in Model)
+    {
+        <partial name="_UserInfo" for="@user" />
+    }
+}

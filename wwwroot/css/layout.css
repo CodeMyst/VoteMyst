@@ -72,6 +72,10 @@ nav li:last-child:after {
     content: "";
 }
 
+hr {
+    border-color: var(--color-gray);
+}
+
 footer {
     margin: 2rem 0;
     text-align: center;
