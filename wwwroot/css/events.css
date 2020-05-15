@@ -50,7 +50,7 @@
 .event .event-state {
     margin: auto auto 0 0;
     width: 100%;
-    color: var(--color-gray);
+    color: var(--color-light-gray);
 }
 
 .leaderboard {

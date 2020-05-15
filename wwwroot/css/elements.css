@@ -35,3 +35,26 @@
     color: var(--color-light-gray);
     white-space: normal;
 }
+
+.timer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+}
+.timer > * {
+    padding: 0.2rem 0.8rem;
+    border-left: 2px solid var(--color-dark-gray);
+    line-height: 1.1rem;
+}
+.timer .prefix {
+    font-size: 1rem;
+    border: none;
+}
+.timer .fragment span:first-child {
+    font-weight: bold;
+}
+.timer .fragment span:last-child {
+    font-style: italic;
+    font-size: 0.7rem;
+}

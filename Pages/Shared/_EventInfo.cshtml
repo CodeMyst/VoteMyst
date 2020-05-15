@@ -45,28 +45,16 @@
         @switch(eventState)
         {
             case EventState.Hidden:
-                <span>
-                    The event will be revealed in
-                    <span class="timer" --unix-timestamp="@revealUnix">0.00:00:00</span>.
-                </span>
+                <div class="timer" --unix-timestamp="@revealUnix">Reveal in</div>
                 break;
             case EventState.Revealed:
-                <span>
-                    The event starts in
-                    <span class="timer" --unix-timestamp="@startUnix">0.00:00:00</span>.
-                </span>
+                <div class="timer" --unix-timestamp="@startUnix">Starts in</div>
                 break;
             case EventState.Ongoing:
-                <span>
-                    Submissions will be closed in
-                    <span class="timer" --unix-timestamp="@endUnix">0.00:00:00</span>.
-                </span>
+                <div class="timer" --unix-timestamp="@endUnix">Submissions close in</div>
                 break;
             case EventState.Voting:
-                <span>
-                    Voting will be closed in
-                    <span class="timer" --unix-timestamp="@voteEndUnix">0.00:00:00</span>.
-                </span>
+                <div class="timer" --unix-timestamp="@voteEndUnix">Voting closes in</div>
                 break;
             case EventState.Closed:
                 <span>The event is over!</span>
