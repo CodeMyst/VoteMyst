@@ -3,11 +3,6 @@
 
 @model Event
 @{
-    ulong revealUnix = Model.RevealDate.ToUnixSeconds();
-    ulong startUnix = Model.StartDate.ToUnixSeconds();
-    ulong endUnix = Model.EndDate.ToUnixSeconds();
-    ulong voteEndUnix = Model.VoteEndDate.ToUnixSeconds();
-
     EventState eventState = Model.GetCurrentState();
 }
 
@@ -26,39 +21,24 @@
         </p>
     </div>
 
-    <table class="event-dates">
-        <tr>
-            <th>@(eventState >= EventState.Ongoing ? "Event started" : "Event start")</th>
-            <td class="start-date local-date" --unix-timestamp="@startUnix"></td>
-        </tr>
-        <tr>
-            <th>@(eventState >= EventState.Voting ? "Submissions closed" : "Submissions close")</th>
-            <td class="start-date local-date" --unix-timestamp="@endUnix"></td>
-        </tr>
-        <tr>
-            <th>@(eventState >= EventState.Closed ? "Votings closed" : "Votings close")</th>
-            <td class="start-date local-date" --unix-timestamp="@voteEndUnix"></td>
-        </tr>
-    </table>
-
-    <div class="event-state">
-        @switch(eventState)
-        {
-            case EventState.Hidden:
-                <div class="timer" --unix-timestamp="@revealUnix">Reveal in</div>
-                break;
-            case EventState.Revealed:
-                <div class="timer" --unix-timestamp="@startUnix">Starts in</div>
-                break;
-            case EventState.Ongoing:
-                <div class="timer" --unix-timestamp="@endUnix">Submissions close in</div>
-                break;
-            case EventState.Voting:
-                <div class="timer" --unix-timestamp="@voteEndUnix">Voting closes in</div>
-                break;
-            case EventState.Closed:
-                <span>The event is over!</span>
-                break;
-        }
-    </div>
+    @if (eventState != EventState.Closed)
+    {
+        <div class="event-state">
+            @switch(eventState)
+            {
+                case EventState.Hidden:
+                    <div class="timer" --unix-timestamp="@Model.RevealDate.ToUnixSeconds()">Reveal in</div>
+                    break;
+                case EventState.Revealed:
+                    <div class="timer" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">Starts in</div>
+                    break;
+                case EventState.Ongoing:
+                    <div class="timer" --unix-timestamp="@Model.EndDate.ToUnixSeconds()">Submissions close in</div>
+                    break;
+                case EventState.Voting:
+                    <div class="timer" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
+                    break;
+            }
+        </div>
+    }
 </div>

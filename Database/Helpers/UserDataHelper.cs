@@ -69,6 +69,11 @@ namespace VoteMyst.Database
                 .Where(x => x.Username.Contains(query, StringComparison.InvariantCultureIgnoreCase))
                 .ToArray();
 
+        public UserData[] GetUsersByState(AccountState state)
+            => _context.UserData
+                .Where(x => x.AccountState == state)
+                .ToArray();
+
         public bool WipeUser(int userId) 
         {
             UserData user = GetUser(userId);

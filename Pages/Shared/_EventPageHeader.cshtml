@@ -1,0 +1,51 @@
+@inject DatabaseHelperProvider DatabaseHelpers
+
+@using VoteMyst.Database
+@using VoteMyst.Database.Models
+
+@model Event
+@{
+    EventState eventState = Model.GetCurrentState();
+    string[] hosts = DatabaseHelpers.Users.GetUsersByState(AccountState.Admin)
+        .Select(h => $"<a href=\"/users/display/{h.DisplayId}\">{h.Username}</a>")
+        .ToArray();
+}
+
+<div class="event-page">
+    <h1 class="event-title">@Model.Title</h1>
+    <p class="event-hosts">Hosted by @Html.Raw(string.Join(", ", hosts))</p>
+    <p class="event-description">@Model.Description</p>
+    <div class="event-datebox">
+        <div class="event-dates">
+            <div class=@(eventState == EventState.Revealed ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">@Model.StartDate</p>
+                <p>Event starts</p>
+            </div>
+            <div class=@(eventState == EventState.Ongoing ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.EndDate.ToUnixSeconds()">@Model.EndDate</p>
+                <p>Submissions close</p>
+            </div>
+            <div class=@(eventState == EventState.Voting ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">@Model.VoteEndDate</p>
+                <p>Votings close</p>
+            </div>
+        </div>
+        @switch(eventState)
+        {
+            case EventState.Hidden:
+                <div class="timer event-timer" --unix-timestamp="@Model.RevealDate.ToUnixSeconds()">Reveal in</div>
+                break;
+            case EventState.Revealed:
+                <div class="timer event-timer" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">Starts in</div>
+                break;
+            case EventState.Ongoing:
+                <div class="timer event-timer" --unix-timestamp="@Model.EndDate.ToUnixSeconds()">Submissions close in</div>
+                break;
+            case EventState.Voting:
+                <div class="timer event-timer" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
+                break;
+        }
+    </div>
+
+    <hr>
+</div>

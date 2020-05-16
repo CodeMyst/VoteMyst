@@ -22,6 +22,7 @@
 
 .posts {    
     display: grid;
+    margin: 1rem 0;
     grid-gap: 6vmin;
     grid-template-columns: repeat(2, auto);
     grid-template-rows: auto;
@@ -82,11 +83,20 @@
     margin: auto 0 auto auto;
     color: var(--color-light-gray);
 }
+.post .post-image {
+    width: 100%;
+    padding-top: 100%;
+    position: relative;
+}
 .post .post-image img {
     display: block;
-    width: 100%;
-    height: auto;
-    box-sizing: border-box;
+    position: absolute;
+    top: 0; left: 0;
+    bottom: 0; right: 0;
+    margin: auto;
+    border-radius: 0.5rem;
+    max-width: 95%;
+    max-height: 95%;
 }
 .post .post-toolbar .l {
     margin: auto auto auto 0;
@@ -121,23 +131,32 @@
 .post .vote[voted] {
 
 }
-.post .vote:hover, .post .vote[voted] {
-    border-color: var(--color-success-text);
-    color: var(--color-success-text);
-}
-.post .vote[voted]:hover {
-    border-color: var(--color-error-text);
-    color: var(--color-error-text);
+.post .broken-heart {
+    display: none;
 }
 .post .vote[voted] > *:last-child {
     display: inline-block;
 }
-.post .vote[voted]:hover .heart {
-    display: none;
+
+.post .vote[voted] {
+    border-color: var(--color-success-text);
+    color: var(--color-success-text);
 }
-.post .vote[voted]:hover .broken-heart {
-    display: inline-block;
-}
-.post .broken-heart {
-    display: none;
+
+/* Hover effects should not be supported on mobile, due to the sticky :hover effect. */
+@media (hover: hover) {
+    .post .vote:hover {
+        border-color: var(--color-success-text);
+        color: var(--color-success-text);
+    }
+    .post .vote[voted]:hover {
+        border-color: var(--color-error-text);
+        color: var(--color-error-text);
+    }
+    .post .vote[voted]:hover .heart {
+        display: none;
+    }
+    .post .vote[voted]:hover .broken-heart {
+        display: inline-block;
+    }
 }

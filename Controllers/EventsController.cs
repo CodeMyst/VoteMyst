@@ -41,7 +41,7 @@ namespace VoteMyst.Controllers
         }
         public class Leaderboard : IEnumerable<Leaderboard.Place> 
         {
-            public struct Place 
+            public class Place 
             {
                 public int Number { get; set; }
                 public UserData Author { get; set; }
@@ -60,19 +60,26 @@ namespace VoteMyst.Controllers
                 }
             }
 
-            private readonly Place[] _places;
+            public Entry[] NotEligable { get; }
+            public Place[] Places { get; }
 
-            private Leaderboard(Place[] places)
+            private Leaderboard(Place[] places, Entry[] notEligable = null)
             {
-                _places = places;
+                Places = places;
+                NotEligable = notEligable;
             }
 
             public static Leaderboard FromEvent(Event ev, DatabaseHelperProvider helpers)
             {
                 Place[] places = helpers.Entries.GetEntriesInEvent(ev)
+                    .Where(entry => helpers.Users.GetUser(entry.UserId).HasPermission(Permissions.AllowWinning))
                     .Select(entry => Place.FromEntry(entry, helpers))
                     .OrderByDescending(place => place.Votes)
                     .ThenBy(place => place.Entry.EntryId)
+                    .ToArray();
+
+                Entry[] notEligable = helpers.Entries.GetEntriesInEvent(ev)
+                    .Where(entry => !helpers.Users.GetUser(entry.UserId).HasPermission(Permissions.AllowWinning))
                     .ToArray();
 
                 int currentPlace = 0;
@@ -81,21 +88,25 @@ namespace VoteMyst.Controllers
                 for(int i = 0; i < places.Length; i++)
                 {
                     if (places[i].Votes != currentVotes)
+                    {
+                        currentVotes = places[i].Votes;
                         currentPlace++;
+                    }
 
                     places[i].Number = currentPlace;
+                    Console.WriteLine($"Index {i} is {currentPlace} with {currentVotes} votes.");
                 }
 
-                return new Leaderboard(places);
+                return new Leaderboard(places, notEligable);
             }
 
             public IEnumerator<Place> GetEnumerator()
             {
-                foreach (Place p in _places)
+                foreach (Place p in Places)
                     yield return p;
             }
             IEnumerator IEnumerable.GetEnumerator()
-                => _places.GetEnumerator();
+                => Places.GetEnumerator();
         }
 
         private readonly ILogger _logger;
@@ -117,12 +128,9 @@ namespace VoteMyst.Controllers
             Event[] plannedEvents = DatabaseHelpers.Events.GetPlannedEvents(user.HasPermission(Permissions.CreateEvents));
             Event[] ongoingEvents = DatabaseHelpers.Events.GetCurrentEvents();
 
-            ViewBag.CanCreateEvents = user.HasPermission(Permissions.CreateEvents);
-            ViewBag.History = finishedEvents;
-            ViewBag.Planned = plannedEvents;
-            ViewBag.Current = ongoingEvents;
+            ViewBag.CanManageEvents = user.HasPermission(Permissions.CreateEvents);
 
-            return View();
+            return View(DatabaseHelpers.Events.GetAllEventsGrouped());
         }
 
         /// <summary>

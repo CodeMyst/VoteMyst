@@ -76,4 +76,5 @@ function toggleVote(element) {
     else {
         castVote(element);
     }
+    document.activeElement = null;
 }

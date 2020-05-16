@@ -15,8 +15,7 @@
     background-color: var(--color-dark-gray);
 }
 .event .event-info {
-    margin: 0 auto 1rem 0;
-    max-width: 50%;
+    margin: 0 auto auto 0;
 }
 .event .event-info > * {
     margin: 0.2rem;
@@ -33,58 +32,83 @@
     font-size: 0.9rem;
     line-height: 1.4rem;
 }
-.event table.event-dates {
-    margin: 0 0 auto auto;
-    max-width: 50%;
-    white-space: normal;
-    font-size: 0.9rem;
-    line-height: 1.3rem;
-}
-.event table.event-dates tr > * {
-    color: var(--color-gray);
-}
-.event table.event-dates th {
-    text-align: right;
-    padding-right: 0.5rem;
-}
 .event .event-state {
-    margin: auto auto 0 0;
+    margin: 0.6rem auto 0 0;
     width: 100%;
     color: var(--color-light-gray);
 }
 
-.leaderboard {
-    display: flex;
-    flex-direction: column;
-    margin: 1rem auto;
-    width: 100%;
-}
-.leaderboard > div {
-    display: flex;
-    margin: auto;
-    flex-direction: row;
-    justify-content: space-between;
-    margin: 1rem auto;
-    width: 80%;
-}
-.leaderboard .place {
-    margin: auto 8%;
-    font-size: 2rem;
+
+.event-page .event-title {
     font-weight: bold;
-    object-fit: contain;
+    margin: 2rem 0 0 0;
+}
+.event-page .event-hosts {
+    margin: 0;
+    color: var(--color-light-gray);
+}
+.event-page .event-description {
+}
+.event-page .event-dates {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+}
+.event-page .event-dates p {
+    margin: 0.1rem 0;
     color: var(--color-gray);
-    max-width: 5rem;
-    width: 10%;
 }
-.leaderboard .top-3 {
-    width: 100%;
+.event-page .event-dates > div {
+    margin: 0.3rem 0.6rem;
 }
-.leaderboard .top-3 .place {
-    width: 20%;
+.event-page .event-dates > div.active p {
+    color: var(--color-white);
 }
-.leaderboard .post {
+.event-page .event-dates p:last-child {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
 }
-.leaderboard .top-3 .post {
+.event-page .event-datebox {
+    margin: 2rem 0;
+}
+.event-page .event-timer {
+    margin: 1rem auto;
+    justify-content: center;
+}
+
+.submission-button {
+    text-align: right;
+}
+.submission-button .button {
+    margin: 0.5rem 0 auto auto;
+}
+
+.leaderboard {
+    margin-bottom: 4rem;
+}
+.leaderboard .post .place p {
+    margin: auto 0.5rem auto 0;
+    font-weight: bold;
+    color: var(--color-light-gray);
+}
+.leaderboard .post .place[place="1"] p {
+    color: #ffae00;
+}
+.leaderboard .post .place[place="2"] p {
+    color: #b1a2a2;
+}
+.leaderboard .post .place[place="3"] p {
+    color: #a35244;
+}
+.leaderboard .post .place .votecount {
+    color: var(--color-gray);
+    font-weight: normal;
+    font-style: normal;
+    font-size: 0.8rem;
+    padding-left: 0.2rem;
 }
 
 @media (max-width: 640px) {

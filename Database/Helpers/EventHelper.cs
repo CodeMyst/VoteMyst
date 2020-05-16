@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
+
 using VoteMyst.Database.Models;
 
 namespace VoteMyst.Database
@@ -64,6 +66,14 @@ namespace VoteMyst.Database
                     y => y.EventId,
                     (x, y) => y)
                 .ToArray();
+
+        public Dictionary<EventState, IEnumerable<Event>> GetAllEventsGrouped()
+        {
+            EventState[] states = (EventState[])Enum.GetValues(typeof(EventState));
+            IEnumerable<KeyValuePair<EventState, Event>> eventsWithStates = context.Events
+                .Select(e => new KeyValuePair<EventState, Event>(e.GetCurrentState(), e));
+            return states.ToDictionary(state => state, state => eventsWithStates.Where(e => e.Key == state).Select(e => e.Value));
+        }
 
         public Event[] GetAllEventsAfter(DateTime date)
             => context.Events

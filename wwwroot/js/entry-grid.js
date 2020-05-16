@@ -1,4 +1,4 @@
-const posts = document.querySelector('.posts');
+const posts = document.querySelectorAll('.posts');
 const gridOptions = document.querySelectorAll(".post-display-options > *");
 
 function setGridAspect(aspect) {
@@ -6,7 +6,7 @@ function setGridAspect(aspect) {
         option.classList = option.id.endsWith(aspect)
             ? "active" : "";
     });
-    posts.classList = "posts posts-aspect-" + aspect;
+    posts.forEach(post => post.classList = "posts posts-aspect-" + aspect);
     window.sessionStorage.setItem("aspect", aspect);
 }
 gridOptions.forEach(option => {

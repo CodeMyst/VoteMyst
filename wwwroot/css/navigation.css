@@ -15,7 +15,7 @@
 }
 .desktop-nav li:after {
     content: "-";
-    padding: 0 0.5rem;
+    padding: 0 0.5rem 0 0.6rem;
 }
 .desktop-nav li:last-child:after {
     content: "";

@@ -10,15 +10,15 @@
     UserData author = DatabaseHelpers.Users.GetUser(Model.UserId);
 
     Event e = DatabaseHelpers.Events.GetEvent(Model.EventId);
-    bool votingOpen = DateTime.UtcNow >= e.EndDate && DateTime.UtcNow < e.VoteEndDate;
-    bool displayUser = DateTime.UtcNow >= e.VoteEndDate;
+    bool votingOpen = e.GetCurrentState() == EventState.Voting;
+    bool displayUser = e.GetCurrentState() == EventState.Closed;
     bool isSelfPost = user.UserId == author.UserId;
     bool canVote = votingOpen && !isSelfPost;
     bool hasVoted = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, Model) != null;
 }
 
 <div class="post"
-    @(canVote ? $"entry-id={Model.EntryId} allow-vote onclick=castVote(this)" : "")
+    @(canVote ? $"entry-id={Model.EntryId} allow-vote" : "")
     @(isSelfPost ? "self-post" : "") >
     @if(displayUser)
     {
