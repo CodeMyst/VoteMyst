@@ -1,5 +1,16 @@
+@using VoteMyst.Database;
+
+@inject UserProfileBuilder ProfileBuilder
+@{
+    var user = ProfileBuilder.FromPrincipal(User);
+}
+
 <ul>
     <li><a href="/">home</a></li>
     <li><a href="/events">events</a></li>
-    <li><a href="/users/search">find user</a></li>
+
+    @if (user.HasPermission(Permissions.ModifyUsers))
+    {
+        <li><a href="/users/search">find user</a></li>
+    }
 </ul>

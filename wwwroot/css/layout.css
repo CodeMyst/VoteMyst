@@ -73,3 +73,9 @@ table th {
     text-align: right;
     padding-right: 0.3rem;
 }
+
+@media (min-width: 160em) {
+    #container {
+        max-width: calc(2 * 960px);
+    }
+}
