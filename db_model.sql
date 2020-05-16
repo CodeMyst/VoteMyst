@@ -57,6 +57,7 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `votemyst`.`events` (
   `event_id` INT NOT NULL AUTO_INCREMENT,
+  `url` VARCHAR(32) NOT NULL,
   `name` VARCHAR(64) NOT NULL,
   `description` VARCHAR(512) NULL DEFAULT NULL,
   `event_type` INT NOT NULL,
