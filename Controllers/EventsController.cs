@@ -94,7 +94,6 @@ namespace VoteMyst.Controllers
                     }
 
                     places[i].Number = currentPlace;
-                    Console.WriteLine($"Index {i} is {currentPlace} with {currentVotes} votes.");
                 }
 
                 return new Leaderboard(places, notEligable);
