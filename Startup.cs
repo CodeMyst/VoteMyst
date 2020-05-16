@@ -124,11 +124,20 @@ namespace VoteMyst
 
             app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
             
-            // TODO: add https redirection later, but might not even be needed, this should be handled by the web server like nginx
-            // app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            // add the https scheme to oauth redirect urls
+            // adds this only on the server as it has SSL
+            if (System.Environment.GetEnvironmentVariable("VOTEMYST_ENV") == "Server")
+            {
+                app.Use((context, next) =>
+                {
+                    context.Request.Scheme = "https";
+                    return next();
+                });
+            }
 
             app.UseAuthorization();
             app.UseAuthentication();
