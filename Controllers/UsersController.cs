@@ -43,6 +43,7 @@ namespace VoteMyst.Controllers
         /// <summary>
         /// Provides the page to search for users.
         /// </summary>
+        [RequirePermissions(Permissions.ModifyUsers)]
         public IActionResult Search() 
         {
             string queryName = Request.Query["name"];
