@@ -10,17 +10,16 @@
     UserData author = DatabaseHelpers.Users.GetUser(Model.UserId);
 
     Event e = DatabaseHelpers.Events.GetEvent(Model.EventId);
-    bool votingOpen = DateTime.UtcNow >= e.EndDate && DateTime.UtcNow < e.VoteEndDate;
-    bool displayUser = DateTime.UtcNow >= e.VoteEndDate;
+    bool votingOpen = e.GetCurrentState() == EventState.Voting;
+    bool displayUser = e.GetCurrentState() == EventState.Closed;
     bool isSelfPost = user.UserId == author.UserId;
     bool canVote = votingOpen && !isSelfPost;
     bool hasVoted = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, Model) != null;
 }
 
 <div class="post"
-    @(canVote ? $"entry-id={Model.EntryId} allow-vote onclick=castVote(this)" : "")
-    @(isSelfPost ? "self-post" : "")
-    @(hasVoted ? "voted" : "") >
+    @(canVote ? $"entry-id={Model.EntryId} allow-vote" : "")
+    @(isSelfPost ? "self-post" : "") >
     @if(displayUser)
     {
         <div class="post-user">
@@ -34,7 +33,21 @@
     <div class="post-image">
         <img src="/@Model.Content" />
     </div>
-    
-    <img class="post-absolute-element post-vote" src="/img/heart.png"/>
-    <img class="post-absolute-element post-has-voted" src="/img/heart.png" @(canVote ? "onclick=removeVote(this)" : "") />
+
+    <div class="post-toolbar">
+        <span class="l">
+            @if (canVote)
+            {
+                <span class="vote" onclick="toggleVote(this)" @(hasVoted ? "voted" : "")>
+                    <i class="heart fas fa-heart"></i>
+                    <i class="broken-heart fas fa-heart-broken"></i>
+                    <span>Vote</span>
+                    <span>d!</span>
+                </span>
+            }
+        </span>
+        <span class="r">
+            <span class="report" title="Report this post"><i class="fas fa-flag"></i></span>
+        </span>
+    </div>
 </div>

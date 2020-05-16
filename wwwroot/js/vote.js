@@ -38,13 +38,13 @@ function buildUrlParameters(post) {
 }
 
 function castVote(element) {
-    const post = element;
-    if (!post.hasAttribute(votedAttribute)) {
+    const post = element.closest('.post');
+    if (!element.hasAttribute(votedAttribute)) {
         fetch(`/vote/cast/${buildUrlParameters(post)}`, buildPostBody(post))
             .then(toJson)
             .then(result => {
                 if (result.hasVote) {
-                    post.setAttribute(votedAttribute, '');
+                    element.setAttribute(votedAttribute, '');
                 }
                 if (!result.actionSuccess) {
                     console.log("Error: The post already had a vote.");
@@ -54,13 +54,13 @@ function castVote(element) {
     }
 }
 function removeVote(element) {
-    const post = element.parentElement;
-    if (post.hasAttribute(votedAttribute)) {
+    const post = element.closest('.post');
+    if (element.hasAttribute(votedAttribute)) {
         fetch(`/vote/remove/${buildUrlParameters(post)}`, buildPostBody(post))
             .then(toJson)
             .then(result => {
                 if (!result.hasVote) {
-                    post.removeAttribute(votedAttribute);
+                    element.removeAttribute(votedAttribute);
                 }
                 if (!result.actionSuccess) {
                     console.log("Error: The post did not have a vote.");
@@ -68,4 +68,13 @@ function removeVote(element) {
             })
             .catch();
     }
+}
+function toggleVote(element) {
+    if (element.hasAttribute(votedAttribute)) {
+        removeVote(element);
+    }
+    else {
+        castVote(element);
+    }
+    document.activeElement = null;
 }

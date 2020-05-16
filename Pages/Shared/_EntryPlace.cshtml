@@ -1,0 +1,48 @@
+@using VoteMyst.Database
+@using VoteMyst.Database.Models
+@using VoteMyst.Controllers
+
+@inject UserProfileBuilder ProfileBuilder
+@inject DatabaseHelperProvider DatabaseHelpers
+
+@model EventsController.Leaderboard.Place
+@{
+    UserData user = ProfileBuilder.FromPrincipal(User);
+    UserData author = DatabaseHelpers.Users.GetUser(Model.Entry.UserId);
+
+    Entry entry = Model.Entry;
+}
+
+<div class="post">
+    <div class="post-user">
+        <div class="place" place="@Model.Number">
+            <p>
+                @if (Model.Number <= 3)
+                {
+                    <i class="fas fa-trophy fa-lg"></i>
+                }
+                else 
+                {
+                    <span>@(Model.Number + ".")</span>
+                }
+                <i class="votecount">(@Model.Votes votes)</i>
+            </p>
+        </div>
+        <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayId">
+            <partial name="_Avatar" for="@author" />
+            <p class="username">@author.Username</p>
+        </a>
+        <p class="post-date local-date" --unix-timestamp="@entry.SubmitDate.ToUnixSeconds()" --date-only>@entry.SubmitDate.ToString("dd/MM/yyyy")</p>
+    </div>
+    <div class="post-image">
+        <img src="/@entry.Content" />
+    </div>
+
+    <div class="post-toolbar">
+        <span class="l">
+        </span>
+        <span class="r">
+            <span class="report" title="Report this post"><i class="fas fa-flag"></i></span>
+        </span>
+    </div>
+</div>

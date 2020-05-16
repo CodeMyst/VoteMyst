@@ -12,6 +12,8 @@
 
     --user-widget-height: 48px;
     --panel-border-radius: 0.3rem;
+    --sidebar-width: 200px;
+    --sidebar-toggle-duration: 0.2s;
 
     font-size: 16px;
     line-height: 24px;

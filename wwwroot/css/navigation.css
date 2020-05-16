@@ -1,0 +1,106 @@
+.desktop-nav {
+    display: block;
+
+    margin: 1rem auto 1rem 0;
+
+    background-color: var(--color-dark-gray);
+    border-radius: var(--panel-border-radius);
+}
+.desktop-nav ul {
+    padding: 0.8rem;
+}
+.desktop-nav li {
+    display: inline;
+    font-size: 1.3rem;
+}
+.desktop-nav li:after {
+    content: "-";
+    padding: 0 0.5rem 0 0.6rem;
+}
+.desktop-nav li:last-child:after {
+    content: "";
+}
+
+#sidebar {
+    display: block;
+    box-sizing: border-box;
+    padding: 1rem;
+    width: var(--sidebar-width);
+    height: 100%;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+
+    filter: none;
+    background-color: var(--color-dark-gray);
+
+    transition: left var(--sidebar-toggle-duration);
+}
+#sidebar[expanded] {
+    filter: drop-shadow(0 0 20px rgb(0, 0, 0, 1));
+}
+#sidebar:not([expanded]) {
+    left: calc(-1 * var(--sidebar-width));
+}
+#sidebar .toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 48px;
+
+    position: fixed;
+    left: 0px;
+    top: 8px;
+
+    cursor: pointer;
+    color: var(--color-light-gray);   
+    background-color: var(--color-dark-gray);
+    border-radius: 0 24px 24px 0;
+    transition: left var(--sidebar-toggle-duration);
+}
+#sidebar .toggle .fas {
+    font-size: 1.5rem;
+    margin-right: 5px;
+}
+#sidebar:not([expanded]) .toggle {
+    filter: drop-shadow(0 0 10px rgb(0, 0, 0, 1));
+}
+#sidebar[expanded] .toggle {
+    left: calc(0px + var(--sidebar-width))
+}
+
+#sidebar ul {
+    list-style: none;
+    padding-left: 1rem;
+}
+#sidebar ul li {
+    font-size: 1.3rem;
+    line-height: 2.2rem;
+}
+
+body.sidebar-open {
+    overflow-y: hidden;
+}
+body.sidebar-open #container {
+    filter: blur(3px) brightness(0.9);
+}
+body #container {
+    transition: filter var(--sidebar-toggle-duration);
+}
+
+@media (max-width: 640px) {
+    .desktop-nav {
+        display: none;
+    }
+    header .user-widget {
+        display: none;
+    }
+}
+@media (min-width: 641px) {
+    #sidebar {
+        display: none;
+    }
+}

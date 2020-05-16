@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Vote";
     Layout = "_Layout";
+
+    Event e = ViewBag.Event;
 }
 
 @section ContentMeta
@@ -11,6 +13,8 @@
     <meta property="og:image" content="/img/trophy.png" />
 }
 
+<partial name="_EventPageHeader" for="@e" />
+
 <div class="post-display-options">
     <div id="post-display-option-large"><img src="/img/post-display-large.svg"/></div>
     <div id="post-display-option-middle"><img src="/img/post-display-middle.svg"/></div>
@@ -18,9 +22,9 @@
 </div>
 
 <div class="posts" event-id="@ViewBag.Event.EventId">
-@foreach (Entry e in ViewBag.RandomizedEntries)
+@foreach (Entry entry in ViewBag.RandomizedEntries)
 {
-    <partial name="_Entry" for="@e" />
+    <partial name="_Entry" for="@entry" />
 }
 </div>
 

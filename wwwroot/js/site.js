@@ -1,4 +1,14 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿
+// Setup the sidebar for mobile devices
 
-// Write your Javascript code.
+const body = document.querySelector("body");
+const sidebar = document.querySelector("#sidebar");
+
+sidebar.querySelector(".toggle").addEventListener("click", e => {
+    body.classList.toggle('sidebar-open');
+    sidebar.toggleAttribute("expanded");
+});
+container.addEventListener("click", e => {
+    body.classList.remove('sidebar-open');
+    sidebar.removeAttribute("expanded");
+})
