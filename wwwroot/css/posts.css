@@ -37,12 +37,27 @@
     grid-template-columns: repeat(3, 1fr);
 }
 
+.posts-aspect-large .post-image {
+    padding: 1rem 0 !important;
+}
+.posts-aspect-large .post-image img {
+    position: initial !important;
+}
+
 @media (max-width: 640px) {
     .post-display-options {
         display: none;
     }
+
+    /* Achieve the effect of adding the 'post-aspect-large' class. */
     .posts {
         grid-template-columns: repeat(1, 1fr);
+    }
+    .post-image {
+        padding: 1rem 0 !important;
+    }
+    .post-image img {
+        position: initial !important;
     }
 }
 
@@ -126,6 +141,10 @@
 .post .vote > *:last-child {
     margin-left: -0.25rem;
     display: none;
+}
+
+.post[self-post] {
+    border: 2px solid var(--color-mystge);
 }
 
 .post .vote[voted] {

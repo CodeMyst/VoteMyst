@@ -27,7 +27,7 @@ else if (ViewBag.Event != null)
     </p>
     <form method="post" enctype="multipart/form-data" asp-controller="submit" asp-route-id="@ViewBag.Event.Url">
         <label for="file">Submission File (max. @(ViewBag.MaxFileMB)MB):</label>
-        <input type="file" id="file" name="file" /> <br>
+        <input type="file" id="file" name="file" accept="image/*"/> <br>
         <button type="submit">Submit!</button>
     </form>
     <p class="disclaimer">
