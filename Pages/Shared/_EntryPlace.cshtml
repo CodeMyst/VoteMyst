@@ -11,9 +11,11 @@
     UserData author = DatabaseHelpers.Users.GetUser(Model.Entry.UserId);
 
     Entry entry = Model.Entry;
+    bool isSelfPost = user.UserId == author.UserId;
 }
 
-<div class="post">
+<div class="post"
+    @(isSelfPost ? "self-post" : "") >
     <div class="post-user">
         <div class="place" place="@Model.Number">
             <p>

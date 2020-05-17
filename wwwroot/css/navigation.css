@@ -95,7 +95,7 @@ body #container {
     .desktop-nav {
         display: none;
     }
-    header .user-widget {
+    header .user-widget, header .login-widget {
         display: none;
     }
 }
