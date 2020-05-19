@@ -42,6 +42,7 @@
 }
 .posts-aspect-large .post-image img {
     position: initial !important;
+    max-height: 90vh !important;
 }
 
 @media (max-width: 640px) {
@@ -58,6 +59,7 @@
     }
     .post-image img {
         position: initial !important;
+        max-height: 90vh !important;
     }
 }
 
@@ -147,9 +149,6 @@
     border: 2px solid var(--color-mystge);
 }
 
-.post .vote[voted] {
-
-}
 .post .broken-heart {
     display: none;
 }
@@ -178,4 +177,44 @@
     .post .vote[voted]:hover .broken-heart {
         display: inline-block;
     }
+}
+
+#lightbox {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000bb;
+}
+#lightbox:not([open]) {
+    display: none;
+}
+#lightbox .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 24px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--color-light-gray);
+}
+#lightbox .content {
+    position: absolute;
+    margin: auto;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    width: 80vmin;
+    height: 80vmin;
+    background-color: var(--color-dark-gray);
+    border-radius: 1rem;
+    box-shadow: 0px 5px 10px rgb(0, 0, 0, 0.5)
+}
+#lightbox .content img {
+    position: absolute;
+    margin: auto;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    border-radius: 0.5rem;
+    max-width: 95%;
+    max-height: 95%;
 }
