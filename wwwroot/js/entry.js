@@ -1,8 +1,8 @@
 /*
-    vote.js - Copyright © YilianSource 2020
+    entry.js - Copyright © YilianSource 2020
     
-    Provides functionality for users to vote on entries,
-      interacting with the VoteMyst backend.
+    Provides functionality for users to interact with entries,
+      and consequentially with the VoteMyst backend.
     
     Methods are designed with user error in mind.
 */
@@ -77,4 +77,20 @@ function toggleVote(element) {
         castVote(element);
     }
     document.activeElement = null;
+}
+
+function reportPost(element) {
+    const post = element.closest('.post');
+    promptModal({
+        title: "Report post",
+        content: "Do you really want to report this post? This action cannot be undone. Abusing the system will result in removal of report permissions.",
+        width: 450,
+        buttons: [{
+            content: "Yes.",
+            style: "ok"
+        }, {
+            content: "No.",
+            style: "cancel"
+        }]
+    });
 }
