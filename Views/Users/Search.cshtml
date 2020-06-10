@@ -1,6 +1,6 @@
-@using VoteMyst.Database.Models
+@using VoteMyst.Database
 
-@model UserData[]
+@model UserAccount[]
 @{
     ViewData["Title"] = "Search User";
     Layout = "_Layout";
@@ -20,7 +20,7 @@
 
     <p>@Model.Length users found.</p>
 
-    foreach (UserData user in Model)
+    foreach (UserAccount user in Model)
     {
         <partial name="_UserInfo" for="@user" />
     }

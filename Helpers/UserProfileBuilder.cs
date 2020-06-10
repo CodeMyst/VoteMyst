@@ -4,7 +4,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Hosting;
 
 using VoteMyst.Database;
-using VoteMyst.Database.Models;
 
 namespace VoteMyst
 {
@@ -19,7 +18,7 @@ namespace VoteMyst
             _environment = environment;
         }
 
-        public UserData FromPrincipal(ClaimsPrincipal principal)
+        public UserAccount FromPrincipal(ClaimsPrincipal principal)
         {
             if (!principal.Identity.IsAuthenticated)
                 return _helpers.Users.Guest();
@@ -27,21 +26,20 @@ namespace VoteMyst
             string nameIdentifier = principal.FindFirstValue(ClaimTypes.NameIdentifier);
             if (principal.Identity.AuthenticationType == "Discord") 
             {
-                UserData user = _helpers.Authorization.GetAuthorizedUser(ServiceType.Discord, nameIdentifier);
+                UserAccount user = _helpers.Authorization.GetAuthorizedUser(Service.Discord, nameIdentifier);
                 if (user == null) 
                 {
-                    user = _helpers.Users.NewUser();
-                    user.Username = principal.FindFirstValue(ClaimTypes.Name);
+                    user = _helpers.Users.NewUser(principal.FindFirstValue(ClaimTypes.Name));
 
                     string discordAvatar = principal.FindFirstValue("urn:discord:avatar");
                     if (!string.IsNullOrEmpty(discordAvatar))
                     {
                         // Download the avatar image
                         DownloadHelper.DownloadFile($"https://cdn.discordapp.com/avatars/{nameIdentifier}/{discordAvatar}.png",
-                            Path.Combine(_environment.WebRootPath, $"assets/avatars/{user.DisplayId}.png"));
+                            Path.Combine(_environment.WebRootPath, $"assets/avatars/{user.DisplayID}.png"));
                     }
 
-                    _helpers.Authorization.AddAuthorizedUser(user.UserId, nameIdentifier.ToString(), ServiceType.Discord);
+                    _helpers.Authorization.AddAuthorizedUser(user, nameIdentifier.ToString(), Service.Discord);
                 }
                 return user;
             }
@@ -49,7 +47,7 @@ namespace VoteMyst
             return null;
         }
 
-        public UserData FromId(string displayId)
-            => _helpers.Users.GetUser(displayId);
+        public UserAccount FromId(string displayId)
+            => _helpers.Context.QueryByDisplayID<UserAccount>(displayId);
     }
 }

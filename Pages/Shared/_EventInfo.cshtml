@@ -1,5 +1,4 @@
 @using VoteMyst.Database
-@using VoteMyst.Database.Models
 
 @model Event
 @{
@@ -8,7 +7,7 @@
 
 <div class="event">
     <div class="event-info">
-        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.Url">
+        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.GetValidUrl()">
             @Model.Title
             @if (eventState == EventState.Hidden) 
             {

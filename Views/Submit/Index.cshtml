@@ -23,9 +23,9 @@ else if (ViewBag.Event != null)
         </div>
     }
     <p>
-        You're submitting to <a asp-controller="events" asp-action="display" asp-route-id="@ViewBag.Event.Url"><b>@ViewBag.Event.Title</b></a>.
+        You're submitting to <a asp-controller="events" asp-action="display" asp-route-id="@ViewBag.Event.URL"><b>@ViewBag.Event.Title</b></a>.
     </p>
-    <form method="post" enctype="multipart/form-data" asp-controller="submit" asp-route-id="@ViewBag.Event.Url">
+    <form method="post" enctype="multipart/form-data" asp-controller="submit" asp-route-id="@ViewBag.Event.URL">
         <label for="file">Submission File (max. @(ViewBag.MaxFileMB)MB):</label>
         <input type="file" id="file" name="file" accept="image/*"/> <br>
         <button type="submit">Submit!</button>

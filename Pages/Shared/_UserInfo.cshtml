@@ -1,14 +1,11 @@
-@using VoteMyst.Database.Models
+@using VoteMyst.Database
 
-@model UserData
-@{
+@model UserAccount
 
-}
-
-<a class="panel small user-info" asp-controller="users" asp-action="display" asp-route-id="@Model.DisplayId">
+<a class="panel small user-info" asp-controller="users" asp-action="display" asp-route-id="@Model.DisplayID">
     <partial name="_Avatar" for="@Model" />
     <p>@Model.Username</p>
-    <p class="user-badge @Model.AccountState.ToString().ToLower()">
-        @Model.AccountState
+    <p class="user-badge @Model.AccountBadge.ToString().ToLower()">
+        @Model.AccountBadge
     </p>
 </a>

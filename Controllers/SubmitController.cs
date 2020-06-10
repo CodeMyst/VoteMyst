@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 
 using VoteMyst.Database;
-using VoteMyst.Database.Models;
 using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
@@ -34,11 +33,11 @@ namespace VoteMyst.Controllers
         /// Shows the submission page for the event with the specified ID.
         /// </summary>
         [Route("submit/{id}")]
-        [RequirePermissions(Permissions.SubmitEntries)]
+        [RequireGlobalPermission(GlobalPermissions.ParticipateInEvents)]
         public IActionResult Index(string id)
         {
-            UserData currentUser = GetCurrentUser();
-            Event currentEvent = DatabaseHelpers.Events.GetEvent(id);
+            UserAccount currentUser = GetCurrentUser();
+            Event currentEvent = DatabaseHelpers.Events.GetEventByUrl(id);
 
             bool validEvent = SetupValidation(validator => 
             {
@@ -63,12 +62,16 @@ namespace VoteMyst.Controllers
         /// </summary>
         [HttpPost]
         [Route("submit/{id}")]
-        [RequirePermissions(Permissions.SubmitEntries)]
-        public IActionResult Index(string id, IFormFile file)
+        [RequireGlobalPermission(GlobalPermissions.ParticipateInEvents)]
+        public IActionResult Index(string id, 
+            [FromForm] IFormFile file, 
+            [FromForm] string storyContent, 
+            [FromForm] string pasteLink, 
+            [FromForm] string itchLink)
         {
             // TODO: Maybe support multiple events?
-            Event ev = DatabaseHelpers.Events.GetEvent(id);
-            
+            Event ev = DatabaseHelpers.Events.GetEventByUrl(id);
+
             bool validEvent = SetupValidation(validator => 
             {
                 validator.Verify(ev != null);
@@ -80,23 +83,32 @@ namespace VoteMyst.Controllers
 
             bool validForm = SetupValidation(validator =>
             {
-                validator.Verify(file != null, "A file to be uploaded needs to be specified.");
-                validator.Verify(file.Length <= MaxFileMB * 1000000, "The specified file is too large.");
-
-                var typeProvider = new FileExtensionContentTypeProvider();
-                validator.Verify(typeProvider.TryGetContentType(file.FileName, out string contentType), "Unknown file type.");
-
                 switch(ev.EventType)
                 {
-                    case EventType.Art: validator.Verify(contentType.StartsWith("image/"), "Only image files are allowed for this event."); break;
-                    // TODO: Validate other event types
+                    case EventType.Art:
+                        validator.Verify(file != null, "A file to be uploaded needs to be specified.");
+                        validator.Verify(file.Length <= MaxFileMB * 1000000, "The specified file is too large.");
+
+                        var typeProvider = new FileExtensionContentTypeProvider();
+                        validator.Verify(typeProvider.TryGetContentType(file.FileName, out string contentType), "Unknown file type.");
+                        validator.Verify(contentType.StartsWith("image/"), "Only image files are allowed for this event.");
+
+                        break;
+                    case EventType.Story:
+                        validator.Verify(!string.IsNullOrEmpty(storyContent), "A submission may not be empty.");
+
+                        break;
+                    case EventType.Gamejam:
+                    case EventType.Coding:
+                        // Validate URL
+                        break;
                 }
 
             }).HandleInvalid(InjectResultIntoView).Run();
 
             if (validForm)
             {
-                UserData user = GetCurrentUser();
+                UserAccount user = GetCurrentUser();
 
                 Entry existingEntry = DatabaseHelpers.Entries.GetEntryOfUserInEvent(ev, user);
                 if (existingEntry != null)
@@ -106,7 +118,7 @@ namespace VoteMyst.Controllers
                     if (existingEntry.EntryType == EntryType.File)
                     {
                         // Retrieve the previous entry path, making sure to make the path relative instead of absolute
-                        string entryAssetPath = PathBuilder.GetEntryUrl(existingEntry);
+                        string entryAssetPath = existingEntry.GetAbsoluteUrl(Environment);
 
                         if (System.IO.File.Exists(entryAssetPath)) 
                         {
@@ -114,24 +126,15 @@ namespace VoteMyst.Controllers
                         }
                     }
                 }
+                
+                Entry entry = DatabaseHelpers.Entries.CreateFileEntry(ev, user, file, Environment);
 
-                string relativePath = PathBuilder.GetEntryUrlRelative(ev, user, file.FileName);
-                string absolutePath = PathBuilder.GetEntryUrlAbsolute(ev, user, file.FileName);
 
-                // Ensure that the directory exists
-                Directory.CreateDirectory(Path.GetDirectoryName(absolutePath));
 
-                using (var localFile = System.IO.File.OpenWrite(absolutePath))
-                using (var uploadedFile = file.OpenReadStream())
-                {
-                    uploadedFile.CopyTo(localFile);
-                }
-
-                Entry entry = DatabaseHelpers.Entries.CreateEntry(ev, user, EntryType.File, relativePath);
 
                 _logger.LogInformation("User {0} uploaded a submission to the event '{1}'.", user.Username, ev.Title);
 
-                return Redirect("/events/display/" + ev.Url);
+                return Redirect("/events/display/" + ev.URL);
             }
             
             return Index(id);

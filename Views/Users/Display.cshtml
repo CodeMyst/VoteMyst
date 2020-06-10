@@ -1,145 +1,68 @@
-@using VoteMyst.Database.Models
+@using VoteMyst.Database
+
 @inject AvatarHelper AvatarHelper
+@inject UserProfileBuilder ProfileBuilder
+@inject DatabaseHelperProvider DatabaseHelpers
+
+@model UserAccount
 @{
     ViewData["Title"] = "User";
 
-    UserData inspectedUser = ViewBag.InspectedUser;
-    UserData selfUser = ViewBag.SelfUser;
+    UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
 
-    string avatarUrl = AvatarHelper.GetRelativeAvatarUrl(inspectedUser, out _) ?? "/img/trophy.png";
+    Entry[] entries = Model.Entries.ToArray();
+    int totalVotes = entries.Sum(e => e.Votes.Count);
+    int totalSubmissions = entries.Length;
 }
 
 @section ContentMeta
 {
-    <meta property="og:title" content="@inspectedUser.Username" />
-    <meta property="og:description" content="@ViewBag.InspectedUserGroup at VoteMyst." />
-    <meta property="og:image" content="@avatarUrl" />
+    <meta property="og:title" content="@Model.Username" />
+    <meta property="og:description" content="A VoteMyst user." />
 }
 
 <div class="panel user-profile">
     <div class="user-profile-column">
-        <partial name="_Avatar" for="@inspectedUser" />
-        <p class="username">@inspectedUser.Username</p>
-        @if(ViewBag.InspectedUserGroup != null) 
+        <partial name="_Avatar" for="@Model" />
+        <p class="username">@Model.Username</p>
+        @if(@Model.AccountBadge != AccountBadge.None) 
         {
-            <p class="user-badge @ViewBag.InspectedUserGroup.ToLower()">
-                @ViewBag.InspectedUserGroup
+            <p class="user-badge @Model.AccountBadge.ToString().ToLower()">
+                @switch (Model.AccountBadge)
+                {
+                    case AccountBadge.SiteModerator: @Html.Raw("Moderator"); break;
+                    case AccountBadge.SiteAdministrator: @Html.Raw("Admin"); break;
+                }
             </p>
         }
-        <p class="own-display-id">Account ID:<br>@ViewBag.InspectedUser.DisplayId</p>
+        <p class="own-display-id">Account ID:<br>@Model.DisplayID</p>
     </div>
     <table class="user-profile-table">
         <tr>
             <th>Join Date:</th>
-            <td>@inspectedUser.JoinDate.ToString("dd/MM/yyyy")</td>
+            <td>@Model.JoinDate.ToString("dd/MM/yyyy")</td>
         </tr>
         <tr>
-            <th>Total votes:</th>
-            <td>@ViewBag.InspectedTotalVotes</td>
+            <th>Total votes received:</th>
+            <td>@totalVotes</td>
         </tr>
         <tr>
             <th>Total submissions:</th>
-            <td>@ViewBag.InspectedTotalEntries</td>
+            <td>@totalSubmissions</td>
         </tr>
     </table>
 
-    @if(ViewBag.IsSelf)
+    @if (selfUser.ID == Model.ID)
     {
-        <a href="/logout" class="logout-button">
-            Log Out
+        <a href="/logout" class="profile-button logout-button">
+            <i class="fas fa-sign-out-alt"></i>Log Out
+        </a>
+    }
+
+    @if (selfUser.ID == Model.ID || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers))
+    {
+        <a asp-controller="users" asp-action="edit" asp-route-id="@Model.DisplayID" class="profile-button edit-button">
+            <i class="fas fa-cog"></i>Edit
         </a>
     }
 </div>
-
-@if(ViewBag.AllowAdminDashboard)
-{
-    <div class="panel">
-        <form id="permissionsForm" class="user-admin-panel" method="post" action="/users/edit/@ViewBag.InspectedUser.DisplayId">
-            <table class="user-permission-table">
-                @foreach(var entry in ViewBag.PermissionEntries)
-                {
-                    <tr>
-                        <td>
-                            <p class="permission-label">@entry.Item1</p>
-                        </td>
-                        <td>
-                            <div class="permission-checkbox" 
-                                --permissionflag="@entry.Item2"
-                                @(entry.Item3 ? "checked" : "")>
-                                <div class="knob"></div>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </table>
-            <table class="user-groups-table">
-                @foreach(var entry in ViewBag.AccountGroups)
-                {
-                    <tr>
-                        <td>
-                            <div class="button group-button"
-                                --permissionflag="@entry.Item2">Apply @entry.Item1</div>
-                        </td>
-                    </tr>
-                }
-            </table>
-            <input type="hidden" name="userId" value="@ViewBag.InspectedUser.DisplayId" />
-            <input type="hidden" name="permissions" value="0" />
-            <input type="hidden" name="group" value="@ViewBag.InspectedUserGroupLevel" />
-            <button type="submit">Update Permissions</button>
-        </form>
-    </div>
-    
-
-    <script>
-        function recalculatePermissions() {
-            let permissions = 0n;
-            document.querySelectorAll(".permission-checkbox")
-                .forEach(c => {
-                    if (c.hasAttribute("checked")) {
-                        permissions += BigInt(c.getAttribute("--permissionflag"));
-                    }
-                });
-            document.querySelectorAll("#permissionsForm")[0]["permissions"].value = permissions;
-        }
-        function applyPermissions(permissions) {
-            document.querySelectorAll(".permission-checkbox")
-                .forEach(c => {
-                    let mask = BigInt(c.getAttribute("--permissionflag"));
-                    if ((permissions & mask) != 0) {
-                        c.setAttribute("checked", "");
-                    }
-                    else {
-                        c.removeAttribute("checked");
-                    }
-                });
-            document.querySelectorAll("#permissionsForm")[0]["permissions"].value = permissions;
-        }
-        recalculatePermissions();
-
-        document.querySelectorAll(".permission-checkbox")
-            .forEach(c => c.addEventListener("click", e => {
-                c.toggleAttribute("checked");
-                recalculatePermissions();
-            }));
-        document.querySelectorAll(".group-button")
-            .forEach(c => c.addEventListener("click", e => {
-                let val = BigInt(c.getAttribute("--permissionflag"));
-                let form = document.querySelectorAll("#permissionsForm")[0];
-                form["group"].value = val; 
-                form.submit();
-            }));
-    </script>
-}
-
-<input style="display:none" type="checkbox" checked="true" onchange="theme()" />
-
-<script>
-    function theme() {
-        let useDark = document.querySelector("input").checked;
-        document.querySelector("link[--theme-css]")
-            .setAttribute("href", useDark
-                ? "/css/variables-dark.css"
-                : "/css/variables-light.css");
-    }
-</script>

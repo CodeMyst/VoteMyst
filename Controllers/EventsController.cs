@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using VoteMyst.Database;
-using VoteMyst.Database.Models;
 using VoteMyst.PermissionSystem;
 
 namespace VoteMyst.Controllers
@@ -44,7 +43,7 @@ namespace VoteMyst.Controllers
             public class Place 
             {
                 public int Number { get; set; }
-                public UserData Author { get; set; }
+                public UserAccount Author { get; set; }
                 public Entry Entry { get; set; }
                 public int Votes { get; set; }
 
@@ -53,9 +52,9 @@ namespace VoteMyst.Controllers
                     return new Place
                     {
                         Number = -1,
-                        Author = helpers.Users.GetUser(entry.UserId),
+                        Author = entry.Author,
                         Entry = entry,
-                        Votes = helpers.Votes.GetAllVotesForEntry(entry).Length
+                        Votes = entry.Votes.Count
                     };
                 }
             }
@@ -71,15 +70,15 @@ namespace VoteMyst.Controllers
 
             public static Leaderboard FromEvent(Event ev, DatabaseHelperProvider helpers)
             {
-                Place[] places = helpers.Entries.GetEntriesInEvent(ev)
-                    .Where(entry => helpers.Users.GetUser(entry.UserId).HasPermission(Permissions.AllowWinning))
+                Place[] places = ev.Entries
+                    .Where(entry => helpers.Events.CanUserWin(entry.Author, ev))
                     .Select(entry => Place.FromEntry(entry, helpers))
                     .OrderByDescending(place => place.Votes)
-                    .ThenBy(place => place.Entry.EntryId)
+                    .ThenBy(place => place.Entry.ID)
                     .ToArray();
 
-                Entry[] notEligable = helpers.Entries.GetEntriesInEvent(ev)
-                    .Where(entry => !helpers.Users.GetUser(entry.UserId).HasPermission(Permissions.AllowWinning))
+                Entry[] notEligable = ev.Entries
+                    .Where(entry => !helpers.Events.CanUserWin(entry.Author, ev))
                     .ToArray();
 
                 int currentPlace = 0;
@@ -118,28 +117,22 @@ namespace VoteMyst.Controllers
         /// <summary>
         /// Displays an overview of all events.
         /// </summary>
-        [RequirePermissions(Permissions.ViewEvents)]
         public IActionResult Index()
         {
-            UserData user = GetCurrentUser();
+            UserAccount user = GetCurrentUser();
 
-            Event[] finishedEvents = DatabaseHelpers.Events.GetAllEventsFinishedBefore(DateTime.UtcNow);
-            Event[] plannedEvents = DatabaseHelpers.Events.GetPlannedEvents(user.HasPermission(Permissions.CreateEvents));
-            Event[] ongoingEvents = DatabaseHelpers.Events.GetCurrentEvents();
-
-            ViewBag.CanManageEvents = user.HasPermission(Permissions.CreateEvents);
+            ViewBag.CanManageEvents = user.Permissions.HasFlag(GlobalPermissions.CreateEvents);
 
             return View(DatabaseHelpers.Events.GetAllEventsGrouped());
         }
 
         /// <summary>
-        /// Displays the entry with the specified ID.
+        /// Displays the event with the specified ID.
         /// </summary>
-        [RequirePermissions(Permissions.ViewEntries)]
         public IActionResult Display(string id) 
         {
-            UserData user = GetCurrentUser();
-            Event e = DatabaseHelpers.Events.GetEvent(id);
+            UserAccount user = GetCurrentUser();
+            Event e = DatabaseHelpers.Events.GetEventByUrl(id);
             ViewBag.Event = e;
 
             if (e == null)
@@ -148,16 +141,15 @@ namespace VoteMyst.Controllers
             EventState eventState = e.GetCurrentState();
 
             // If the event is not revealed yet, don't allow to find it, except if the user is an admin
-            if (eventState == EventState.Hidden && user.AccountState != AccountState.Admin)
+            if (eventState == EventState.Hidden && user.AccountBadge != AccountBadge.SiteAdministrator)
             {
-                _logger.LogWarning("User {0} attempted to access the event with ID {1}, but it is hidden. Sending a 404 response.", user.Username, id);
+                _logger.LogWarning("{0} attempted to access the {1}, but it is hidden. Sending a 404 response.", user, e);
                 return NotFound();
             }
             // If the event voting phase has started and not ended yet, redirect to the vote page
             if (eventState == EventState.Voting) 
             {
-                _logger.LogInformation("User {0} attempted to access the event with ID {1}, but voting is in progress. Redirecting to the vote page.", 
-                    user.Username, id);
+                _logger.LogInformation("{0} attempted to access {1}, but voting is in progress. Redirecting to the vote page.", user, e);
                 return RedirectToAction("vote", new { id = id });
             }
             
@@ -167,7 +159,7 @@ namespace VoteMyst.Controllers
         /// <summary>
         /// Provides the page to create a new event.
         /// </summary>
-        [RequirePermissions(Permissions.CreateEvents)]
+        [RequireGlobalPermission(GlobalPermissions.CreateEvents)]
         public IActionResult New() 
         {
             return View(new Event());
@@ -177,14 +169,18 @@ namespace VoteMyst.Controllers
         /// Creates a new event in the database.
         /// </summary>
         [HttpPost]
-        [RequirePermissions(Permissions.CreateEvents)]
+        [RequireGlobalPermission(GlobalPermissions.CreateEvents)]
         public IActionResult New([FromForm] Event e)
         {
-            if (string.IsNullOrEmpty(e.Url))
+            if (string.IsNullOrEmpty(e.URL))
             {
-                e.Url = Regex.Replace(Regex.Replace(e.Title.ToLowerInvariant().Replace(" ", "-"), 
+                e.URL = Regex.Replace(Regex.Replace(e.Title.ToLowerInvariant().Replace(" ", "-"), 
                     @"[^a-zA-Z\d\-]", string.Empty).Trim('-'), @"-{2,}", "-");
             }
+
+            // Temporarily set the DisplayID to something to bypass user validation.
+            // The ID will later be injected when creating the event.
+            e.DisplayID = "null";
 
             ModelState.Clear();
             TryValidateModel(e);
@@ -200,7 +196,7 @@ namespace VoteMyst.Controllers
             }
             else
             {
-                DatabaseHelpers.Events.CreateEvent(e);
+                DatabaseHelpers.Events.CreateEvent(e, GetCurrentUser());
 
                 _logger.LogInformation("User {0} created the event '{1}'.", GetCurrentUser().Username, e.Title);
 
@@ -208,18 +204,17 @@ namespace VoteMyst.Controllers
             }
         }
 
-        [RequirePermissions(Permissions.ViewEntries)]
         public IActionResult Vote(string id) 
         {
             // TODO: Maybe support multiple events?
-            Event currentEvent = DatabaseHelpers.Events.GetEvent(id);
+            Event currentEvent = DatabaseHelpers.Events.GetEventByUrl(id);
 
             if (currentEvent == null)
                 return NotFound();
             if (currentEvent.GetCurrentState() != EventState.Voting)
                 return Unauthorized();
 
-            Entry[] entries = DatabaseHelpers.Entries.GetEntriesInEvent(currentEvent);
+            Entry[] entries = currentEvent.Entries.ToArray();
 
             Random rnd = new Random();
             Entry[] randomizedEntries = entries.OrderBy(e => rnd.Next()).ToArray();
@@ -231,66 +226,66 @@ namespace VoteMyst.Controllers
         }
 
         [HttpPost]
-        [Route("vote/cast/{eventId}/{entryId}")]
-        public IActionResult CastVote(int eventId, int entryId)
+        [Route("vote/cast/{entryDisplayId}")]
+        public IActionResult CastVote(string entryDisplayId)
         {
             // Disallow anonymous voting
             if (!User.Identity.IsAuthenticated)
                 return Forbid();
 
-            Entry entry = DatabaseHelpers.Entries.GetEntry(entryId);
+            Entry entry = DatabaseHelpers.Context.QueryByDisplayID<Entry>(entryDisplayId);
+            Event entryEvent = entry.Event;
 
-            UserData user = GetCurrentUser();
-            UserData author = DatabaseHelpers.Users.GetUser(entry.UserId);
+            UserAccount user = GetCurrentUser();
+            UserAccount author = entry.Author;
             
             // Disallow voting on own posts
-            if (user.UserId == author.UserId)
+            if (user.ID == author.ID)
                 return Unauthorized();
 
-            Event entryEvent = DatabaseHelpers.Events.GetEvent(eventId);
-            
             // Only allow voting while its open
             if (entryEvent.GetCurrentState() != EventState.Voting)
                 return Unauthorized();
 
-            Vote vote = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user.UserId, entryId);
+            Vote vote = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, entry);
+            Console.WriteLine(vote);
 
             // Make sure a vote by the user on the specified entry does not exist yet
             if (vote != null)
                 return Ok(new VoteActionResult(false, true));
             
             // If all checks passed, cast the vote
-            DatabaseHelpers.Votes.AddVote(entryId, user.UserId);
+            DatabaseHelpers.Votes.AddVote(entry, user);
 
-            _logger.LogInformation("User {0} cast a vote on the entry with ID {1}.", user.Username, entryId);
+            _logger.LogInformation("User {0} cast a vote on the entry with ID {1}.", user.Username, entryDisplayId);
 
             return Ok(new VoteActionResult(true, true));
         }
         
         [HttpPost]
-        [Route("vote/remove/{eventId}/{entryId}")]
-        public IActionResult RemoveVote(int eventId, int entryId)
+        [Route("vote/remove/{entryDisplayId}")]
+        public IActionResult RemoveVote(string entryDisplayId)
         {
             // Disallow anonymous voting
             if (!User.Identity.IsAuthenticated)
                 return Forbid();
                 
-            Event entryEvent = DatabaseHelpers.Events.GetEvent(eventId);
+            UserAccount user = GetCurrentUser();
+            Entry entry = DatabaseHelpers.Context.QueryByDisplayID<Entry>(entryDisplayId);
+            Vote vote = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, entry);
+            Event entryEvent = entry.Event;
 
             // Only allow deleting votes if voting is still open
              if (entryEvent.GetCurrentState() != EventState.Voting)
                 return Unauthorized();
 
-            UserData user = GetCurrentUser();
-            Vote vote = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user.UserId, entryId);
-
             // Make sure a vote exists that can be deleted
             if (vote == null)
                 return Ok(new VoteActionResult(false, false));
 
-            _logger.LogInformation("User {0} removed their vote on the entry with ID {1}.", user.Username, entryId);
+            _logger.LogInformation("User {0} removed their vote on the entry with ID {1}.", user.Username, entryDisplayId);
 
-            DatabaseHelpers.Votes.DeleteVote(entryId, user.UserId);
+            DatabaseHelpers.Votes.DeleteVote(vote);
             return Ok(new VoteActionResult(true, false));
         }
     }

@@ -1,5 +1,4 @@
 @using VoteMyst.Database
-@using VoteMyst.Database.Models
 @using VoteMyst.Controllers
 
 @inject UserProfileBuilder ProfileBuilder
@@ -7,11 +6,11 @@
 
 @model EventsController.Leaderboard.Place
 @{
-    UserData user = ProfileBuilder.FromPrincipal(User);
-    UserData author = DatabaseHelpers.Users.GetUser(Model.Entry.UserId);
+    UserAccount user = ProfileBuilder.FromPrincipal(User);
+    UserAccount author = Model.Author;
 
     Entry entry = Model.Entry;
-    bool isSelfPost = user.UserId == author.UserId;
+    bool isSelfPost = user.ID == author.ID;
 }
 
 <div class="post"
@@ -30,21 +29,23 @@
                 <i class="votecount">(@Model.Votes votes)</i>
             </p>
         </div>
-        <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayId">
+        <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayID">
             <partial name="_Avatar" for="@author" />
             <p class="username">@author.Username</p>
         </a>
         <p class="post-date local-date" --unix-timestamp="@entry.SubmitDate.ToUnixSeconds()" --date-only>@entry.SubmitDate.ToString("dd/MM/yyyy")</p>
     </div>
     <div class="post-image">
-        <img src="/@entry.Content" />
+        <img src="/@Model.Entry.GetRelativeUrl()" />
     </div>
 
     <div class="post-toolbar">
         <span class="l">
         </span>
         <span class="r">
-            <span class="report" title="Report this post"><i class="fas fa-flag"></i></span>
+            <span class="report" title="Report this post" onclick="reportPost(this)">
+                <i class="fas fa-flag"></i>
+            </span>
         </span>
     </div>
 </div>

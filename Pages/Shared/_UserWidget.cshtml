@@ -1,14 +1,13 @@
 @using VoteMyst
-@using VoteMyst.Database.Models
+@using VoteMyst.Database
 
 @inject UserProfileBuilder _profileBuilder
 
 @{
-    bool loggedIn = User.Identity.IsAuthenticated;
-    UserData user = loggedIn ? _profileBuilder.FromPrincipal(User) : null;
+    UserAccount user = User.Identity.IsAuthenticated ? _profileBuilder.FromPrincipal(User) : null;
 }
 
-@if (loggedIn)
+@if (user != null)
 {
     <a href="/users/me" class="widget user-widget">
         <partial name="_Avatar" for="@user" />

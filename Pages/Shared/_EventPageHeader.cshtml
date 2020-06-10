@@ -1,13 +1,12 @@
 @inject DatabaseHelperProvider DatabaseHelpers
 
 @using VoteMyst.Database
-@using VoteMyst.Database.Models
 
 @model Event
 @{
     EventState eventState = Model.GetCurrentState();
-    string[] hosts = DatabaseHelpers.Users.GetUsersByState(AccountState.Admin)
-        .Select(h => $"<a href=\"/users/display/{h.DisplayId}\">{h.Username}</a>")
+    string[] hosts = DatabaseHelpers.Events.GetEventHosts(Model)
+        .Select(h => $"<a href=\"/users/display/{h.DisplayID}\">{h.Username}</a>")
         .ToArray();
 }
 

@@ -1,12 +1,17 @@
 using System;
+using System.IO;
 using System.Linq;
-using VoteMyst.Database.Models;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace VoteMyst.Database
 {
+    /// <summary>
+    /// Provides utility to handle <see cref="Entry"/>s.
+    /// </summary>
     public class EntryHelper
     {
-
         private readonly VoteMystContext context;
 
         public EntryHelper(VoteMystContext context)
@@ -14,55 +19,72 @@ namespace VoteMyst.Database
             this.context = context;
         }
 
-        public Entry CreateEntry(Event ev, UserData user, EntryType type, string content)
-            => CreateEntry(ev.EventId, user.UserId, type, content);
-
-        public Entry CreateEntry(int eventId, int userId, EntryType type, string content)
+        /// <summary>
+        /// Creates a new entry for the specified event, from the given user account.
+        /// <para>Note that this method only creates the database entry.</para>
+        /// </summary>
+        public Entry CreateEntry(Event ev, UserAccount user, EntryType type, string content)
         {
-            Entry entry = new Entry()
+            Entry entry = new Entry
             {
-                EventId = eventId,
-                UserId = userId,
+                Event = ev,
+                Author = user,
                 EntryType = type,
                 Content = content,
                 SubmitDate = DateTime.UtcNow
             };
 
+            DisplayIDProvider.InjectDisplayId(entry);
+
             context.Entries.Add(entry);
+            context.SaveChanges();
 
-             context.SaveChanges();
-
-             return entry;
+            return entry;
         }
 
-        public Entry GetEntry(int entryID)
-            => context.Entries
-                .FirstOrDefault(x => x.EntryId == entryID);
+        /// <summary>
+        /// Creates a new file entry for the specified event, from the given user account. The file is also saved to the disk assets.
+        /// </summary>
+        public Entry CreateFileEntry(Event e, UserAccount user, IFormFile file, IWebHostEnvironment environment)
+        {
+            Entry entry = new Entry 
+            {
+                Event = e,
+                Author = user,
+                EntryType = EntryType.File,
+                SubmitDate = DateTime.UtcNow
+            };
 
-        public Entry[] GetEntriesFromUser(UserData user)
-            => GetEntriesFromUser(user.UserId);
+            DisplayIDProvider.InjectDisplayId(entry);
 
-        public Entry[] GetEntriesFromUser(int userId)
-            => context.Entries
-                .Where(x => x.UserId == userId)
-                .ToArray();
+            entry.Content = $"{entry.DisplayID}{Path.GetExtension(file.FileName)}";
 
-        public Entry[] GetEntriesInEvent(Event ev)
-            => GetEntriesInEvent(ev.EventId);
+            context.Entries.Add(entry);
+            context.SaveChanges();
 
-        public Entry[] GetEntriesInEvent(int eventId)
-            => context.Entries
-                .Where(x => x.EventId == eventId)
-                .ToArray();
+            string absoluteEntryPath = entry.GetAbsoluteUrl(environment);
 
-        public Entry GetEntryOfUserInEvent(Event ev, UserData user)
-            => GetEntryOfUserInEvent(ev.EventId, user.UserId);
+            // Ensure that the directory exists
+            Directory.CreateDirectory(Path.GetDirectoryName(absoluteEntryPath));
 
-        public Entry GetEntryOfUserInEvent(int eventId, int userId)
-            => context.Entries
-                .Where(x => x.UserId == userId)
-                .FirstOrDefault(x => x.EventId == eventId);
+            using (var localFile = File.OpenWrite(absoluteEntryPath))
+            using (var uploadedFile = file.OpenReadStream())
+            {
+                uploadedFile.CopyTo(localFile);
+            }
 
+            return entry;
+        }
+
+        /// <summary>
+        /// Retrieves the submitted entry of the given user from the event, if possible.
+        /// </summary>
+        public Entry GetEntryOfUserInEvent(Event ev, UserAccount user)
+            => ev.Entries.FirstOrDefault(x => x.Author.ID == user.ID);
+
+        /// <summary>
+        /// Deletes the specified entry.
+        /// </summary>
         public bool DeleteEntry(Entry entry)
         {
             context.Entries.Remove(entry);

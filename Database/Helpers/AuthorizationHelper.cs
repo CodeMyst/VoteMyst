@@ -1,10 +1,12 @@
+using System.Text;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using VoteMyst.Database.Models;
 
 namespace VoteMyst.Database 
 {
+    /// <summary>
+    /// Provides utility to handle <see cref="Authorization"/>s.
+    /// </summary>
     public class AuthorizationHelper 
     {
         private readonly VoteMystContext context;
@@ -14,43 +16,41 @@ namespace VoteMyst.Database
             this.context = context;
         }
 
-        public Authorization AddAuthorizedUser(int userId, string serviceUserId, ServiceType serviceType)
+        /// <summary>
+        /// Registers a user via an authorization service.
+        /// </summary>
+        public Authorization AddAuthorizedUser(UserAccount user, string serviceUserId, Service serviceType)
         {
             Authorization authorization = new Authorization() 
             {
-                UserId = userId,
-                ServiceUserId = ComputeSha256Hash(serviceUserId),
-                ServiceType = serviceType,
+                User = user,
+                ServiceUserID = ComputeSha256Hash(serviceUserId),
+                Service = serviceType,
                 Valid = true
             };
 
             context.Authorizations.Add(authorization);
-
             context.SaveChanges();
 
             return authorization;
         }
 
-        public UserData GetAuthorizedUser(ServiceType serviceType, string serviceUserId)
+        /// <summary>
+        /// Retrieves a user via a hashed user ID from a service.
+        /// </summary>
+        public UserAccount GetAuthorizedUser(Service serviceType, string serviceUserId)
             => context.Authorizations
-                .Where(auth => auth.ServiceType == serviceType)
-                .Where(auth => auth.ServiceUserId == ComputeSha256Hash(serviceUserId))
-                .Join(context.UserData,
-                    auth => auth.UserId,
-                    user => user.UserId,
+                .Where(auth => auth.Service == serviceType)
+                .Where(auth => auth.ServiceUserID == ComputeSha256Hash(serviceUserId))
+                .Join(context.UserAccounts,
+                    auth => auth.User.ID,
+                    user => user.ID,
                     (auth, user) => user)
                 .FirstOrDefault();
 
-        public Authorization GetAuthorization(int authId)
-            => context.Authorizations
-                .FirstOrDefault(x => x.AuthId == authId);
-
-        public Authorization[] GetAllAuthorizationsOfUser(int userId)
-            => context.Authorizations
-                .Where(x => x.UserId == userId)
-                .ToArray();
-
-
+        /// <summary>
+        /// Hashes the specified string.
+        /// </summary>
         private string ComputeSha256Hash(string input)
         {
             using (SHA256 sha256 = SHA256.Create())

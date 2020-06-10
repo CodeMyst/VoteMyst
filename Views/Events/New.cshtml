@@ -1,5 +1,4 @@
 @using VoteMyst.Database
-@using VoteMyst.Database.Models
 
 @model Event
 @{
@@ -32,8 +31,8 @@
             <td><input asp-for="@Model.Title" placeholder="My Event Title!"/></td>
         </tr>
         <tr>
-            <th><label asp-for="@Model.Url"></label></th>
-            <td><input asp-for="@Model.Url" /></td>
+            <th><label asp-for="@Model.URL"></label></th>
+            <td><input asp-for="@Model.URL" /></td>
         </tr>
         <tr>
             <th><label asp-for="@Model.Description"></label></th>
@@ -76,7 +75,7 @@
 
 <script>
     let titleInput = document.querySelector("#Title");
-    let urlInput = document.querySelector("#Url");
+    let urlInput = document.querySelector("#URL");
     function generateUrl(e) {
         urlInput.placeholder = titleInput.value
             .toLowerCase()
