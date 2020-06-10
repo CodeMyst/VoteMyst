@@ -141,16 +141,15 @@ namespace VoteMyst.Controllers
             EventState eventState = e.GetCurrentState();
 
             // If the event is not revealed yet, don't allow to find it, except if the user is an admin
-            if (eventState == EventState.Hidden && user.AccountBadge == AccountBadge.SiteAdministrator)
+            if (eventState == EventState.Hidden && user.AccountBadge != AccountBadge.SiteAdministrator)
             {
-                _logger.LogWarning("User {0} attempted to access the event with ID {1}, but it is hidden. Sending a 404 response.", user.Username, id);
+                _logger.LogWarning("{0} attempted to access the {1}, but it is hidden. Sending a 404 response.", user, e);
                 return NotFound();
             }
             // If the event voting phase has started and not ended yet, redirect to the vote page
             if (eventState == EventState.Voting) 
             {
-                _logger.LogInformation("User {0} attempted to access the event with ID {1}, but voting is in progress. Redirecting to the vote page.", 
-                    user.Username, id);
+                _logger.LogInformation("{0} attempted to access {1}, but voting is in progress. Redirecting to the vote page.", user, e);
                 return RedirectToAction("vote", new { id = id });
             }
             

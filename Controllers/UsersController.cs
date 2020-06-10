@@ -100,9 +100,6 @@ namespace VoteMyst.Controllers
 
             UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
 
-            //if (selfUser.IsBanned())
-            //    return Forbid();
-
             return Display(selfUser.DisplayID);
         }
 
@@ -141,7 +138,6 @@ namespace VoteMyst.Controllers
                 // TODO: Implement avatar changing
             }
 
-            Console.WriteLine($"{accountChanges.Permissions} != {targetUser.Permissions}");
             if (accountChanges.Permissions != targetUser.Permissions || accountChanges.AccountBadge != targetUser.AccountBadge)
             {
                 if (!canManageUsers)

@@ -94,6 +94,7 @@ namespace VoteMyst.Database
             var provider = validationContext.GetService(typeof(DatabaseHelperProvider)) as DatabaseHelperProvider;
             if (provider.Events.GetEventByUrl(URL) != null)
             {
+                // Users could potentially detect hidden events by repeatedly trying to create events here.
                 yield return new ValidationResult("That URL is already in use.");
             }
         }
