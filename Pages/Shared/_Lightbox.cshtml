@@ -1,7 +1,9 @@
-<div id="lightbox">
-    <div class="content">
+<div id="lightbox" onclick="closeLightbox()">
+    <div class="content" onclick="event.stopPropagation();">
         <img/>
-        <div class="close"><i class="fas fa-times"></i></div>
+        <div class="close" title="Close the window.">
+            <i class="fas fa-times"></i>
+        </div>
     </div>
 </div>
 

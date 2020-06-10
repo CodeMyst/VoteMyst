@@ -99,13 +99,14 @@ namespace VoteMyst
                 options.Scope.Add("guilds");
             });
 
-            services.AddDbContext<VoteMystContext>(options => options.UseMySql(Configuration["MySQLConnection"]));
+            services.AddDbContext<VoteMystContext>(options => options
+                .UseMySql(Configuration["MySQLConnection"])
+                .UseLazyLoadingProxies());
 
             // Avatar Helper is used by the UserDataHelper which gets instantiated by DatabaseHelperProvider
             services.AddScoped<AvatarHelper>();
             services.AddScoped<DatabaseHelperProvider>();
             services.AddScoped<UserProfileBuilder>();
-            services.AddScoped<PathBuilder>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

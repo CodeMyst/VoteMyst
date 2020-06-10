@@ -1,0 +1,44 @@
+@using VoteMyst.Database
+
+@inject AvatarHelper AvatarHelper
+@inject UserProfileBuilder ProfileBuilder
+@inject DatabaseHelperProvider DatabaseHelpers
+
+@model UserAccount
+@{
+    ViewData["Title"] = "User";
+
+    UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
+}
+
+<h1>Edit User</h1>
+
+<form method="post" enctype="multipart/form-data"
+    autocomplete="off" onsubmit="return validateForm()">
+    <table>
+        <colgroup>
+            <col style="width: 120px">
+            <col>
+        </colgroup>
+        <tr>
+            <th><label asp-for="@Model.Username"></label></th>
+            <td><input asp-for="@Model.Username"/></td>
+        </tr>
+
+        @if (selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers))
+        {
+            <tr>
+                <th><label asp-for="@Model.Permissions"></label></th>
+                <td><input asp-for="@Model.Permissions"/></td>
+            </tr>
+            <tr>
+                <th><label asp-for="@Model.AccountBadge"></label></th>
+                <td><select asp-for="@Model.AccountBadge" asp-items="@Html.GetEnumSelectList<AccountBadge>()"></select></td>
+            </tr>
+        }
+    </table>
+    <div class="form-submit">
+        <button type="submit">Update User</button>
+        <div></div>
+    </div>
+</form>

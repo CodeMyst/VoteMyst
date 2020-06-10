@@ -24,8 +24,8 @@ function getEventId() {
     return parseInt(document.querySelector(".posts").getAttribute(eventIdAttribute));
 }
 
-// Constructs the POST body, using the entryId of the given element
-function buildPostBody(post) {
+// Constructs the body for the POST request
+function buildRequestBody(entry) {
     return {
         method: "POST",
         headers: {
@@ -33,14 +33,14 @@ function buildPostBody(post) {
         }
     }
 }
-function buildUrlParameters(post) {
-    return getEventId() + "/" + getEntryId(post);
+function getEntryId(post) {
+    return post.getAttribute("entry-id");
 }
 
 function castVote(element) {
     const post = element.closest('.post');
     if (!element.hasAttribute(votedAttribute)) {
-        fetch(`/vote/cast/${buildUrlParameters(post)}`, buildPostBody(post))
+        fetch(`/vote/cast/${getEntryId(post)}`, buildRequestBody(post))
             .then(toJson)
             .then(result => {
                 if (result.hasVote) {
@@ -56,7 +56,7 @@ function castVote(element) {
 function removeVote(element) {
     const post = element.closest('.post');
     if (element.hasAttribute(votedAttribute)) {
-        fetch(`/vote/remove/${buildUrlParameters(post)}`, buildPostBody(post))
+        fetch(`/vote/remove/${getEntryId(post)}`, buildRequestBody(post))
             .then(toJson)
             .then(result => {
                 if (!result.hasVote) {

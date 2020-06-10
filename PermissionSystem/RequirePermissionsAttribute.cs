@@ -8,24 +8,23 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using VoteMyst.Controllers;
 using VoteMyst.Database;
-using VoteMyst.Database.Models;
 
 namespace VoteMyst.PermissionSystem
 {
-    public class RequirePermissionsAttribute : TypeFilterAttribute
+    public class RequireGlobalPermissionAttribute : TypeFilterAttribute
     {
-        public RequirePermissionsAttribute(Permissions permissions) : base(typeof(RequirePermissionsAttributeImpl))
+        public RequireGlobalPermissionAttribute(GlobalPermissions permissions) : base(typeof(RequirePermissionsAttributeImpl))
         {
-            Arguments = new[] { new PermissionAuthorizationRequirement(permissions) };
+            Arguments = new[] { new PermissionAuthorizationRequirement<GlobalPermissions>(permissions) };
         }
 
         private class RequirePermissionsAttributeImpl : Attribute, IActionFilter
         {
-            private readonly PermissionAuthorizationRequirement permissions;
+            private readonly PermissionAuthorizationRequirement<GlobalPermissions> permissions;
             private readonly DatabaseHelperProvider dbhelper;
             private readonly UserProfileBuilder profileBuilder;
 
-            public RequirePermissionsAttributeImpl(PermissionAuthorizationRequirement permissions,
+            public RequirePermissionsAttributeImpl(PermissionAuthorizationRequirement<GlobalPermissions> permissions,
                                                    DatabaseHelperProvider dbhelper,
                                                    UserProfileBuilder profileBuilder)
             {
@@ -40,17 +39,11 @@ namespace VoteMyst.PermissionSystem
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                UserData user;
-                if (!context.HttpContext.User.Identity.IsAuthenticated)
-                {
-                    user = dbhelper.Users.Guest();
-                }
-                else
-                {
-                    user = profileBuilder.FromPrincipal(context.HttpContext.User);
-                }
-
-                if (user.IsBanned() || !user.PermissionLevel.HasFlag(permissions.Permissions))
+                UserAccount user = context.HttpContext.User.Identity.IsAuthenticated
+                    ? profileBuilder.FromPrincipal(context.HttpContext.User)
+                    : user = dbhelper.Users.Guest();
+                
+                if (!user.Permissions.HasFlag(permissions.Permissions))
                 {
                     context.Result = new StatusCodeResult(StatusCodes.Status403Forbidden);
                 }

@@ -90,6 +90,9 @@
     height: 32px;
     width: 32px;
 }
+.post .post-user .avatar > p {
+    font-size: 0.9rem;
+}
 .post .post-user .username {
     font-size: 0.9rem;
     margin: auto 0.4rem;
@@ -191,12 +194,17 @@
 }
 #lightbox .close {
     position: absolute;
-    right: 10px;
-    top: 10px;
-    width: 24px;
+    right: 0; top: 0;
+    width: 48px;
+    height: 48px;
+    line-height: 48px;
+
     text-align: center;
     cursor: pointer;
+
     color: var(--color-light-gray);
+    background-color: var(--color-dark-gray);
+    border-radius: 16px;
 }
 #lightbox .content {
     position: absolute;

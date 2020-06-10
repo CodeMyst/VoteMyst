@@ -134,7 +134,8 @@
 .user-badge {
     height: 1.5rem;
 
-    border: 1px solid white;
+    color: var(--color-white);
+    border: 1px solid var(--color-white);
     border-radius: 0.75rem;
 
     font-size: 0.8rem;
@@ -144,11 +145,11 @@
     text-align: center;
     text-transform: uppercase;
 }
-.user-badge.admin {
+.user-badge.siteadministrator {
     border-color: var(--color-badge-admin);
     color: var(--color-badge-admin);
 }
-.user-badge.moderator {
+.user-badge.sitemoderator {
     border-color: var(--color-badge-moderator);
     color: var(--color-badge-moderator);
 }
@@ -169,22 +170,26 @@
     color: var(--color-light-gray);
 }
 
+.user-profile .profile-button {
+    position: absolute;
+    margin: 1rem 1.5rem;
+    color: var(--color-gray);
+}
 .user-profile .logout-button {
-    padding: 0.1rem 1rem;
-    margin: auto 0 0 auto;
-
-    color: var(--color-light-gray);
-    border: 1px solid var(--color-light-gray);
-    border-radius: 5px;
-
-    font-size: 0.8rem;
-    font-weight: bold;
-    letter-spacing: 0.06rem;
-    text-transform: uppercase;
+    bottom: 0; right: 0;
 }
 .user-profile .logout-button:hover {
     color: var(--color-mysted);
-    border-color: var(--color-mysted);
+}
+
+.user-profile .edit-button {
+    top: 0; right: 0;
+}
+.user-profile .fas {
+    margin-right: 0.3rem;
+}
+.user-profile .edit-button:hover {
+    color: var(--color-light-gray);
 }
 
 .user-admin-panel {

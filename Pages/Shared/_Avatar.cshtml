@@ -1,9 +1,9 @@
 @using VoteMyst
-@using VoteMyst.Database.Models
+@using VoteMyst.Database
 
 @inject AvatarHelper _avatarHelper
 
-@model UserData
+@model UserAccount
 @{
     string url = _avatarHelper.GetRelativeAvatarUrl(Model, out string _initials);
 }

@@ -1,9 +1,9 @@
-@using VoteMyst.Database.Models
-@{
-    ViewData["Title"] = "Vote";
-    Layout = "_Layout";
+@using VoteMyst.Database
 
-    Event e = ViewBag.Event;
+@model Event
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "_Layout";
 }
 
 @section ContentMeta
@@ -13,7 +13,7 @@
     <meta property="og:image" content="/img/trophy.png" />
 }
 
-<partial name="_EventPageHeader" for="@e" />
+<partial name="_EventPageHeader" for="@Model" />
 
 <div class="post-display-options">
     <div id="post-display-option-large"><img src="/img/post-display-large.svg"/></div>
@@ -21,7 +21,7 @@
     <div id="post-display-option-small"><img src="/img/post-display-smallest.svg"/></div>
 </div>
 
-<div class="posts" event-id="@ViewBag.Event.EventId">
+<div class="posts">
 @foreach (Entry entry in ViewBag.RandomizedEntries)
 {
     <partial name="_Entry" for="@entry" />
@@ -29,6 +29,6 @@
 </div>
 
 @section Scripts {
-    <script type="text/javascript" src="~/js/entry-grid.js"></script>
-    <script type="text/javascript" src="~/js/entry.js"></script>
+    <script src="~/js/entry-grid.js" asp-append-version="true"></script>
+    <script src="~/js/entry.js" asp-append-version="true"></script>
 }

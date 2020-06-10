@@ -1,10 +1,10 @@
 using System;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 using VoteMyst.Database;
-using VoteMyst.Database.Models;
 using VoteMyst.PermissionSystem;
 using VoteMyst.Controllers.Validation;
 
@@ -17,19 +17,19 @@ namespace VoteMyst.Controllers
     {
         protected UserProfileBuilder ProfileBuilder { get; }
         protected DatabaseHelperProvider DatabaseHelpers { get; }
-        protected PathBuilder PathBuilder { get; }
+        protected IWebHostEnvironment Environment { get; }
 
         public VoteMystController(IServiceProvider serviceProvider)
         {
             ProfileBuilder = serviceProvider.GetService<UserProfileBuilder>();
-            PathBuilder = serviceProvider.GetService<PathBuilder>();
             DatabaseHelpers = serviceProvider.GetService<DatabaseHelperProvider>();
+            Environment = serviceProvider.GetService<IWebHostEnvironment>();
         }
 
         /// <summary>
         /// Returns the currently authenticated user. Returns a guest user if the no one is logged in.
         /// </summary>
-        public UserData GetCurrentUser()
+        public UserAccount GetCurrentUser()
             => ProfileBuilder.FromPrincipal(User);
 
         /// <summary>

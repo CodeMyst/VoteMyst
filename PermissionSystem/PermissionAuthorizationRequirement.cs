@@ -1,14 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+
 using Microsoft.AspNetCore.Authorization;
+
 using VoteMyst.Database;
 
 namespace VoteMyst.PermissionSystem
 {
-    public class PermissionAuthorizationRequirement : IAuthorizationRequirement
+    public class PermissionAuthorizationRequirement<T> : IAuthorizationRequirement where T : Enum
     {
-        public Permissions Permissions;
+        public T Permissions { get; set; }
 
-        public PermissionAuthorizationRequirement(Permissions permissions)
+        public PermissionAuthorizationRequirement(T permissions)
         {
             Permissions = permissions;
         }

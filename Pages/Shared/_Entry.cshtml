@@ -1,29 +1,28 @@
 @using VoteMyst.Database
-@using VoteMyst.Database.Models
 
 @inject UserProfileBuilder ProfileBuilder
 @inject DatabaseHelperProvider DatabaseHelpers
 
 @model Entry
 @{
-    UserData user = ProfileBuilder.FromPrincipal(User);
-    UserData author = DatabaseHelpers.Users.GetUser(Model.UserId);
+    UserAccount user = ProfileBuilder.FromPrincipal(User);
+    UserAccount author = Model.Author;
 
-    Event e = DatabaseHelpers.Events.GetEvent(Model.EventId);
+    Event e = Model.Event;
     bool votingOpen = e.GetCurrentState() == EventState.Voting;
     bool displayUser = e.GetCurrentState() == EventState.Closed;
-    bool isSelfPost = user.UserId == author.UserId;
+    bool isSelfPost = user.ID == author.ID;
     bool canVote = votingOpen && !isSelfPost;
     bool hasVoted = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, Model) != null;
 }
 
 <div class="post"
-    @(canVote ? $"entry-id={Model.EntryId} allow-vote" : "")
+    @(canVote ? $"entry-id={Model.DisplayID} allow-vote" : "")
     @(isSelfPost ? "self-post" : "") >
     @if(displayUser)
     {
         <div class="post-user">
-            <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayId">
+            <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayID">
                 <partial name="_Avatar" for="@author" />
                 <p class="username">@author.Username</p>
             </a>
@@ -31,7 +30,7 @@
         </div>
     }
     <div class="post-image">
-        <img src="/@Model.Content" />
+        <img src="/@Model.GetRelativeUrl()" />
     </div>
 
     <div class="post-toolbar">
