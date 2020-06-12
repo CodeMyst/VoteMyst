@@ -19,3 +19,6 @@
 
 /* Styling for event displays */
 @import url(events.css);
+
+/* Styling for entry reports */
+@import url(reports.css);

@@ -31,6 +31,11 @@ namespace VoteMyst.Database
         /// </summary>
         public string Reason { get; set; }
 
+        /// <summary>
+        /// The current state of the report.
+        /// </summary>
+        public ReportStatus Status { get; set; }
+
         public override string ToString()
             => $"Report({User}->{Entry})";
     }

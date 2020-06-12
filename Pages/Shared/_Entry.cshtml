@@ -16,8 +16,8 @@
     bool hasVoted = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, Model) != null;
 }
 
-<div class="post"
-    @(canVote ? $"entry-id={Model.DisplayID} allow-vote" : "")
+<div class="post" id=@Model.DisplayID
+    @(canVote ? "allow-vote" : "")
     @(isSelfPost ? "self-post" : "") >
     @if(displayUser)
     {
@@ -46,9 +46,12 @@
             }
         </span>
         <span class="r">
-            <span class="report" title="Report this post" onclick="reportPost(this)">
-                <i class="fas fa-flag"></i>
-            </span>
+            @if (!isSelfPost)
+            {
+                <span class="report" title="Report this post" onclick="reportPost(this)">
+                    <i class="fas fa-flag"></i>
+                </span>
+            }
         </span>
     </div>
 </div>

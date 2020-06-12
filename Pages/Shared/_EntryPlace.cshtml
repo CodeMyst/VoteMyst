@@ -13,7 +13,7 @@
     bool isSelfPost = user.ID == author.ID;
 }
 
-<div class="post"
+<div class="post" id=@Model.Entry.DisplayID
     @(isSelfPost ? "self-post" : "") >
     <div class="post-user">
         <div class="place" place="@Model.Number">

@@ -9,7 +9,7 @@ namespace VoteMyst.Database
     /// <summary>
     /// Represents an entry that was posted inside of an event by a user.
     /// </summary>
-    public class Entry : IDatabaseEntity, IPublicDisplayable
+    public class Entry : IDatabaseEntity, IPublicDisplayable, ILinkable
     {
         /// <summary>
         /// The primary database ID for the entry.
@@ -55,10 +55,15 @@ namespace VoteMyst.Database
 
         public virtual ICollection<Vote> Votes { get; set; }
 
+        public virtual ICollection<Report> Reports { get; set; }
+
         public Entry()
         {
             Votes = new HashSet<Vote>();
         }
+
+        public string GetUrl()
+            => $"{Event.GetUrl()}#{DisplayID}";
 
         public override string ToString()
             => $"Entry('{DisplayID}', {EntryType}, {Author}@{Event})";

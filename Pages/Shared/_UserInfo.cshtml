@@ -2,10 +2,10 @@
 
 @model UserAccount
 
-<a class="panel small user-info" asp-controller="users" asp-action="display" asp-route-id="@Model.DisplayID">
+<a class="user-info" href="@Model.GetUrl()">
     <partial name="_Avatar" for="@Model" />
     <p>@Model.Username</p>
-    <p class="user-badge @Model.AccountBadge.ToString().ToLower()">
+    @* <p class="user-badge @Model.AccountBadge.ToString().ToLower()">
         @Model.AccountBadge
-    </p>
+    </p> *@
 </a>
