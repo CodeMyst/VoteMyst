@@ -1,0 +1,43 @@
+@using VoteMyst.Database
+
+@model Event
+@{
+    EventState eventState = Model.GetCurrentState();
+}
+
+<div class="event">
+    <div class="event-info">
+        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.GetValidDisplayUrl()">
+            @Model.Title
+            @if (eventState == EventState.Hidden) 
+            {
+                <span style="padding-left: 0.5rem; opacity: 0.5;">(hidden)</span>
+            }
+        </a>
+        
+        <p class="event-description">
+            @(string.IsNullOrEmpty(Model.Description) ? "No description was provided." : Model.Description)
+        </p>
+    </div>
+
+    @if (eventState != EventState.Closed)
+    {
+        <div class="event-state">
+            @switch(eventState)
+            {
+                case EventState.Hidden:
+                    <div class="timer" --unix-timestamp="@Model.RevealDate.ToUnixSeconds()">Reveal in</div>
+                    break;
+                case EventState.Revealed:
+                    <div class="timer" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">Starts in</div>
+                    break;
+                case EventState.Ongoing:
+                    <div class="timer" --unix-timestamp="@Model.EndDate.ToUnixSeconds()">Submissions close in</div>
+                    break;
+                case EventState.Voting:
+                    <div class="timer" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
+                    break;
+            }
+        </div>
+    }
+</div>

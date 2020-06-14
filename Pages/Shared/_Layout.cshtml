@@ -1,31 +1,60 @@
-﻿<!DOCTYPE html>
+﻿@inject SemVer Version
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>@ViewData["Title"] - VoteMyst</title>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - VoteMyst</title>
-    <link rel="stylesheet" href="~/css/variables-dark.css" --theme-css />
+
+    <link rel="stylesheet" href="~/css/theme-dark.css" --theme />
     <link rel="stylesheet" href="~/css/main.css" />
     <link rel="icon" type="image/png" href="/img/trophy.png"/>
+
+    <script src="https://kit.fontawesome.com/f0bb3c2940.js" crossorigin="anonymous"></script>
+
+    <meta property="og:site_name" content="VoteMyst" />
+
+    @if (IsSectionDefined("ContentMeta"))
+    {
+        @RenderSection("ContentMeta", required: false)
+    }
+    else 
+    {
+        <meta property="og:title" content="VoteMyst" />
+        <meta property="og:image" content="/img/trophy.png" />
+        <meta property="og:description" content="A simple website for event voting." />
+    }
 </head>
 <body>
-    <div class="container">
+    <partial name="_Sidebar" />
+    
+    <div id="container">
         <header>
-            <h1 class="heading">
-                <img src="/img/trophy.png"/>
-                <a href="/">votemyst</a>
-            </h1>
-            @await Component.InvokeAsync("UserWidget")
+            <a href="/">
+                <h1>
+                    <img src="/img/trophy.png"/>
+                    <span>VoteMyst</span>
+                    <sub class="version">v<span>@Version.VersionString</span></sub>
+                </h1>
+            </a>
+            <partial name="_UserWidget" />
         </header>
-        
-        <p class="subheading">a simple website for event voting.</p>
+        <p class="subheading">a simple website for event voting</p>
+
+        <nav class="desktop-nav">
+            <partial name="_NavigationItems" />
+        </nav>
 
         @RenderBody()
 
-        <partial name="_Footer.cshtml" />
+        <partial name="_Footer" />
     </div>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/time.js" asp-append-version="true"></script>
+    <script src="~/js/modal.js" asp-append-version="true"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

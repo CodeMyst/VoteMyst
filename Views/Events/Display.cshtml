@@ -1,0 +1,77 @@
+@inject DatabaseHelperProvider DatabaseHelpers
+
+@using VoteMyst.Database
+@using VoteMyst.Controllers
+
+@model Event
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "_Layout";
+
+    EventState eventState = Model.GetCurrentState();
+}
+
+@section ContentMeta
+{
+    <meta property="og:title" content="@Model.Title" />
+    <meta property="og:description" content="@Model.Description" />
+    <meta property="og:image" content="/img/trophy.png" />
+}
+
+<partial name="_EventPageHeader" for="@Model" />
+
+@if (eventState != EventState.Revealed)
+{
+    <div class="post-display-options">
+        <div id="post-display-option-large"><img src="/img/post-display-large.svg"/></div>
+        <div id="post-display-option-middle"><img src="/img/post-display-middle.svg"/></div>
+        <div id="post-display-option-small"><img src="/img/post-display-smallest.svg"/></div>
+    </div>
+}
+
+@if (eventState == EventState.Ongoing)
+{
+    <div class="submission-button">
+        <a class="button" asp-controller="submit" asp-action="index" asp-route-id="@Model.GetValidDisplayUrl()">Submit an entry</a>
+    </div>
+
+    <div class="posts">
+        @foreach (var e in Model.Entries)
+        {
+            <partial name="_Entry" for="@e" />
+        }
+    </div>
+}
+@if (eventState == EventState.Closed)
+{
+    EventsController.Leaderboard leaderboard = EventsController.Leaderboard.FromEvent(Model, DatabaseHelpers);
+
+    <h2>Leaderboard</h2>
+    <div class="leaderboard">
+        <div class="posts">
+            @foreach (var place in leaderboard)
+            {
+                <partial name="_EntryPlace" for="@place" />
+            }
+        </div>
+    </div>
+
+    @if (leaderboard.NotEligable != null && leaderboard.NotEligable.Length > 0)
+    {
+        <h2>Not eligible to win</h2>
+        <div class="posts">
+            @foreach (var e in leaderboard.NotEligable)
+            {
+                <partial name="_Entry" for="@e" />
+            }
+        </div>
+    }
+}
+
+<partial name="_Lightbox" />
+
+@section Scripts {
+    <script src="~/js/entry-grid.js" asp-append-version="true"></script>
+    <script src="~/js/entry.js" asp-append-version="true"></script>
+    <script src="~/js/report.js" asp-append-version="true"></script>
+}

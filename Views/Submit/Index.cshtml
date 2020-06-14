@@ -5,26 +5,27 @@
 
 <h1>Submit a new entry</h1>
 
-<!-- TODO: Check if an event is current happening -->
+@await Html.PartialAsync("_ValidationMessage", ViewData["ValidationMessage"])
 
-<!-- TODO: Check if the user has already 
-    uploaded for the current event -->
-
-<p>
-    You're submitting to <b>Event Name Here</b>.
-</p>
-
-<form method="post" enctype="multipart/form-data">
-    <label for="file">File @(VoteMyst.Controllers.SubmitController.MaxFileSize / 1000000)MB:</label>
-    <input type="file" id="file" name="file" /> <br>
-    <button type="submit">Submit!</button>
-</form>
-
-@if(ViewBag.Message != null) 
+@if (ViewBag.Event != null)
 {
-    <p>@ViewBag.Message</p>
+    if (ViewBag.Entry != null)
+    {
+        <div class="panel small message warning">
+            You already uploaded a submission for this event.
+            Submitting a new entry will remove your existing one. This can not be undone.
+        </div>
+    }
+    <p>
+        You're submitting to <a asp-controller="events" asp-action="display" asp-route-id="@ViewBag.Event.URL"><b>@ViewBag.Event.Title</b></a>.
+    </p>
+    <form method="post" enctype="multipart/form-data" asp-controller="submit" asp-route-id="@ViewBag.Event.URL">
+        <label for="file">Submission File (max. @(ViewBag.MaxFileMB)MB):</label>
+        <input type="file" id="file" name="file" accept="image/*"/> <br>
+        <button type="submit">Submit!</button>
+    </form>
+    <p class="disclaimer">
+        By uploading content to VoteMyst you give us unrestricted non-retractable rights to use, distribute, alter, and display the uploaded content in connection with VoteMyst. 
+        Because VoteMyst is public use we cannot guarantee your content will not be copied by other users. As such we cannot be held liable in the event this happens.
+    </p>
 }
-
-<p class="disclaimer">
-    Some disclaimer legal stuff about uploading.
-</p>

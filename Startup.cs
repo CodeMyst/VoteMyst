@@ -20,24 +20,30 @@ using Microsoft.Extensions.Hosting;
 
 using VoteMyst.Discord;
 using VoteMyst.Database;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VoteMyst
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<SemVer>();
+
             services.AddRazorPages();
           
             services.AddSingleton(Configuration);
+            services.AddRouting(options => options.LowercaseUrls = true );
             services.AddMvc(options => options.EnableEndpointRouting = false );
 
             services.AddAuthentication(options =>
@@ -49,7 +55,7 @@ namespace VoteMyst
 
             .AddCookie(options =>
             {
-                options.ExpireTimeSpan = new TimeSpan (2, 0, 0, 0);
+                options.ExpireTimeSpan = new TimeSpan (7, 0, 0, 0);
                 options.Cookie = new CookieBuilder ()
                 {
                     Name = "DiscordCookie"
@@ -95,12 +101,14 @@ namespace VoteMyst
                 options.Scope.Add("guilds");
             });
 
-            services.AddDbContext<VoteMystContext>(options => options.UseMySql(Configuration["MySQLConnection"]));
+            services.AddDbContext<VoteMystContext>(options => options
+                .UseMySql(Configuration["MySQLConnection"])
+                .UseLazyLoadingProxies());
 
-            services.AddScoped<UserDataHelper>();
-            services.AddScoped<EventHelper>();
-            services.AddScoped<EntryHelper>();
-            services.AddScoped<VoteHelper>();
+            // Avatar Helper is used by the UserDataHelper which gets instantiated by DatabaseHelperProvider
+            services.AddScoped<AvatarHelper>();
+            services.AddScoped<DatabaseHelperProvider>();
+            services.AddScoped<UserProfileBuilder>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -117,58 +125,32 @@ namespace VoteMyst
                 app.UseHsts();
             }
 
-            // TODO: add https redirection later, but might not even be needed, this should be handled by the web server like nginx
-            // app.UseHttpsRedirection();
+            app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
+            
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            // add the https scheme to oauth redirect urls
+            // adds this only on the server as it has SSL
+            if (System.Environment.GetEnvironmentVariable("VOTEMYST_ENV") == "Server")
+            {
+                app.Use((context, next) =>
+                {
+                    context.Request.Scheme = "https";
+                    return next();
+                });
+            }
 
             app.UseAuthorization();
             app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
-                // Consult the wiki about page information
-                
-                // Login/Logout Pages
-                endpoints.MapControllerRoute(name: "login",
-                    pattern: "login",
-                    defaults: new { controller = "User", action = "Login" });
-                endpoints.MapControllerRoute(name: "logout",
-                    pattern: "logout",
-                    defaults: new { controller = "User", action = "Logout" });
-                    
-                // User searching
-                endpoints.MapControllerRoute(name: "searchUser",
-                    pattern: "users",
-                    defaults: new { controller = "User", action = "Search" });
-                // Self user viewing (indirectly uses the 'other user' view)
-                endpoints.MapControllerRoute(name: "viewSelfUser",
-                    pattern: "users/me",
-                    defaults: new { controller = "User", action = "DisplaySelf" });
-                // View user by ID
-                endpoints.MapControllerRoute(name: "viewUser",
-                    pattern: "users/{*userId:int}",
-                    defaults: new { controller = "User", action = "Display" });
-
-                // Browse events / Create event / Edit event
-                endpoints.MapControllerRoute(name: "newEvent",
-                    pattern: "events/{action:alpha}",
-                    defaults: new { controller = "Event", action = "Browse" });
-                // View event by ID
-                endpoints.MapControllerRoute(name: "viewEvent",
-                    pattern: "events/{eventId:int}",
-                    defaults: new { controller = "Event", action = "Display" });
-
-                // Vote on an event
-                endpoints.MapControllerRoute(name: "vote",
-                    pattern: "vote");
-                // Submit an entry to an event
-                endpoints.MapControllerRoute(name: "submit",
-                    pattern: "submit");
-
-                endpoints.MapControllerRoute(name: "default", 
-                    pattern: "{controller=Home}/{action=Index}");
+                endpoints.MapRazorPages();
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

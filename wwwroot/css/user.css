@@ -1,45 +1,34 @@
 .widget {
-    display: block;
+    display: flex;
+
     margin: auto 0 auto auto;
-    height: 48px;
-    border-radius: 25px;
+    height: var(--user-widget-height);
+
+    border-radius: calc(var(--user-widget-height) / 2);
     cursor: pointer;
 }
 
-@media (max-width: 640px) {
-    .widget {
-        height: 42px;
-        margin: 10px auto 10px 10px;
-    }
-}
-
 .user-widget {
-    display: flex;
-    background-color: var(--color-nanolight);
+    background-color: var(--color-dark-gray);
 }
 .user-widget .avatar {
-    height: 100%;
-    border-radius: 50%;
+    height: var(--user-widget-height);
 }
+
 .user-widget .username {
     margin: auto 20px auto 10px;
 }
 
-.username .discord-name {
+.username {
     color: var(--color-white);
     letter-spacing: 0.05em;
 }
-.username .discord-tag {
-    margin-left: -4px;
-    color: var(--color-nanolightlight);
-}
 
 .login-widget {
-    display: flex;
-    background-color: var(--color-discord-blurple);
+    background-color: var(--color-service-discord);
 }
 .login-widget:hover {
-    background-color: var(--color-nanolight);
+    background-color: var(--color-dark-gray);
 }
 .login-widget img {
     height: 80%;
@@ -47,108 +36,237 @@
 }
 .login-widget p {
     margin: auto 0px auto 15px;
-    color: white;
+    color: var(--color-white);
 }
+
+
+.avatar {
+    border-radius: 50%;
+}
+.avatar.avatar-default {
+    width: var(--user-widget-height);
+    height: var(--user-widget-height);
+    background-color: var(--color-mystge);
+    display: flex;
+}
+.avatar.avatar-default p {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: bolder;
+    line-height: 100%;
+    margin: auto;
+    color: var(--color-nano);
+}
+
+
+.user-search {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.user-search > * {
+    margin: 0.3rem 0;
+}
+
 
 .user-info {
     display: flex;
+    color: var(--color-white);
     flex-direction: row;
-    background-color: var(--color-nanolight);
-    border-radius: 10px;
-    padding: 10px;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    font-size: 1rem;
+    width: min-content;
+}
+.user-info:hover {
+    color: inherit;
+}
+.user-info .avatar {
+    height: 28px;
+    width: 28px;
+}
+.user-info .avatar > p {
+    font-size: 0.8rem;
+}
+.user-info > * {
+    margin: 0 0.3rem;
+}
+.user-info > *:first-child {
+    margin-left: 0;
+}
+.user-info .user-badge {
+    padding: 0 1rem;
+}
+
+
+.user-profile {
+    display: flex;
+    flex-direction: row;
     margin: 3rem 0;
 }
 
-.user-info .user-info-column {
+.user-profile .user-info-column {
     margin: 10px;
 }
 
-.user-info .user-avatar {
+.user-profile .avatar {
     display: block;
     margin: auto;
-    width: 100%;
-    max-width: 128px;
+    width: 128px;
     border-radius: 50%;
 }
+.user-profile .avatar-default {
+    height: 128px;
+    display: flex;
+}
+.user-profile .avatar-default p {
+    margin: auto;
+    font-size: 2rem;
+}
 
-.user-info .username {
+.user-profile .username {
     width: 200px;
     margin: 0.8rem auto;
     font-size: 1rem;
     text-align: center;
     overflow-wrap: break-word;
-}
-.user-info .username .discord-tag {
-    overflow-wrap: normal;
+    letter-spacing: 0.1rem;
 }
 
-.user-info .user-badge {
-    height: 1.5rem;
+.user-profile .user-badge {
     width: 70%;
-    line-height: 1.5rem;
     margin: 0px auto;
-    cursor: default;
+}
 
-    border: 1px solid white;
+.user-badge {
+    height: 1.5rem;
+
+    color: var(--color-white);
+    border: 1px solid var(--color-white);
     border-radius: 0.75rem;
 
     font-size: 0.8rem;
     font-weight: bold;
+    line-height: 1.5rem;
     letter-spacing: 0.08rem;
     text-align: center;
     text-transform: uppercase;
 }
-.user-info .user-badge.admin {
+.user-badge.siteadministrator {
     border-color: var(--color-badge-admin);
     color: var(--color-badge-admin);
 }
-.user-info .user-badge.banned {
+.user-badge.sitemoderator {
+    border-color: var(--color-badge-moderator);
+    color: var(--color-badge-moderator);
+}
+.user-badge.banned {
     border-color: var(--color-badge-banned);
     color: var(--color-badge-banned);
 }
 
-.user-info .user-info-table {
+.user-profile .own-display-id {
+    color: var(--color-gray);
+    font-size: 0.7rem;
+    line-height: 1rem;
+    text-align: center;
+}
+
+.user-profile .user-profile-table {
     margin: 30px 10px;
-}
-.user-info .user-info-table tr {
-    line-height: 1.5rem;
-    color: var(--color-nanobrightest);
-}
-.user-info .user-info-table th {
-    text-align: right;
-    padding-right: 0.3rem;
-}
-.user-info .user-info-table td {
+    color: var(--color-light-gray);
 }
 
-.user-info .logout-button {
-    padding: 6px 18px;
+.user-profile .profile-button {
+    position: absolute;
+    margin: 1rem 1.5rem;
+    color: var(--color-gray);
+}
+.user-profile .logout-button {
+    bottom: 0; right: 0;
+}
+.user-profile .logout-button:hover {
+    color: var(--color-mysted);
+}
+
+.user-profile .edit-button {
+    top: 0; right: 0;
+}
+.user-profile .fas {
+    margin-right: 0.3rem;
+}
+.user-profile .edit-button:hover {
+    color: var(--color-light-gray);
+}
+
+.user-admin-panel {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    box-sizing: border-box;
+}
+.user-admin-panel > * {
+    margin: 0.5rem 1.5rem;
+    width: auto;
+}
+.user-admin-panel button[type=submit] {
     margin: auto 0 0 auto;
-    background-color: #8d3d3d;
-    color: var(--color-nanolight);
-    border-radius: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.06rem;
-    font-size: 0.8rem;
-    font-weight: bold;
 }
-.user-info .logout-button:hover {
-    background-color: #a81313;
-    color: white;
+.user-admin-panel .permission-label {
+    padding-right: 1rem;
+    margin: 0;
 }
 
-.user-info .user-not-found {
+.user-admin-panel .permission-checkbox {
+    position: relative;
+    width: 2rem;
+    height: 1rem;
+    border-radius: 0.5rem;
+    background-color: #801919;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+.user-admin-panel .permission-checkbox[checked] {
+    background-color: #3b8a3b;
+}
+.user-admin-panel .permission-checkbox .knob {
+    content: "";
+    left: 0;
+    transition: left 0.2s;
+    position: absolute;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: var(--color-white);
+}
+.user-admin-panel .permission-checkbox[checked] .knob {
+    left: 50%;
+}
 
+.user-admin-panel .group-button {
+    margin: auto;
+    width: 100%;
+}
+
+.user-admin-panel .user-groups-table {
+    margin: 1rem;
 }
 
 @media (max-width: 640px) {
-    .user-info {
+    .widget {
+        margin: 10px auto 10px 10px;
+    }
+
+    .user-profile {
         flex-wrap: wrap;
     }
-    .user-info .user-info-column {
+    .user-profile .user-profile-column {
         margin: 10px auto;
     }
-    .user-info .user-info-table {
+    .user-profile .user-profile-table {
         margin: 10px;
     }
 }

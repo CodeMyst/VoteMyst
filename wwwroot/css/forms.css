@@ -2,13 +2,14 @@ form {
     width: 100%;
 }
 
-input[type=text], input[type="date"], select, textarea {
-    background-color: var(--color-nanolight);
+input[type=text], input[type="date"], input[type="datetime"], input[type="datetime-local"], select, textarea {
+    background-color: var(--color-dark-gray);
     color: var(--color-white);
     border: none;
     border-radius: 0.5rem;
     font-family: inherit;
     padding: 0.4rem 0.5rem;
+    box-sizing: border-box;
 }
 input[type=text], textarea {
     width: 100%;
@@ -17,16 +18,14 @@ input[type=text], textarea {
     min-height: 1.1rem;
     resize: vertical;
 }
-input[type=text][--search] {
-    
-}
 
 input:focus, select:focus, textarea:focus {
     outline: none;
 }
 
-button {
+button, .button {
     display: inline-block;
+    margin: 1rem 0;
     height: 38px;
     line-height: 38px;
     padding: 0 30px;
@@ -38,21 +37,27 @@ button {
     font-weight: bold;
     letter-spacing: 0.1rem;
     text-transform: uppercase;
+    text-align: center;
     cursor: pointer;
+    white-space: nowrap;
 }
-button:hover {
-    background-color: var(--color-nanolight);
+button:hover, .button:hover {
+    background-color: var(--color-mystlue);
     color: var(--color-white);
 }
 
 .form-submit {
-    margin: 1.5rem 0;
+    display: flex;
 }
-.form-submit span {
+.form-submit div {
     margin: auto 30px;
-    color: red;
+    color: var(--color-mysted);
 }
 
+form table {
+    table-layout: fixed;
+    width: 100%;
+}
 form table th {
     text-align: right;
     font-weight: normal;
@@ -74,7 +79,7 @@ form .row-layout div.break {
     margin: 0;
 }
 form .row-layout > div {
-    margin: 0 20px 10px;
+    margin: 0 0.6rem 0.3rem;
 }
 form .row-layout p {
     margin: 0.2rem 0;

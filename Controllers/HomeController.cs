@@ -1,28 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
+
+using VoteMyst.Database;
 
 namespace VoteMyst.Controllers
 {
-    public class HomeController : Controller
+    /// <summary>
+    /// Provides the homepage for the site.
+    /// </summary>
+    public class HomeController : VoteMystController
     {
+        public HomeController(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
+        /// <summary>
+        /// The index page for the site.
+        /// </summary>
+        [Route("")]
         public IActionResult Index()
         {
-            // If an event is currently happening, display information about it
-            if (false) 
-            {
-                return View("DisplayCurrent");
-            }
-            
-            // If an event is coming up, display information about it
-            if (false)
-            {
-                return View("DisplayUpcoming");
-            }
-
-            return View("DisplayNone");
+            return View();
         }
     }
 }

@@ -1,96 +1,52 @@
 using System;
 using System.Linq;
-using VoteMyst.Database.Models;
 
 namespace VoteMyst.Database
 {
+    /// <summary>
+    /// Provides utility to handle <see cref="Vote"/>s.
+    /// </summary>
     public class VoteHelper
     {
-        private readonly VoteMystContext context;
+        private readonly VoteMystContext _context;
 
         public VoteHelper(VoteMystContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
-        public bool AddVote(Entry entry, UserData user, out Vote vote)
-            => AddVote(entry.EntryId, user.Snowflake, out vote);
-
-        public bool AddVote(int entryId, ulong snowflake, out Vote vote)
+        /// <summary>
+        /// Adds a vote from the specified user to the specified entry.
+        /// </summary>
+        public Vote AddVote(Entry entry, UserAccount user)
         {
-            vote = new Vote()
+            Vote vote = new Vote
             {
-                EntryId = entryId,
-                Snowflake = snowflake,
+                Entry = entry,
+                User = user,
                 VoteDate = DateTime.UtcNow
             };
 
-            context.Votes.Add(vote);
+            _context.Votes.Add(vote);
+            _context.SaveChanges();
 
-            return context.SaveChanges() > 0;
+            return vote;
         }
 
+        /// <summary>
+        /// Deletes the specified vote.
+        /// </summary>
         public bool DeleteVote(Vote vote)
-            => DeleteVote(vote.VoteId);
-
-        public bool DeleteVote(int voteId)
         {
-            context.Votes
-                .Remove(GetVote(voteId));
-
-            return context.SaveChanges() > 0;
+            _context.Votes.Remove(vote);
+            return _context.SaveChanges() > 0;
         }
 
-        public bool DeleteVote(Entry entry, UserData user)
-            => DeleteVote(entry.EntryId, user.Snowflake);
-
-        public bool DeleteVote(int entryId, ulong snowflake)
-        {
-            context.Votes
-                .Remove(GetVoteByUserOnEntry(snowflake, entryId));
-
-            return context.SaveChanges() > 0;
-        }
-
-        public Vote GetVote(int voteId)
-            => context.Votes
-                .FirstOrDefault(x => x.VoteId == voteId);
-
-        public Vote GetVoteByUserOnEntry(UserData user, Entry entry)
-            => GetVoteByUserOnEntry(user.Snowflake, entry.EntryId);
-
-        public Vote GetVoteByUserOnEntry(ulong snowflake, int entryId)
-            => context.Votes
-                .Where(x => x.EntryId == entryId)
-                .FirstOrDefault(x => x.Snowflake == snowflake);
-
-        public Vote[] GetAllVotesOfUser(UserData user)
-            => GetAllVotesOfUser(user.Snowflake);
-
-        public Vote[] GetAllVotesOfUser(ulong snowflake)
-            => context.Votes
-                .Where(x => x.Snowflake == snowflake)
-                .ToArray();
-
-        public Vote[] GetAllVotesForEntry(Entry entry)
-            => GetAllVotesForEntry(entry.EntryId);
-
-        public Vote[] GetAllVotesForEntry(int entryId)
-            => context.Votes
-                .Where(x => x.EntryId == entryId)
-                .ToArray();
-
-        public Vote[] GetAllVotesInEvent(Event ev)
-            => GetAllVotesInEvent(ev.EventId);
-
-        public Vote[] GetAllVotesInEvent(int eventId)
-            => context.Entries
-                .Where(x => x.EventId == eventId)
-                .Join(context.Votes,
-                    entry => entry.EntryId,
-                    vote => vote.EntryId,
-                    (entry, vote) => vote)
-                .ToArray();
+        /// <summary>
+        /// Returns the vote the user cast on the specified entry. Null if no vote exists.
+        /// </summary>
+        public Vote GetVoteByUserOnEntry(UserAccount user, Entry entry)
+            => entry.Votes.FirstOrDefault(v => v.User.ID == user.ID);
     }
 
 }

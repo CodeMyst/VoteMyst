@@ -1,0 +1,60 @@
+@using VoteMyst.Database
+
+@model Dictionary<EventState, IEnumerable<Event>>
+@{
+    ViewData["Title"] = "Browse";
+    Layout = "_Layout";
+}
+
+@if (ViewBag.CanManageEvents)
+{
+    <div>
+        <a class="button" asp-controller="events" asp-action="new">Create an event</a>
+    </div>
+}
+
+<div class="events">
+    @if ((Model[EventState.Ongoing].Count() + Model[EventState.Voting].Count()) > 0)
+    {
+        <div class="events-active">
+            <h1>Active events</h1>
+            <div class="event-container">
+                @foreach (Event e in Model[EventState.Ongoing].Concat(Model[EventState.Voting]))
+                {
+                    <partial name="_EventInfo" for="@e" />
+                }
+            </div>
+        </div>
+    }
+    @if (Model[EventState.Revealed].Count() > 0 || (ViewBag.CanManageEvents && Model[EventState.Hidden].Count() > 0))
+    {
+        <div class="events-planned">
+            <h1>Planned events</h1>
+            <div class="event-container">
+                @{
+                    var upcomingEvents = Model[EventState.Revealed];
+                    if (ViewBag.CanManageEvents)
+                    {
+                        upcomingEvents = upcomingEvents.Concat(Model[EventState.Hidden]);
+                    }
+                }
+                @foreach (Event e in upcomingEvents)
+                {
+                    <partial name="_EventInfo" for="@e" />
+                }
+            </div>
+        </div>
+    }
+    @if (Model[EventState.Closed].Count() > 0)
+    {
+        <div class="events-finished">
+            <h1>Finished events</h1>
+            <div class="event-container">
+                @foreach (Event e in Model[EventState.Closed])
+                {
+                    <partial name="_EventInfo" for="@e" />
+                }
+            </div>
+        </div>
+    }
+</div>

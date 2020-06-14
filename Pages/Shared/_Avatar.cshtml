@@ -1,0 +1,20 @@
+@using VoteMyst
+@using VoteMyst.Database
+
+@inject AvatarHelper _avatarHelper
+
+@model UserAccount
+@{
+    string url = _avatarHelper.GetRelativeAvatarUrl(Model, out string _initials);
+}
+
+@if(url != null) 
+{
+    <img class="avatar" src="@url" />
+}
+else
+{
+    <div class="avatar avatar-default">
+        <p>@_initials</p>
+    </div>
+}

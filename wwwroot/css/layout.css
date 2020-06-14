@@ -1,9 +1,15 @@
 body {
-    background-color: var(--color-nano);
-    font-family: 'Raleway', sans-serif;
-    color: var(--color-white);
-    overflow-y: scroll;
     margin: 0;
+    overflow-y: scroll;
+    
+    font-family: 'Raleway', sans-serif;
+
+    color: var(--color-white);
+    background-color: var(--color-nano);
+}
+*::selection {
+    background-color: var(--color-mystge);
+    color: var(--color-white);
 }
 
 a {
@@ -16,27 +22,14 @@ a:hover {
 
 h1 {
     font-weight: normal;
+    line-height: 2.5rem;
 }
 
-.container {
+#container {
     width: 90%;
     max-width: 960px;
     position: relative;
     margin: auto;
-}
-
-.heading {
-    font-size: 3.5rem;
-    justify-self: flex-start;
-    margin: 10px 0;
-}
-.heading img {
-    position: relative;
-    top: 5px;
-    height: 50px;
-}
-.heading a {
-    font-weight: normal;
 }
 
 header {
@@ -44,18 +37,52 @@ header {
     flex-direction: row;
     margin: 10px 0 20px;
 }
+header h1 {
+    position: relative;
+    margin: 10px 0;
+    justify-self: flex-start;
+    font-size: 3.5rem;
+}
+header h1 img {
+    position: relative;
+    height: 50px;
+    top: 5px;
+}
+header h1 .version {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    color: var(--color-gray);
+    font-size: 0.9rem;
+}
 
-@media (max-width: 640px) {
-    header {
-        flex-direction: column;
-    }
+hr {
+    border-color: var(--color-gray);
 }
 
 footer {
+    margin: 2rem 0;
     text-align: center;
     font-size: 0.9em;
 }
 footer a {
     font-weight: bold;
     letter-spacing: 0.05em;
+}
+footer span {
+    padding: 0 0.4rem;
+}
+
+table {
+    white-space: nowrap;
+}
+table th {
+    text-align: right;
+    padding-right: 0.3rem;
+}
+
+@media (min-width: 160em) {
+    #container {
+        max-width: calc(2 * 960px);
+    }
 }

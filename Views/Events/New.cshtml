@@ -1,0 +1,89 @@
+@using VoteMyst.Database
+
+@model Event
+@{
+    ViewData["Title"] = "Event";
+}
+
+<h1>Create a new Event</h1>
+
+@if (ViewBag.ErrorMessages != null)
+{
+    <div class="panel small message error">
+        <ul>
+            @foreach (string error in ViewBag.ErrorMessages)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+<form method="post" enctype="multipart/form-data"
+    autocomplete="off" onsubmit="return validateForm()">
+    <table>
+        <colgroup>
+            <col style="width: 120px">
+            <col>
+        </colgroup>
+        <tr>
+            <th><label asp-for="@Model.Title"></label></th>
+            <td><input asp-for="@Model.Title" placeholder="My Event Title!"/></td>
+        </tr>
+        <tr>
+            <th><label asp-for="@Model.URL"></label></th>
+            <td><input asp-for="@Model.URL" /></td>
+        </tr>
+        <tr>
+            <th><label asp-for="@Model.Description"></label></th>
+            <td><textarea asp-for="@Model.Description" placeholder="This is an event."></textarea></td>
+        </tr>
+        <tr>
+            <th><label asp-for="@Model.EventType"></label></th>
+            <td><select asp-for="@Model.EventType" asp-items="@Html.GetEnumSelectList<EventType>()"></select></td>
+        </tr>
+        <tr>
+            <th>Dates:</th>
+            <td>
+                <div class="row-layout">
+                    <div>
+                        <p><label asp-for="@Model.RevealDate"></label></p>
+                        <input asp-for="@Model.RevealDate" />
+                    </div>
+                    <div>
+                        <p><label asp-for="@Model.StartDate"></label></p>
+                        <input asp-for="@Model.StartDate" />
+                    </div>
+                    <div>
+                        <p><label asp-for="@Model.EndDate"></label></p>
+                        <input asp-for="@Model.EndDate" />
+                    </div>
+                    <div>
+                        <p><label asp-for="@Model.VoteEndDate"></label></p>
+                        <input asp-for="@Model.VoteEndDate" />
+                    </div>
+                </div>
+                <p class="disclaimer">Note that entered dates will be interpreted as UTC dates.</p>
+            </td>
+        </tr>
+    </table>
+    <div class="form-submit">
+        <button type="submit">Create Event</button>
+        <div></div>
+    </div>
+</form>
+
+<script>
+    let titleInput = document.querySelector("#Title");
+    let urlInput = document.querySelector("#URL");
+    function generateUrl(e) {
+        urlInput.placeholder = titleInput.value
+            .toLowerCase()
+            .replace(/ /g, '-')          // replaces spaces with dashes
+            .replace(/[^a-z\d\-]/g, '')  // remove invalid characters
+            .replace(/^\-+|\-+$/g, '')   // trim dashes
+            .replace(/-{2,}/g, '-');     // remove duplicate dashes
+    }
+    titleInput.addEventListener("input", generateUrl);
+    generateUrl(null);
+</script>
