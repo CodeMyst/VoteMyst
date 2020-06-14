@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +9,7 @@ namespace VoteMyst.Database
     /// <summary>
     /// Represents an event that contains entries posted by users.
     /// </summary>
-    public class Event : IValidatableObject, IDatabaseEntity, IPublicDisplayable
+    public class Event : IValidatableObject, IDatabaseEntity, IPublicDisplayable, ILinkable
     {
         private const string _dateTimeFormat = "{0:yyyy-MM-ddTHH:mm}";
 
@@ -79,6 +80,9 @@ namespace VoteMyst.Database
 
         public virtual ICollection<Entry> Entries { get; set; }
 
+        [NotMapped]
+        public IEnumerable<Report> Reports => Entries.SelectMany(e => e.Reports);
+
         public Event()
         {
             Entries = new HashSet<Entry>();
@@ -115,7 +119,10 @@ namespace VoteMyst.Database
         public EventState GetCurrentState()
             => GetStateForTime(DateTime.UtcNow);
 
-        public string GetValidUrl()
+        public string GetUrl()
+            => $"/events/display/{GetValidDisplayUrl()}";
+
+        public string GetValidDisplayUrl()
             => URL ?? DisplayID;
 
         public override string ToString()

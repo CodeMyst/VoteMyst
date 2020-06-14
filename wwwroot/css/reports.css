@@ -1,0 +1,28 @@
+.reports {
+    overflow-x: auto;
+}
+.report-overview-table {
+}
+.report-overview-table th {
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+.report-overview-table td {
+    padding-right: 1.5rem;
+}
+.reports .reason {
+    white-space: normal;
+}
+.reports .author .user-info {
+    padding: 0.3rem 0;
+}
+.reports .status.pending {
+    color: var(--color-light-gray);
+}
+.reports .status.approved {
+    color: var(--color-success-text);
+}
+.reports .status.rejected {
+    color: var(--color-error-text);
+}

@@ -129,12 +129,9 @@ namespace VoteMyst.Controllers
                 
                 Entry entry = DatabaseHelpers.Entries.CreateFileEntry(ev, user, file, Environment);
 
-
-
-
                 _logger.LogInformation("User {0} uploaded a submission to the event '{1}'.", user.Username, ev.Title);
 
-                return Redirect("/events/display/" + ev.URL);
+                return Redirect(entry.GetUrl());
             }
             
             return Index(id);

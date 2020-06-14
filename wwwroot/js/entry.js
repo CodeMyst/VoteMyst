@@ -24,15 +24,6 @@ function getEventId() {
     return parseInt(document.querySelector(".posts").getAttribute(eventIdAttribute));
 }
 
-// Constructs the body for the POST request
-function buildRequestBody(entry) {
-    return {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-}
 function getEntryId(post) {
     return post.getAttribute("entry-id");
 }
@@ -40,7 +31,7 @@ function getEntryId(post) {
 function castVote(element) {
     const post = element.closest('.post');
     if (!element.hasAttribute(votedAttribute)) {
-        fetch(`/vote/cast/${getEntryId(post)}`, buildRequestBody(post))
+        fetch(`/vote/cast/${getEntryId(post)}`, buildApiPostBody())
             .then(toJson)
             .then(result => {
                 if (result.hasVote) {
@@ -56,7 +47,7 @@ function castVote(element) {
 function removeVote(element) {
     const post = element.closest('.post');
     if (element.hasAttribute(votedAttribute)) {
-        fetch(`/vote/remove/${getEntryId(post)}`, buildRequestBody(post))
+        fetch(`/vote/remove/${getEntryId(post)}`, buildApiPostBody())
             .then(toJson)
             .then(result => {
                 if (!result.hasVote) {
@@ -77,20 +68,4 @@ function toggleVote(element) {
         castVote(element);
     }
     document.activeElement = null;
-}
-
-function reportPost(element) {
-    const post = element.closest('.post');
-    promptModal({
-        title: "Report post",
-        content: "Do you really want to report this post? This action cannot be undone. Abusing the system will result in removal of report permissions.",
-        width: 450,
-        buttons: [{
-            content: "Yes.",
-            style: "ok"
-        }, {
-            content: "No.",
-            style: "cancel"
-        }]
-    });
 }

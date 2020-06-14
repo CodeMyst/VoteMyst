@@ -32,7 +32,7 @@
 @if (eventState == EventState.Ongoing)
 {
     <div class="submission-button">
-        <a class="button" asp-controller="submit" asp-action="index" asp-route-id="@Model.GetValidUrl()">Submit an entry</a>
+        <a class="button" asp-controller="submit" asp-action="index" asp-route-id="@Model.GetValidDisplayUrl()">Submit an entry</a>
     </div>
 
     <div class="posts">
@@ -73,4 +73,5 @@
 @section Scripts {
     <script src="~/js/entry-grid.js" asp-append-version="true"></script>
     <script src="~/js/entry.js" asp-append-version="true"></script>
+    <script src="~/js/report.js" asp-append-version="true"></script>
 }

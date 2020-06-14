@@ -8,7 +8,7 @@ namespace VoteMyst.Database
     /// <summary>
     /// Represents a user account on the service.
     /// </summary>
-    public class UserAccount : IDatabaseEntity, IPublicDisplayable
+    public class UserAccount : IDatabaseEntity, IPublicDisplayable, ILinkable
     {
         /// <summary>
         /// The primary database ID for the user account.
@@ -56,6 +56,9 @@ namespace VoteMyst.Database
             AuthoredReports = new HashSet<Report>();
             AuthoredVotes = new HashSet<Vote>();
         }
+
+        public string GetUrl()
+            => $"/users/display/{DisplayID}";
 
         public override string ToString()
             => $"UserAccount('{DisplayID}', {Username})";

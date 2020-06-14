@@ -37,7 +37,7 @@ namespace VoteMyst.Database
         public Event GetEventByUrl(string url)
             => context.Events
                 .AsEnumerable()
-                .FirstOrDefault(x => x.GetValidUrl().Equals(url, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(x => x.GetValidDisplayUrl().Equals(url, StringComparison.InvariantCultureIgnoreCase));
 
         /// <summary>
         /// Returns all events that start between the two given dates.
@@ -134,8 +134,19 @@ namespace VoteMyst.Database
         /// </summary>
         public UserAccount[] GetEventHosts(Event e)
             => context.EventPermissionModifiers
-                .Where(x => x.Event.ID == e.ID && x.Permissions.HasFlag(EventPermissions.EditEventSettings))
+                .Where(x => x.Event.ID == e.ID && x.Permissions == EventPermissions.Host)
                 .Select(x => context.UserAccounts.FirstOrDefault(u => u.ID == x.User.ID))
+                .ToArray();
+
+        /// <summary>
+        /// Returns all events in which the user is registered as host.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public Event[] GetHostedEvents(UserAccount user)
+            => context.EventPermissionModifiers
+                .Where(x => x.User.ID == user.ID && x.Permissions == EventPermissions.Host)
+                .Select(x => x.Event)
                 .ToArray();
 
         /// <summary>

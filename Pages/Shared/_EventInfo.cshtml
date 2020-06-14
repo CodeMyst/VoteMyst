@@ -7,7 +7,7 @@
 
 <div class="event">
     <div class="event-info">
-        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.GetValidUrl()">
+        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.GetValidDisplayUrl()">
             @Model.Title
             @if (eventState == EventState.Hidden) 
             {

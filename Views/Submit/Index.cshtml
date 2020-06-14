@@ -7,13 +7,7 @@
 
 @await Html.PartialAsync("_ValidationMessage", ViewData["ValidationMessage"])
 
-@if (ViewBag.UploadedEntry != null)
-{
-    <div class="panel small message success">
-        Your submission was uploaded!
-    </div>
-}
-else if (ViewBag.Event != null)
+@if (ViewBag.Event != null)
 {
     if (ViewBag.Entry != null)
     {

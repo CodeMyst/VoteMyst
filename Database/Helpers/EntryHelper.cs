@@ -90,6 +90,31 @@ namespace VoteMyst.Database
             context.Entries.Remove(entry);
             return context.SaveChanges() > 0;
         }
-    }
 
+        /// <summary>
+        /// Creates a report for the given entry.
+        /// </summary>
+        public void ReportEntry(Entry entry, UserAccount reportAuthor, string reason)
+        {
+            Report report = new Report
+            {
+                Entry = entry,
+                User = reportAuthor,
+                Reason = reason,
+                Status = ReportStatus.Pending
+            };
+
+            context.Reports.Add(report);
+            context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Updates the status of the given report.
+        /// </summary>
+        public void UpdateEntryReportStatus(Report report, ReportStatus status)
+        {
+            report.Status = status;
+            context.SaveChanges();
+        }
+    }
 }

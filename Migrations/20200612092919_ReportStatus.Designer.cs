@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VoteMyst.Database;
 
 namespace VoteMyst.Migrations
 {
     [DbContext(typeof(VoteMystContext))]
-    partial class VoteMystContextModelSnapshot : ModelSnapshot
+    [Migration("20200612092919_ReportStatus")]
+    partial class ReportStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -19,6 +19,7 @@
 function promptModal(config) {
     let modalElement = document.createElement("div");
     modalElement.classList.add("modal");
+    modalElement.classList.add("no-select");
 
     if (config.title) {
         let titleElement = document.createElement("h1");
