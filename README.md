@@ -23,7 +23,7 @@ To run the project on localhost, simply execute `dotnet run` or `dotnet watch ru
 
 Thank you for your interested in contributing to the project!
 
-Before you start coding, we ask you to review our [contributing guidelines](./contributing).
+Before you start coding, we ask you to review our [contributing guidelines](./.github/contributing).
 
 If you have a suggestion, bug report or discussion, please open an issue. We provide issue templates for the most common inquiries.
 

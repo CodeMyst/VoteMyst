@@ -15,7 +15,7 @@ When contributing to this repository, please first discuss the change you wish t
 
 VoteMyst runs on ASP.NET Core, which means that functionality is written in C#. We try to maintain the standard C# naming conventions throughout the projects and request that you try the same to ensure a consistent convention. Please refer to existing code for that matter and do not shy away from asking for feedback in your pull requests.
 
-Note that the project makes heavy use of database queries and dependancy injection.
+Note that the project makes heavy use of database queries and dependency injection.
 
 ### Extending the database
 
