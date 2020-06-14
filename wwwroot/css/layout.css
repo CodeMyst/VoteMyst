@@ -32,7 +32,13 @@ h1 {
     margin: auto;
 }
 
+header {
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0 20px;
+}
 header h1 {
+    position: relative;
     margin: 10px 0;
     justify-self: flex-start;
     font-size: 3.5rem;
@@ -42,11 +48,12 @@ header h1 img {
     height: 50px;
     top: 5px;
 }
-
-header {
-    display: flex;
-    flex-direction: row;
-    margin: 10px 0 20px;
+header h1 .version {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    color: var(--color-gray);
+    font-size: 0.9rem;
 }
 
 hr {
