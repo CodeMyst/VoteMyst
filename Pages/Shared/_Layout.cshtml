@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject SemVer Version
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>@ViewData["Title"] - VoteMyst</title>
@@ -34,6 +36,7 @@
                 <h1>
                     <img src="/img/trophy.png"/>
                     <span>VoteMyst</span>
+                    <sub class="version">v<span>@Version.VersionString</span></sub>
                 </h1>
             </a>
             <partial name="_UserWidget" />
