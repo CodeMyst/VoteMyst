@@ -1,4 +1,5 @@
 using System.IO;
+using System.Net;
 using System.Security.Claims;
 
 using Microsoft.AspNetCore.Hosting;
@@ -35,8 +36,14 @@ namespace VoteMyst
                     if (!string.IsNullOrEmpty(discordAvatar))
                     {
                         // Download the avatar image
-                        DownloadHelper.DownloadFile($"https://cdn.discordapp.com/avatars/{nameIdentifier}/{discordAvatar}.png",
-                            Path.Combine(_environment.WebRootPath, $"assets/avatars/{user.DisplayID}.png"));
+                        string sourceUrl = $"https://cdn.discordapp.com/avatars/{nameIdentifier}/{discordAvatar}.png";
+                        string targetPath = Path.Combine(_environment.WebRootPath, $"assets/avatars/{user.DisplayID}.png");
+
+                        Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+                        using (var client = new WebClient())
+                        {
+                            client.DownloadFile(sourceUrl, targetPath);
+                        }
                     }
 
                     _helpers.Authorization.AddAuthorizedUser(user, nameIdentifier.ToString(), Service.Discord);
