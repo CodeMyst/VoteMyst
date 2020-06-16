@@ -47,8 +47,14 @@ namespace VoteMyst.Database
         /// <summary>
         /// The type of the event.
         /// </summary>
-        [Required, Display(Name = "Event Type")]
+        [Required, Display(Name = "Type")]
         public EventType EventType { get; set; }
+
+        /// <summary>
+        /// The settings for the event.
+        /// </summary>
+        [Display(Name = "Settings")]
+        public EventSettings Settings { get; set; } = EventSettings.Default;
 
         /// <summary>
         /// The UTC date when the event will be revealed to non-hosts.
@@ -96,7 +102,9 @@ namespace VoteMyst.Database
             }
 
             var provider = validationContext.GetService(typeof(DatabaseHelperProvider)) as DatabaseHelperProvider;
-            if (provider.Events.GetEventByUrl(URL) != null)
+
+            Event conflictingEvent = provider.Events.GetEventByUrl(URL);
+            if (conflictingEvent != null && conflictingEvent.ID != ID)
             {
                 // Users could potentially detect hidden events by repeatedly trying to create events here.
                 yield return new ValidationResult("That URL is already in use.");
@@ -120,7 +128,7 @@ namespace VoteMyst.Database
             => GetStateForTime(DateTime.UtcNow);
 
         public string GetUrl()
-            => $"/events/display/{GetValidDisplayUrl()}";
+            => $"/events/{GetValidDisplayUrl()}";
 
         public string GetValidDisplayUrl()
             => URL ?? DisplayID;

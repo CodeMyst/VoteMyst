@@ -208,7 +208,7 @@ namespace VoteMyst.Controllers
                 }
             }
 
-            DatabaseHelpers.Users.SaveUser(targetUser);
+            DatabaseHelpers.Context.UpdateAndSave(targetUser);
 
             return targetUser.ID == selfUser.ID
                 ? RedirectToAction("me")

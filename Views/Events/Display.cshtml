@@ -9,6 +9,10 @@
     Layout = "_Layout";
 
     EventState eventState = Model.GetCurrentState();
+    IEnumerable<Entry> entries = Model.Entries;
+
+    if (Model.Settings.HasFlag(EventSettings.RandomizeEntries))
+        entries = entries.Shuffle();
 }
 
 @section ContentMeta
@@ -29,14 +33,10 @@
     </div>
 }
 
-@if (eventState == EventState.Ongoing)
+@if (eventState == EventState.Ongoing || eventState == EventState.Voting)
 {
-    <div class="submission-button">
-        <a class="button" asp-controller="submit" asp-action="index" asp-route-id="@Model.GetValidDisplayUrl()">Submit an entry</a>
-    </div>
-
     <div class="posts">
-        @foreach (var e in Model.Entries)
+        @foreach (var e in entries)
         {
             <partial name="_Entry" for="@e" />
         }

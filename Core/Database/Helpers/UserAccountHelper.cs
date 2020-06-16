@@ -119,12 +119,5 @@ namespace VoteMyst.Database
             _context.UserAccounts.Update(user);
             return _context.SaveChanges() > 0;
         }
-
-        public bool SaveUser(UserAccount user)
-        {
-            _context.UserAccounts.Update(user);
-
-            return _context.SaveChanges() > 0;
-        }
     }
 }

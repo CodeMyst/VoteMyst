@@ -29,6 +29,6 @@ namespace VoteMyst.Database
         /// <summary>
         /// The permissions that should be applied to the user inside the event.
         /// </summary>
-        public EventPermissions Permissions { get; set; }
+        public EventPermissions Permissions { get; set; } = EventPermissions.Default;
     }
 }

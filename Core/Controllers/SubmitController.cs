@@ -32,7 +32,7 @@ namespace VoteMyst.Controllers
         /// <summary>
         /// Shows the submission page for the event with the specified ID.
         /// </summary>
-        [Route("submit/{id}")]
+        [Route("events/{id}/submit")]
         [RequireGlobalPermission(GlobalPermissions.ParticipateInEvents)]
         public IActionResult Index(string id)
         {
@@ -61,7 +61,7 @@ namespace VoteMyst.Controllers
         /// Provides the endpoint for submission POST requests.
         /// </summary>
         [HttpPost]
-        [Route("submit/{id}")]
+        [Route("events/{id}/submit")]
         [RequireGlobalPermission(GlobalPermissions.ParticipateInEvents)]
         public IActionResult Index(string id, 
             [FromForm] IFormFile file, 

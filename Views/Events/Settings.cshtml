@@ -1,11 +1,27 @@
+@inject DatabaseHelperProvider DatabaseHelpers
+
 @using VoteMyst.Database
+@using VoteMyst.Controllers
 
 @model Event
 @{
-    ViewData["Title"] = "Event";
+    ViewData["Title"] = Model.Title;
+    Layout = "_Layout";
+
+    EventState eventState = Model.GetCurrentState();
+    IEnumerable<Entry> shuffledEntries = Model.Entries.Shuffle();
 }
 
-<h1>Create a new Event</h1>
+@section ContentMeta
+{
+    <meta property="og:title" content="@Model.Title" />
+    <meta property="og:description" content="@Model.Description" />
+    <meta property="og:image" content="/img/trophy.png" />
+}
+
+<partial name="_EventPageHeader" for="@Model" />
+
+<h1>Edit Event Settings</h1>
 
 @if (ViewBag.ErrorMessages != null)
 {
@@ -19,8 +35,9 @@
     </div>
 }
 
-<form method="post" enctype="multipart/form-data"
-    autocomplete="off" onsubmit="return validateForm()">
+<form method="post" enctype="multipart/form-data" autocomplete="off">
+    <input type="hidden" asp-for="@Model.DisplayID" />
+
     <table>
         <colgroup>
             <col style="width: 120px">
@@ -66,21 +83,10 @@
                 <p class="disclaimer">Note that entered dates will be interpreted as UTC dates.</p>
             </td>
         </tr>
+        <tr>
+            <th><label asp-for="@Model.Settings"></label></th>
+            <td><partial name="_FlagsEnum" for="@Model.Settings" /></td>
+        </tr>
     </table>
-    <button type="submit">Create Event</button>
+    <button type="submit">Save Changes</button>
 </form>
-
-<script>
-    let titleInput = document.querySelector("#Title");
-    let urlInput = document.querySelector("#URL");
-    function generateUrl(e) {
-        urlInput.placeholder = titleInput.value
-            .toLowerCase()
-            .replace(/ /g, '-')          // replaces spaces with dashes
-            .replace(/[^a-z\d\-]/g, '')  // remove invalid characters
-            .replace(/^\-+|\-+$/g, '')   // trim dashes
-            .replace(/-{2,}/g, '-');     // remove duplicate dashes
-    }
-    titleInput.addEventListener("input", generateUrl);
-    generateUrl(null);
-</script>

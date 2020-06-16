@@ -129,11 +129,11 @@ namespace VoteMyst.Controllers
         /// <summary>
         /// Displays the event with the specified ID.
         /// </summary>
+        [Route("events/{id}")]
         public IActionResult Display(string id) 
         {
             UserAccount user = GetCurrentUser();
             Event e = DatabaseHelpers.Events.GetEventByUrl(id);
-            ViewBag.Event = e;
 
             if (e == null)
                 return NotFound();
@@ -146,14 +146,79 @@ namespace VoteMyst.Controllers
                 _logger.LogWarning("{0} attempted to access the {1}, but it is hidden. Sending a 404 response.", user, e);
                 return NotFound();
             }
-            // If the event voting phase has started and not ended yet, redirect to the vote page
-            if (eventState == EventState.Voting) 
-            {
-                _logger.LogInformation("{0} attempted to access {1}, but voting is in progress. Redirecting to the vote page.", user, e);
-                return RedirectToAction("vote", new { id = id });
-            }
             
             return View(e);
+        }
+
+        [Route("events/{id}/settings")]
+        public IActionResult Settings(string id)
+        {
+            UserAccount user = GetCurrentUser();
+            Event e = DatabaseHelpers.Events.GetEventByUrl(id);
+
+            if (e == null)
+                return NotFound();
+
+            EventState eventState = e.GetCurrentState();
+
+            // If the event is not revealed yet, don't allow to find it, except if the user is an admin
+            if (eventState == EventState.Hidden && user.AccountBadge != AccountBadge.SiteAdministrator)
+            {
+                _logger.LogWarning("{0} attempted to access the {1}, but it is hidden. Sending a 404 response.", user, e);
+                return NotFound();
+            }
+
+            return View(e);
+        }
+        [HttpPost]
+        [Route("events/{id}/settings")]
+        public IActionResult Settings(string id, [FromForm, Bind] Event eventChanges)
+        {
+            UserAccount user = GetCurrentUser();
+            Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(id);
+            EventPermissions userPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
+
+            if (targetEvent == null)
+                return NotFound();
+            if (!userPermissions.HasFlag(EventPermissions.EditEventSettings))
+                return Forbid();
+
+            eventChanges.ID = targetEvent.ID;
+
+            ModelState.Clear();
+            TryValidateModel(eventChanges);
+
+            // Collect the initial model errors
+            List<string> errorMessages = new List<string>();
+            if (!ModelState.IsValid)
+            {
+                errorMessages = ModelState.Values.SelectMany(value => value.Errors).Select(error => error.ErrorMessage).ToList();
+            }
+
+            // Perform additional validation
+
+            if (errorMessages.Count > 0)
+            {
+                // If validation errors occured, display them on the edit page.
+                ViewBag.ErrorMessages = errorMessages.ToArray();
+                return Settings(id);
+            }
+
+            targetEvent.Title = eventChanges.Title;
+            targetEvent.URL = eventChanges.URL;
+            targetEvent.Description = eventChanges.Description;
+
+            targetEvent.EventType = eventChanges.EventType;
+            targetEvent.Settings = eventChanges.Settings;
+
+            targetEvent.RevealDate = eventChanges.RevealDate;
+            targetEvent.StartDate = eventChanges.StartDate;
+            targetEvent.EndDate = eventChanges.EndDate;
+            targetEvent.VoteEndDate = eventChanges.VoteEndDate;
+
+            DatabaseHelpers.Context.UpdateAndSave(targetEvent);
+
+            return Redirect(targetEvent.GetUrl());
         }
 
         /// <summary>
@@ -164,7 +229,6 @@ namespace VoteMyst.Controllers
         {
             return View(new Event());
         }
-
         /// <summary>
         /// Creates a new event in the database.
         /// </summary>
@@ -200,29 +264,8 @@ namespace VoteMyst.Controllers
 
                 _logger.LogInformation("User {0} created the event '{1}'.", GetCurrentUser().Username, e.Title);
 
-                return View("Success", e);
+                return RedirectToAction("display", e.DisplayID);
             }
-        }
-
-        public IActionResult Vote(string id) 
-        {
-            // TODO: Maybe support multiple events?
-            Event currentEvent = DatabaseHelpers.Events.GetEventByUrl(id);
-
-            if (currentEvent == null)
-                return NotFound();
-            if (currentEvent.GetCurrentState() != EventState.Voting)
-                return Unauthorized();
-
-            Entry[] entries = currentEvent.Entries.ToArray();
-
-            Random rnd = new Random();
-            Entry[] randomizedEntries = entries.OrderBy(e => rnd.Next()).ToArray();
-
-            ViewBag.Event = currentEvent;
-            ViewBag.RandomizedEntries = randomizedEntries;
-
-            return View(currentEvent);
         }
 
         [HttpPost]

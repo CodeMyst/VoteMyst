@@ -25,7 +25,7 @@ function getEventId() {
 }
 
 function getEntryId(post) {
-    return post.getAttribute("entry-id");
+    return post.getAttribute("id");
 }
 
 function castVote(element) {
