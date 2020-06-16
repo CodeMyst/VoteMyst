@@ -27,6 +27,12 @@ namespace VoteMyst.Database
             modelBuilder.Entity<UserAccount>().HasIndex(x => x.DisplayID).IsUnique();
         }
 
+        public bool UpdateAndSave<TEntity>(TEntity entity)
+        {
+            Update(entity);
+            return SaveChanges() > 0;
+        }
+
         public TEntity QueryByID<TEntity>(int id) where TEntity : class, IDatabaseEntity
         {
             return GetEntitySet<TEntity>()

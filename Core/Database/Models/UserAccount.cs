@@ -25,7 +25,8 @@ namespace VoteMyst.Database
         /// <summary>
         /// The username of the account.
         /// </summary>
-        [Required]
+        [Required(ErrorMessage = "The username may not be empty.")]
+        [MinLength(2, ErrorMessage = "The username must be atleast 2 characters long."), MaxLength(32, ErrorMessage = "The username may not be longer than 32 characters.")]
         public string Username { get; set; }
 
         /// <summary>
@@ -42,6 +43,7 @@ namespace VoteMyst.Database
         /// <summary>
         /// The account badge for the account.
         /// </summary>
+        [Display(Name = "Badge")]
         public AccountBadge AccountBadge { get; set; }
 
         public virtual ICollection<Authorization> Authorizations { get; set; }
@@ -58,7 +60,7 @@ namespace VoteMyst.Database
         }
 
         public string GetUrl()
-            => $"/users/display/{DisplayID}";
+            => $"/users/{DisplayID}";
 
         public override string ToString()
             => $"UserAccount('{DisplayID}', {Username})";

@@ -1,0 +1,55 @@
+@using System.ComponentModel.DataAnnotations
+
+@model Enum
+
+@{
+    Type modelType = Model.GetType();
+    ulong enumValue = (ulong)(object)Model;
+}
+
+<input type="hidden" asp-for="@Model" value="@enumValue" />
+
+@foreach (object value in Enum.GetValues(modelType))
+{
+    ulong integerValue = (ulong)value;
+    bool hasFlag = (enumValue & integerValue) != 0;
+
+    var memInfo = modelType.GetMember(value.ToString());
+    DisplayAttribute display = memInfo[0].GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault() as DisplayAttribute;
+
+    if (integerValue != 0 && (integerValue & (integerValue - 1)) == 0)
+    {
+        if (display == null || display.Name != null)
+        {
+            <div class="flag-container">
+                <div class="flag-description">
+                    <h1>@(display?.Name ?? value.ToString())</h1>
+                    <p>@(display?.Description ?? string.Empty)</p>
+                </div>
+                <input type="checkbox" data-flag="@integerValue" @(hasFlag ? "checked" : "")/>
+            </div>
+            <hr>
+        }
+    }
+}
+
+<script>
+    const parent = document.currentScript.parentNode;
+
+    const targetField = parent.querySelectorAll("input")[0];
+    const flagFields = Array.from(parent.querySelectorAll("input")).slice(1);
+
+    flagFields.forEach(flag => {
+        flag.addEventListener("change", e => {
+            let value = 0;
+            flagFields.forEach(f => {
+                if (f.checked) {
+                    value += parseInt(f.getAttribute("data-flag"));
+                }
+            });
+            targetField.value = value;
+        });
+    });
+
+    document.currentScript.remove();
+</script>

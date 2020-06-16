@@ -59,7 +59,7 @@
         </a>
     }
 
-    @if (selfUser.ID == Model.ID || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers))
+    @if (selfUser.ID == Model.ID && selfUser.Permissions.HasFlag(GlobalPermissions.ManageSelf) || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers))
     {
         <a asp-controller="users" asp-action="edit" asp-route-id="@Model.DisplayID" class="profile-button edit-button">
             <i class="fas fa-cog"></i>Edit

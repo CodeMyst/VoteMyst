@@ -9,36 +9,83 @@
     ViewData["Title"] = "User";
 
     UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
+    string avatarUrl = AvatarHelper.GetRelativeAvatarUrl(Model, out string _initials);
 }
 
-<h1>Edit User</h1>
+<h1>Edit Profile</h1>
 
-<form method="post" enctype="multipart/form-data"
-    autocomplete="off" onsubmit="return validateForm()">
+@if (ViewBag.ErrorMessages != null)
+{
+    <div class="panel small message error">
+        <ul>
+            @foreach (string error in ViewBag.ErrorMessages)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+<form method="post" enctype="multipart/form-data" autocomplete="off">
+    <input type="hidden" asp-for="@Model.DisplayID" />
+
     <table>
         <colgroup>
             <col style="width: 120px">
             <col>
         </colgroup>
+
         <tr>
             <th><label asp-for="@Model.Username"></label></th>
-            <td><input asp-for="@Model.Username"/></td>
+            <td><input asp-for="@Model.Username" /></td>
+        </tr>
+        <tr>
+            <th><label for="avatar">Avatar</label></th>
+            <td>
+                <input type="file" style="visibility:hidden;position:absolute;width:0" id="avatar" name="avatar" accept="image/png" />
+                <input type="hidden" style="visibility:hidden;position:absolute;" id="clearAvatar" name="clearAvatar" value="false" />
+                
+                <div class="editable-avatar">
+                    <img src="@(avatarUrl != null ? avatarUrl : "")" draggable="false" asp-append-version="true"/>
+                    <a id="editAvatar" href="#">Edit</a>
+                </div>
+                <a id="removeAvatar" href="#">Remove</a>
+            </td>
         </tr>
 
         @if (selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers))
         {
             <tr>
-                <th><label asp-for="@Model.Permissions"></label></th>
-                <td><input asp-for="@Model.Permissions"/></td>
-            </tr>
-            <tr>
                 <th><label asp-for="@Model.AccountBadge"></label></th>
                 <td><select asp-for="@Model.AccountBadge" asp-items="@Html.GetEnumSelectList<AccountBadge>()"></select></td>
+            </tr>
+
+            <tr>
+                <th><label asp-for="@Model.Permissions"></label></th>
+                <td><partial name="_FlagsEnum" for="@Model.Permissions" /></td>
             </tr>
         }
     </table>
     <div class="form-submit">
-        <button type="submit">Update User</button>
+        <button type="submit">Save Changes</button>
         <div></div>
     </div>
 </form>
+
+<script>
+    let avatarInput = document.querySelector("#avatar");
+    let avatarDisplay = document.querySelector(".editable-avatar img");
+    avatarInput.addEventListener("change", e => {
+        avatarDisplay.src = URL.createObjectURL(e.target.files[0]);
+    });
+    document.querySelector("#editAvatar").addEventListener("click", e => {
+        e.preventDefault();
+        avatarInput.click();
+    });
+    document.querySelector("#removeAvatar").addEventListener("click", e => {
+        e.preventDefault();
+        avatarInput.value = '';
+        avatarDisplay.src = '';
+        document.querySelector("#clearAvatar").setAttribute("value", true);
+    });
+</script>

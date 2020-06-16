@@ -1,15 +1,17 @@
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 using VoteMyst.Database;
 using VoteMyst.PermissionSystem;
+
+using SixLabors.ImageSharp;
 
 namespace VoteMyst.Controllers
 {
@@ -23,10 +25,12 @@ namespace VoteMyst.Controllers
         private static readonly AccountBadge[] _badges = (AccountBadge[])Enum.GetValues(typeof(AccountBadge));
 
         private readonly ILogger _logger;
+        private readonly AvatarHelper _avatarHelper;
 
         public UsersController(ILogger<UsersController> logger, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _logger = logger;
+            _avatarHelper = serviceProvider.GetService<AvatarHelper>();
         }
 
         /// <summary>
@@ -81,11 +85,16 @@ namespace VoteMyst.Controllers
         /// <summary>
         /// Displays the user with the specified ID.
         /// </summary>
+        [Route("users/{id}")]
         public IActionResult Display(string id) 
         {
             UserAccount targetUser = ProfileBuilder.FromId(id);
+            UserAccount selfUser = GetCurrentUser();
+
             if (targetUser == null)
                 return NotFound();
+            if (targetUser.ID == selfUser.ID)
+                return RedirectToAction("me");
 
             return View("Display", targetUser);
         }
@@ -93,16 +102,21 @@ namespace VoteMyst.Controllers
         /// <summary>
         /// Displays the user page for the currently authenticated user.
         /// </summary>
+        [Route("users/me")]
         public IActionResult Me()
         {
             if (!User.Identity.IsAuthenticated)
                 return Forbid();
 
-            UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
+            UserAccount selfUser = GetCurrentUser();
 
-            return Display(selfUser.DisplayID);
+            return View("Display", selfUser);
         }
 
+        /// <summary>
+        /// Displays the editing page for the specified user.
+        /// </summary>
+        [Route("users/{id}/edit")]
         public IActionResult Edit(string id)
         {
             UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
@@ -121,37 +135,84 @@ namespace VoteMyst.Controllers
         /// Provides the endpoint to edit a user.
         /// </summary>
         [HttpPost]
-        public IActionResult Edit(string id, [FromForm, Bind] UserAccount accountChanges, [FromForm] IFormFile avatar)
+        [Route("users/{id}/edit")]
+        public IActionResult Edit(string id, [FromForm, Bind] UserAccount accountChanges, [FromForm] IFormFile avatar, [FromForm] bool clearAvatar)
         {
             UserAccount targetUser = ProfileBuilder.FromId(id);
-            UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
+            UserAccount selfUser = GetCurrentUser();
 
+            bool isSelf = targetUser.ID == selfUser.ID;
+            bool canManageSelf = selfUser.Permissions.HasFlag(GlobalPermissions.ManageSelf);
             bool canManageUsers = selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers);
 
-            if (targetUser.ID != selfUser.ID && !canManageUsers)
+            if (!(isSelf && canManageSelf || canManageUsers))
                 return Forbid();
 
-            targetUser.Username = accountChanges.Username;
-            
-            if (avatar != null) 
+            // Collect the initial model errors
+            List<string> errorMessages = new List<string>();
+            if (!ModelState.IsValid)
             {
-                // TODO: Implement avatar changing
+                errorMessages = ModelState.Values.SelectMany(value => value.Errors).Select(error => error.ErrorMessage).ToList();
             }
 
-            if (accountChanges.Permissions != targetUser.Permissions || accountChanges.AccountBadge != targetUser.AccountBadge)
+            // Perform additional validation
+            if (avatar != null)
             {
-                if (!canManageUsers)
-                    return Forbid();
+                if (avatar.ContentType != "image/png")
+                    errorMessages.Add("You can only use PNG images as avatars.");
+                if (avatar.Length > 4194304)
+                    errorMessages.Add("Avatar images can only be 4MB in size.");
+                
+                using (var image = Image.Load(avatar.OpenReadStream()))
+                {
+                    if (image.Width != image.Height)
+                        errorMessages.Add("Avatar images must be in a square (1:1) aspect ratio.");
+                }
+            }
 
-                targetUser.Permissions = accountChanges.Permissions;
-                targetUser.AccountBadge = accountChanges.AccountBadge;
+            if (errorMessages.Count > 0)
+            {
+                // If validation errors occured, display them on the edit page.
+                ViewBag.ErrorMessages = errorMessages.ToArray();
+                return Edit(id);
+            }
+
+            targetUser.Username = accountChanges.Username;
+
+            string userAvatarPath = System.IO.Path.Combine(Environment.WebRootPath, _avatarHelper.GetAbsoluteAvatarUrl(targetUser));
+            if (avatar != null) 
+            {
+                using (var localFile = System.IO.File.OpenWrite(userAvatarPath))
+                using (var uploadedFile = avatar.OpenReadStream())
+                {
+                    uploadedFile.CopyTo(localFile);
+                }
+            }
+            else
+            {
+                if (clearAvatar)
+                {
+                    System.IO.File.Delete(userAvatarPath);
+                }
+            }
+
+            if (canManageUsers)
+            {
+                if (accountChanges.Permissions != targetUser.Permissions)
+                {
+                    targetUser.Permissions = accountChanges.Permissions;
+                }
+                if (accountChanges.AccountBadge != targetUser.AccountBadge)
+                {
+                    targetUser.AccountBadge = accountChanges.AccountBadge;
+                }
             }
 
             DatabaseHelpers.Users.SaveUser(targetUser);
 
-            return targetUser.ID == GetCurrentUser().ID
+            return targetUser.ID == selfUser.ID
                 ? RedirectToAction("me")
-                : RedirectToAction("display", new { id = id });
+                : RedirectToAction("display", new { id });
         }
     }
 }
