@@ -8,7 +8,7 @@
     string queryParameter = Context.Request.Query["name"];
 }
 
-<form class="user-search" asp-controller="Users" asp-action="Search" method="GET">
+<form class="inline-form" asp-controller="Users" asp-action="Search" method="GET">
     <label for="name">Username:</label>
     <input name="name" value="@queryParameter" type="text" autocomplete="off" />
     <button type="submit">Find User</button>

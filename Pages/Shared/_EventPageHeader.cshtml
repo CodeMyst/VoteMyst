@@ -61,7 +61,8 @@
 
         @if (eventPermissions.HasFlag(EventPermissions.EditEventSettings))
         {
-            <a href="@modelUrl/participants">Participants</a>
+            @* <a href="@modelUrl/participants">Participants</a> *@
+            <a href="@modelUrl/hosts">Hosts</a>
             <a href="@modelUrl/settings">Settings</a>
         }
     </div>

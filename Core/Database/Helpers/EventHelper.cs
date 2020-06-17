@@ -164,5 +164,18 @@ namespace VoteMyst.Database
 
             return context.SaveChanges() > 0;
         }
+        public bool RemoveUserAsHost(UserAccount user, Event e)
+        {
+            EventPermissionModifier modifier = context.EventPermissionModifiers
+                .FirstOrDefault(m => m.Event.ID == e.ID && m.User.ID == user.ID);
+
+            if (modifier != null)
+            {
+                context.EventPermissionModifiers.Remove(modifier);
+                context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
     }
 }

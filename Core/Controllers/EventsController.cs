@@ -150,36 +150,108 @@ namespace VoteMyst.Controllers
             return View(e);
         }
 
+        /// <summary>
+        /// Displays the hosts of an event. Only available for event hosts.
+        /// </summary>
+        [Route("events/{id}/hosts")]
+        public IActionResult Hosts(string id)
+        {
+            UserAccount user = GetCurrentUser();
+            Event e = DatabaseHelpers.Events.GetEventByUrl(id);
+            if (e == null)
+                return NotFound();
+
+            EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, e);
+            if (!permissions.HasFlag(EventPermissions.EditEventSettings))
+                return Forbid();
+
+            return View(e);
+        }
+        /// <summary>
+        /// Provides the endpoint to add a host to an event.
+        /// </summary>
+        [HttpPost]
+        [Route("events/{id}/hosts/add")]
+        public IActionResult AddHost(string id, [FromForm] string userDisplayId)
+        {
+            UserAccount user = GetCurrentUser();
+            Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(id);
+            if (targetEvent == null)
+                return NotFound();
+
+            EventPermissions userPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
+            if (!userPermissions.HasFlag(EventPermissions.EditEventSettings))
+                return Forbid();
+
+            UserAccount targetUser = DatabaseHelpers.Context.QueryByDisplayID<UserAccount>(userDisplayId);
+            if (targetUser != null)
+            {
+                if (user.ID != targetUser.ID)
+                {
+                    DatabaseHelpers.Events.RegisterUserAsHost(targetUser, targetEvent);
+                }
+            }
+
+            return Redirect(targetEvent.GetUrl() + "/hosts");
+        }
+        /// <summary>
+        /// Provides the endpoint to remove a host from an event.
+        /// </summary>
+        [HttpPost]
+        [Route("events/{id}/hosts/remove")]
+        public IActionResult RemoveHost(string id, [FromForm] string userDisplayId)
+        {
+            UserAccount user = GetCurrentUser();
+            Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(id);
+            if (targetEvent == null)
+                return NotFound();
+
+            EventPermissions userPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
+            if (!userPermissions.HasFlag(EventPermissions.EditEventSettings))
+                return Forbid();
+
+            UserAccount targetUser = DatabaseHelpers.Context.QueryByDisplayID<UserAccount>(userDisplayId);
+            if (targetUser == null)
+                return NotFound();
+
+            if (user.ID != targetUser.ID)
+            {
+                DatabaseHelpers.Events.RemoveUserAsHost(targetUser, targetEvent);
+            }
+
+            return Redirect(targetEvent.GetUrl() + "/hosts");
+        }
+
+        /// <summary>
+        /// Displays the settings of an event.
+        /// </summary>
         [Route("events/{id}/settings")]
         public IActionResult Settings(string id)
         {
             UserAccount user = GetCurrentUser();
             Event e = DatabaseHelpers.Events.GetEventByUrl(id);
-
             if (e == null)
                 return NotFound();
 
-            EventState eventState = e.GetCurrentState();
-
-            // If the event is not revealed yet, don't allow to find it, except if the user is an admin
-            if (eventState == EventState.Hidden && user.AccountBadge != AccountBadge.SiteAdministrator)
-            {
-                _logger.LogWarning("{0} attempted to access the {1}, but it is hidden. Sending a 404 response.", user, e);
-                return NotFound();
-            }
+            EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, e);
+            if (!permissions.HasFlag(EventPermissions.EditEventSettings))
+                return Forbid();
 
             return View(e);
         }
+        /// <summary>
+        /// Provides the endpoint to modify event settings.
+        /// </summary>
         [HttpPost]
         [Route("events/{id}/settings")]
         public IActionResult Settings(string id, [FromForm, Bind] Event eventChanges)
         {
             UserAccount user = GetCurrentUser();
             Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(id);
-            EventPermissions userPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
-
             if (targetEvent == null)
                 return NotFound();
+
+            EventPermissions userPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
             if (!userPermissions.HasFlag(EventPermissions.EditEventSettings))
                 return Forbid();
 

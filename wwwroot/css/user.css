@@ -59,18 +59,6 @@
 }
 
 
-.user-search {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-}
-.user-search > * {
-    margin: 0.3rem 0;
-}
-
-
 .user-info {
     display: flex;
     color: var(--color-white);

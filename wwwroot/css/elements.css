@@ -172,3 +172,14 @@
 .flag-container input {
     margin: auto 0.5rem auto auto;
 }
+
+.inline-form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.inline-form > * {
+    margin: 0.3rem 0;
+}
