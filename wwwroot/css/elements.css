@@ -149,3 +149,37 @@
     border-color: var(--color-error-text);
     color: var(--color-error-text);
 }
+
+.flag-container {
+    display: flex;
+    flex-direction: row;
+}
+.flag-description {
+    padding-left: 0.4rem;
+}
+.flag-description h1 {
+    margin: 8px 0 0 0;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.6rem;
+    letter-spacing: 0.05rem;
+}
+.flag-description p {
+    margin: 0 10px 4px 0;
+    font-size: 0.9rem;
+    white-space: normal;
+}
+.flag-container input {
+    margin: auto 0.5rem auto auto;
+}
+
+.inline-form {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+.inline-form > * {
+    margin: 0.3rem 0;
+}

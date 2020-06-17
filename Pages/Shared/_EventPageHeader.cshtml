@@ -1,12 +1,17 @@
+@inject UserProfileBuilder ProfileBuilder
 @inject DatabaseHelperProvider DatabaseHelpers
 
 @using VoteMyst.Database
 
 @model Event
 @{
+    UserAccount currentUser = ProfileBuilder.FromPrincipal(User);
+    EventPermissions eventPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(currentUser, Model);
+
     EventState eventState = Model.GetCurrentState();
+    string modelUrl = Model.GetUrl();
     string[] hosts = DatabaseHelpers.Events.GetEventHosts(Model)
-        .Select(h => $"<a href=\"/users/display/{h.DisplayID}\">{h.Username}</a>")
+        .Select(h => $"<a href=\"{h.GetUrl()}\">{h.Username}</a>")
         .ToArray();
 }
 
@@ -46,5 +51,29 @@
         }
     </div>
 
-    <hr>
+    <div class="event-navigation">
+        <a href="@modelUrl">Overview</a>
+
+        @if (eventState == EventState.Ongoing)
+        {
+            <a href="@modelUrl/submit">Submit</a>
+        }
+
+        @if (eventPermissions.HasFlag(EventPermissions.EditEventSettings))
+        {
+            @* <a href="@modelUrl/participants">Participants</a> *@
+            <a href="@modelUrl/hosts">Hosts</a>
+            <a href="@modelUrl/settings">Settings</a>
+        }
+    </div>
+
+    <script>
+        // Highlight the current event navigation location
+        document.currentScript.previousElementSibling.querySelectorAll("a").forEach(link => {
+            if (link.href.endsWith(window.location.pathname)) {
+                link.classList.add("active");
+            }
+        });
+        document.currentScript.remove();
+    </script>
 </div>

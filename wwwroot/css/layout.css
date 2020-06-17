@@ -7,9 +7,27 @@ body {
     color: var(--color-white);
     background-color: var(--color-nano);
 }
-*::selection {
+
+::selection {
     background-color: var(--color-mystge);
     color: var(--color-white);
+}
+
+body::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-dark-gray);
+}
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray);
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-light-gray);
 }
 
 a {

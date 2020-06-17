@@ -1,0 +1,48 @@
+@inject DatabaseHelperProvider DatabaseHelpers
+@inject UserProfileBuilder ProfileBuilder
+
+@using VoteMyst.Database
+
+@model Event
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "_Layout";
+
+    UserAccount currentUser = ProfileBuilder.FromPrincipal(User);
+    IEnumerable<UserAccount> hosts = DatabaseHelpers.Events.GetEventHosts(Model);
+}
+
+@section ContentMeta
+{
+    <meta property="og:title" content="@Model.Title" />
+    <meta property="og:description" content="@Model.Description" />
+    <meta property="og:image" content="/img/trophy.png" />
+}
+
+<partial name="_EventPageHeader" for="@Model" />
+
+<h1>Event Hosts</h1>
+
+<form class="inline-form" action="hosts/add" method="post" enctype="multipart/form-data" autocomplete="off">
+    <label for="userDisplayId">User Display ID:</label>
+    <input type="text" id="userDisplayId" name="userDisplayId" />
+    <button type="submit">Add Host</button>
+</form>
+
+<hr>
+
+@foreach (UserAccount host in hosts)
+{
+    <form action="hosts/remove" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="userDisplayId" value="@host.DisplayID" />
+        <a class="user-info event-host" href="@host.GetUrl()">
+            <partial name="_Avatar" for="@host" />
+            <p>@host.Username</p>
+            
+            @if (host.ID != currentUser.ID)
+            {
+                <button type="submit">Remove Host</button>
+            }
+        </a>
+    </form>
+}

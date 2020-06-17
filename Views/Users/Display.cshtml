@@ -13,6 +13,9 @@
     Entry[] entries = Model.Entries.ToArray();
     int totalVotes = entries.Sum(e => e.Votes.Count);
     int totalSubmissions = entries.Length;
+
+    bool allowSelfEditing = (selfUser.ID == Model.ID && selfUser.Permissions.HasFlag(GlobalPermissions.ManageSelf)) || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers);
+    bool allowLogout = selfUser.ID == Model.ID;
 }
 
 @section ContentMeta
@@ -52,17 +55,17 @@
         </tr>
     </table>
 
-    @if (selfUser.ID == Model.ID)
-    {
-        <a href="/logout" class="profile-button logout-button">
-            <i class="fas fa-sign-out-alt"></i>Log Out
-        </a>
-    }
-
-    @if (selfUser.ID == Model.ID || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers))
+    @if (allowSelfEditing)
     {
         <a asp-controller="users" asp-action="edit" asp-route-id="@Model.DisplayID" class="profile-button edit-button">
             <i class="fas fa-cog"></i>Edit
+        </a>
+    }
+
+    @if (allowLogout)
+    {
+        <a href="/logout" class="profile-button logout-button">
+            <i class="fas fa-sign-out-alt"></i>Log Out
         </a>
     }
 </div>
