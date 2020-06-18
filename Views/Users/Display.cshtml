@@ -33,6 +33,7 @@
             <p class="user-badge @Model.AccountBadge.ToString().ToLower()">
                 @switch (Model.AccountBadge)
                 {
+                    case AccountBadge.Banned: @Html.Raw("Banned"); break;
                     case AccountBadge.SiteModerator: @Html.Raw("Moderator"); break;
                     case AccountBadge.SiteAdministrator: @Html.Raw("Admin"); break;
                 }

@@ -61,6 +61,7 @@ namespace VoteMyst.Database
         {
             EventState[] states = (EventState[])Enum.GetValues(typeof(EventState));
             IEnumerable<KeyValuePair<EventState, Event>> eventsWithStates = context.Events
+                .OrderByDescending(e => e.StartDate)
                 .Select(e => new KeyValuePair<EventState, Event>(e.GetCurrentState(), e));
             return states.ToDictionary(state => state, state => eventsWithStates.Where(e => e.Key == state).Select(e => e.Value));
         }
@@ -135,7 +136,10 @@ namespace VoteMyst.Database
         public UserAccount[] GetEventHosts(Event e)
             => context.EventPermissionModifiers
                 .Where(x => x.Event.ID == e.ID && x.Permissions == EventPermissions.Host)
-                .Select(x => context.UserAccounts.FirstOrDefault(u => u.ID == x.User.ID))
+                .Join(context.UserAccounts,
+                    evm => evm.User.ID,
+                    account => account.ID,
+                    (evm, account) => account)
                 .ToArray();
 
         /// <summary>
