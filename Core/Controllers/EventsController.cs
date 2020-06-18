@@ -308,7 +308,7 @@ namespace VoteMyst.Controllers
         [RequireGlobalPermission(GlobalPermissions.CreateEvents)]
         public IActionResult New([FromForm] Event e)
         {
-            if (string.IsNullOrEmpty(e.URL))
+            if (string.IsNullOrEmpty(e.URL) && e.Title != null)
             {
                 e.URL = Regex.Replace(Regex.Replace(e.Title.ToLowerInvariant().Replace(" ", "-"), 
                     @"[^a-zA-Z\d\-]", string.Empty).Trim('-'), @"-{2,}", "-");
@@ -336,7 +336,7 @@ namespace VoteMyst.Controllers
 
                 _logger.LogInformation("User {0} created the event '{1}'.", GetCurrentUser().Username, e.Title);
 
-                return RedirectToAction("display", e.DisplayID);
+                return Redirect(e.GetUrl());
             }
         }
 
