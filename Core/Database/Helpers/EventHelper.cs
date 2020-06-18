@@ -61,6 +61,7 @@ namespace VoteMyst.Database
         {
             EventState[] states = (EventState[])Enum.GetValues(typeof(EventState));
             IEnumerable<KeyValuePair<EventState, Event>> eventsWithStates = context.Events
+                .OrderByDescending(e => e.StartDate)
                 .Select(e => new KeyValuePair<EventState, Event>(e.GetCurrentState(), e));
             return states.ToDictionary(state => state, state => eventsWithStates.Where(e => e.Key == state).Select(e => e.Value));
         }
