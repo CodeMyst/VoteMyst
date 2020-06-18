@@ -16,12 +16,29 @@
 }
 .event .event-info {
     margin: 0 auto auto 0;
+    width: 100%;
 }
 .event .event-info > * {
     margin: 0.2rem;
 }
+.event .event-info .event-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.event .event-info .event-header > *{
+    padding-right: 0.5rem;
+}
+.event .event-timestamp {
+    color: var(--color-light-gray);
+    margin: 0 0 auto auto;
+}
+.event .event-hidden {
+    color: var(--color-gray);
+    margin: 0 0 auto 0;
+}
 .event .event-info .event-title {
-    display: block;
     margin: 0.5rem 0.2rem 1rem;
     font-size: 1.5rem;
     font-weight: bold;

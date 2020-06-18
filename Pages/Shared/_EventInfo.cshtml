@@ -7,13 +7,14 @@
 
 <div class="event">
     <div class="event-info">
-        <a class="event-title" asp-controller="events" asp-action="display" asp-route-id="@Model.GetValidDisplayUrl()">
-            @Model.Title
-            @if (eventState == EventState.Hidden) 
+        <span class="event-header">
+            <a class="event-title" href="@Model.GetUrl()">@Model.Title</a>
+            <span class="event-timestamp">@Model.StartDate.ToString("MMMM yyyy")</span>
+            @if (eventState == EventState.Hidden)
             {
-                <span style="padding-left: 0.5rem; opacity: 0.5;">(hidden)</span>
+                <span class="event-hidden">(hidden)</span>
             }
-        </a>
+        </span>
         
         <p class="event-description">
             @(string.IsNullOrEmpty(Model.Description) ? "No description was provided." : Model.Description)
