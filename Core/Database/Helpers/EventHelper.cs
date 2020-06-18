@@ -136,7 +136,10 @@ namespace VoteMyst.Database
         public UserAccount[] GetEventHosts(Event e)
             => context.EventPermissionModifiers
                 .Where(x => x.Event.ID == e.ID && x.Permissions == EventPermissions.Host)
-                .Select(x => context.UserAccounts.FirstOrDefault(u => u.ID == x.User.ID))
+                .Join(context.UserAccounts,
+                    evm => evm.User.ID,
+                    account => account.ID,
+                    (evm, account) => account)
                 .ToArray();
 
         /// <summary>
