@@ -140,8 +140,8 @@ namespace VoteMyst.Controllers
                 
             EventState eventState = e.GetCurrentState();
 
-            // If the event is not revealed yet, don't allow to find it, except if the user is an admin
-            if (eventState == EventState.Hidden && user.AccountBadge != AccountBadge.SiteAdministrator)
+            // If the event is not revealed yet, don't allow to find it, except if the user is a host or an admin
+            if (eventState == EventState.Hidden && !CanViewHiddenEvent(user, e))
             {
                 _logger.LogWarning("{0} attempted to access the {1}, but it is hidden. Sending a 404 response.", user, e);
                 return NotFound();
@@ -402,6 +402,11 @@ namespace VoteMyst.Controllers
 
             DatabaseHelpers.Votes.DeleteVote(vote);
             return Ok(new VoteActionResult(true, false));
+        }
+
+        private Boolean CanViewHiddenEvent(UserAccount user, Event e) 
+        {
+            return user.Permissions.HasFlag(GlobalPermissions.SiteAdministrator) || DatabaseHelpers.Events.GetEventHosts(e).Any(x => x.ID == user.ID);
         }
     }
 }
