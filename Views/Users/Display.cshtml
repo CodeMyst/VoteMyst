@@ -34,6 +34,7 @@
                 @switch (Model.AccountBadge)
                 {
                     case AccountBadge.Banned: @Html.Raw("Banned"); break;
+                    case AccountBadge.BetaTester: @Html.Raw("Beta Tester"); break;
                     case AccountBadge.SiteModerator: @Html.Raw("Moderator"); break;
                     case AccountBadge.SiteAdministrator: @Html.Raw("Admin"); break;
                 }
