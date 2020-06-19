@@ -405,8 +405,7 @@ namespace VoteMyst.Controllers
         }
 
         private Boolean CanViewHiddenEvent(UserAccount user, Event e) 
-        {
-            return user.Permissions.HasFlag(GlobalPermissions.SiteAdministrator) || DatabaseHelpers.Events.GetEventHosts(e).Any(x => x.ID == user.ID);
-        }
+            => user.Permissions.HasFlag(GlobalPermissions.SiteAdministrator) 
+                || DatabaseHelpers.Events.GetEventHosts(e).Any(x => x.ID == user.ID);
     }
 }
