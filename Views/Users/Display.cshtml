@@ -31,12 +31,7 @@
         @if(@Model.AccountBadge != AccountBadge.None) 
         {
             <p class="user-badge @Model.AccountBadge.ToString().ToLower()">
-                @switch (Model.AccountBadge)
-                {
-                    case AccountBadge.Banned: @Html.Raw("Banned"); break;
-                    case AccountBadge.SiteModerator: @Html.Raw("Moderator"); break;
-                    case AccountBadge.SiteAdministrator: @Html.Raw("Admin"); break;
-                }
+                @Html.DisplayFor(e => e.AccountBadge)
             </p>
         }
         <p class="own-display-id">Account ID:<br>@Model.DisplayID</p>

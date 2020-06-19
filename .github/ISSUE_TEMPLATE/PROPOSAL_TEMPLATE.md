@@ -2,7 +2,7 @@
 name: "Proposal"
 about: "Have an idea on how to improve the project?"
 title: '[Proposal] '
-labels: 'i: enhancement'
+labels: 'enhancement'
 assignees: ''
 
 ---

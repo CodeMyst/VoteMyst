@@ -150,6 +150,10 @@
     border-color: var(--color-badge-moderator);
     color: var(--color-badge-moderator);
 }
+.user-badge.betatester {
+    border-color: var(--color-badge-betatester);
+    color: var(--color-badge-betatester);
+}
 .user-badge.banned {
     border-color: var(--color-badge-banned);
     color: var(--color-badge-banned);
