@@ -2,7 +2,7 @@
 name: "Bug Report"
 about: "Something is not working - let's change that!"
 title: '[Bug] '
-labels: 'i: bug'
+labels: 'bug'
 assignees: ''
 
 ---

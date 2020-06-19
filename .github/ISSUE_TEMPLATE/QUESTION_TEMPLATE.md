@@ -2,7 +2,7 @@
 name: "Question"
 about: "Have a question that doesn't fit the other templates?"
 title: '[Question] '
-labels: 'i: question'
+labels: 'question'
 assignees: ''
 
 ---
