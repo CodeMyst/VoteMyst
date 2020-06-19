@@ -1,12 +1,18 @@
+@inject DatabaseHelperProvider DatabaseHelpers
+@inject UserProfileBuilder ProfileBuilder
+
 @using VoteMyst.Database
 
-@model Dictionary<EventState, IEnumerable<Event>>
+@model Dictionary<EventState, Event[]>
 @{
     ViewData["Title"] = "Browse";
     Layout = "_Layout";
+
+    UserAccount currentUser = ProfileBuilder.FromPrincipal(User);
+    Event[] observableHiddenEvents = Model[EventState.Hidden].Where(e => DatabaseHelpers.Events.CanViewHiddenEvent(currentUser, e)).ToArray();
 }
 
-@if (ViewBag.CanManageEvents)
+@if (currentUser.Permissions.HasFlag(GlobalPermissions.CreateEvents))
 {
     <div>
         <a class="button" asp-controller="events" asp-action="new">Create an event</a>
@@ -26,19 +32,16 @@
             </div>
         </div>
     }
-    @if (Model[EventState.Revealed].Count() > 0 || (ViewBag.CanManageEvents && Model[EventState.Hidden].Count() > 0))
+    @if (Model[EventState.Revealed].Count() > 0 || observableHiddenEvents.Length > 0)
     {
         <div class="events-planned">
             <h1>Planned events</h1>
             <div class="event-container">
-                @{
-                    var upcomingEvents = Model[EventState.Revealed];
-                    if (ViewBag.CanManageEvents)
-                    {
-                        upcomingEvents = upcomingEvents.Concat(Model[EventState.Hidden]);
-                    }
+                @foreach (Event e in observableHiddenEvents)
+                {
+                    <partial name="_EventInfo" for="@e" />
                 }
-                @foreach (Event e in upcomingEvents)
+                @foreach (Event e in Model[EventState.Revealed])
                 {
                     <partial name="_EventInfo" for="@e" />
                 }

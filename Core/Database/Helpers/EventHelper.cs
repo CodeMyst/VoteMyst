@@ -57,13 +57,13 @@ namespace VoteMyst.Database
         /// <summary>
         /// Retrieves all events, grouped by their respective state.
         /// </summary>
-        public Dictionary<EventState, IEnumerable<Event>> GetAllEventsGrouped()
+        public Dictionary<EventState, Event[]> GetAllEventsGrouped()
         {
             EventState[] states = (EventState[])Enum.GetValues(typeof(EventState));
             IEnumerable<KeyValuePair<EventState, Event>> eventsWithStates = context.Events
                 .OrderByDescending(e => e.StartDate)
                 .Select(e => new KeyValuePair<EventState, Event>(e.GetCurrentState(), e));
-            return states.ToDictionary(state => state, state => eventsWithStates.Where(e => e.Key == state).Select(e => e.Value));
+            return states.ToDictionary(state => state, state => eventsWithStates.Where(e => e.Key == state).Select(e => e.Value).ToArray());
         }
 
         /// <summary>
@@ -141,6 +141,13 @@ namespace VoteMyst.Database
                     account => account.ID,
                     (evm, account) => account)
                 .ToArray();
+
+        /// <summary>
+        /// Checks if the user can view the specified (hidden) event.
+        /// </summary>
+        public bool CanViewHiddenEvent(UserAccount user, Event e) 
+            => user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents) 
+                || GetEventHosts(e).Contains(user);
 
         /// <summary>
         /// Returns all events in which the user is registered as host.

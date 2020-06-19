@@ -151,8 +151,8 @@
     color: var(--color-badge-moderator);
 }
 .user-badge.betatester {
-    border-color: var(--color-badge-beta-tester);
-    color: var(--color-badge-beta-tester);
+    border-color: var(--color-badge-betatester);
+    color: var(--color-badge-betatester);
 }
 .user-badge.banned {
     border-color: var(--color-badge-banned);
