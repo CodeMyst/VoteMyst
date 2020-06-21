@@ -73,9 +73,9 @@ namespace VoteMyst.Database
         /// <summary>
         /// The UTC date when submissions for the event should close and voting should open.
         /// </summary>
-        [Required, Display(Name = "End Date"), DataType(DataType.DateTime)]
+        [Required, Display(Name = "Submission End Date"), DataType(DataType.DateTime)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = _dateTimeFormat)]
-        public DateTime EndDate { get; set; } = DateTime.UtcNow;
+        public DateTime SubmissionEndDate { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// The UTC date when voting for the event should end.
@@ -84,10 +84,14 @@ namespace VoteMyst.Database
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = _dateTimeFormat)]
         public DateTime VoteEndDate { get; set; } = DateTime.UtcNow;
 
+        /// <summary>
+        /// The entries contained in this event.
+        /// </summary>
         public virtual ICollection<Entry> Entries { get; set; }
-
-        [NotMapped]
-        public IEnumerable<Report> Reports => Entries.SelectMany(e => e.Reports);
+        /// <summary>
+        /// The reports contained in this event.
+        /// </summary>
+        public virtual ICollection<Report> Reports { get; set; }
 
         public Event()
         {
@@ -96,7 +100,7 @@ namespace VoteMyst.Database
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (RevealDate >= StartDate || StartDate >= EndDate || EndDate >= VoteEndDate)
+            if (RevealDate >= StartDate || StartDate >= SubmissionEndDate || SubmissionEndDate >= VoteEndDate)
             {
                 yield return new ValidationResult("All dates must be in ascending order.");
             }
@@ -117,7 +121,7 @@ namespace VoteMyst.Database
                 return EventState.Hidden;
             if (dateTime < StartDate)
                 return EventState.Revealed;
-            if (dateTime < EndDate)
+            if (dateTime < SubmissionEndDate)
                 return EventState.Ongoing;
             if (dateTime < VoteEndDate)
                 return EventState.Voting;

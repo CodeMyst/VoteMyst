@@ -19,9 +19,10 @@ namespace VoteMyst.Migrations
                     Title = table.Column<string>(maxLength: 64, nullable: false),
                     Description = table.Column<string>(maxLength: 512, nullable: true),
                     EventType = table.Column<int>(nullable: false),
+                    Settings = table.Column<ulong>(nullable: false),
                     RevealDate = table.Column<DateTime>(nullable: false),
                     StartDate = table.Column<DateTime>(nullable: false),
-                    EndDate = table.Column<DateTime>(nullable: false),
+                    SubmissionEndDate = table.Column<DateTime>(nullable: false),
                     VoteEndDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
@@ -36,7 +37,7 @@ namespace VoteMyst.Migrations
                     ID = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     DisplayID = table.Column<string>(type: "VARCHAR(28)", nullable: false),
-                    Username = table.Column<string>(nullable: false),
+                    Username = table.Column<string>(maxLength: 32, nullable: false),
                     JoinDate = table.Column<DateTime>(nullable: false),
                     Permissions = table.Column<ulong>(nullable: false),
                     AccountBadge = table.Column<int>(nullable: false)
@@ -131,25 +132,40 @@ namespace VoteMyst.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserID = table.Column<int>(nullable: false),
-                    EntryID = table.Column<int>(nullable: false),
-                    Reason = table.Column<string>(nullable: true)
+                    ReportAuthorID = table.Column<int>(nullable: true),
+                    EntryAuthorID = table.Column<int>(nullable: true),
+                    EventID = table.Column<int>(nullable: true),
+                    EntryID = table.Column<int>(nullable: true),
+                    Reason = table.Column<string>(nullable: true),
+                    Status = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reports", x => x.ID);
                     table.ForeignKey(
+                        name: "FK_Reports_UserAccounts_EntryAuthorID",
+                        column: x => x.EntryAuthorID,
+                        principalTable: "UserAccounts",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Reports_Entries_EntryID",
                         column: x => x.EntryID,
                         principalTable: "Entries",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Reports_UserAccounts_UserID",
-                        column: x => x.UserID,
+                        name: "FK_Reports_Events_EventID",
+                        column: x => x.EventID,
+                        principalTable: "Events",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Reports_UserAccounts_ReportAuthorID",
+                        column: x => x.ReportAuthorID,
                         principalTable: "UserAccounts",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -217,14 +233,24 @@ namespace VoteMyst.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reports_EntryAuthorID",
+                table: "Reports",
+                column: "EntryAuthorID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reports_EntryID",
                 table: "Reports",
                 column: "EntryID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reports_UserID",
+                name: "IX_Reports_EventID",
                 table: "Reports",
-                column: "UserID");
+                column: "EventID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_ReportAuthorID",
+                table: "Reports",
+                column: "ReportAuthorID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserAccounts_DisplayID",

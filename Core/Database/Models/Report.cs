@@ -15,15 +15,23 @@ namespace VoteMyst.Database
         public int ID { get; set; }
 
         /// <summary>
-        /// The <see cref="VoteMyst.Database.UserAccount"/> that submit the report.
+        /// The <see cref="UserAccount"/> that submit the report.
         /// </summary>
-        [Required]
-        public virtual UserAccount User { get; set; }
+        public virtual UserAccount ReportAuthor { get; set; }
 
         /// <summary>
-        /// The <see cref="VoteMyst.Database.Entry"/> that was reported.
+        /// The <see cref="UserAccount"/> that submitted the reported <see cref="Database.Entry"/>.
         /// </summary>
-        [Required]
+        public virtual UserAccount EntryAuthor { get; set; }
+
+        /// <summary>
+        /// The <see cref="Database.Event"/> that the reported entry is contained in.
+        /// </summary>
+        public virtual Event Event { get; set; }
+
+        /// <summary>
+        /// The <see cref="Database.Entry"/> that was reported.
+        /// </summary>
         public virtual Entry Entry { get; set; }
 
         /// <summary>
@@ -37,6 +45,6 @@ namespace VoteMyst.Database
         public ReportStatus Status { get; set; }
 
         public override string ToString()
-            => $"Report({User}->{Entry})";
+            => $"Report({ReportAuthor}->{Entry})";
     }
 }

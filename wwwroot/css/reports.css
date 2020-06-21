@@ -14,6 +14,9 @@
 .reports .reason {
     white-space: normal;
 }
+.reports .deleted {
+    color: var(--color-gray);
+}
 .reports .author .user-info {
     padding: 0.3rem 0;
 }
