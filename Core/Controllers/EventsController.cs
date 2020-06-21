@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using VoteMyst.Database;
-using VoteMyst.PermissionSystem;
+using VoteMyst.Authorization;
 
 namespace VoteMyst.Controllers
 {
@@ -38,16 +38,37 @@ namespace VoteMyst.Controllers
                 HasVote = hasVote;
             }
         }
+        /// <summary>
+        /// Represents a leaderboard for an event.
+        /// </summary>
         public class Leaderboard : IEnumerable<Leaderboard.Place> 
         {
+            /// <summary>
+            /// Represents a place on the <see cref="Leaderboard"/>.
+            /// </summary>
             public class Place 
             {
+                /// <summary>
+                /// The number that the place is at.
+                /// </summary>
                 public int Number { get; set; }
+                /// <summary>
+                /// The author of the entry at the place.
+                /// </summary>
                 public UserAccount Author { get; set; }
+                /// <summary>
+                /// The entry at the place.
+                /// </summary>
                 public Entry Entry { get; set; }
+                /// <summary>
+                /// The number of votes on the entry.
+                /// </summary>
                 public int Votes { get; set; }
 
-                public static Place FromEntry(Entry entry, DatabaseHelperProvider helpers)
+                /// <summary>
+                /// Creates a <see cref="Place"/> from an <see cref="VoteMyst.Database.Entry"/>.
+                /// </summary>
+                public static Place FromEntry(Entry entry)
                 {
                     return new Place
                     {
@@ -59,7 +80,13 @@ namespace VoteMyst.Controllers
                 }
             }
 
+            /// <summary>
+            /// The entries that were not eligable to win.
+            /// </summary>
             public Entry[] NotEligable { get; }
+            /// <summary>
+            /// The places on the leaderboard.
+            /// </summary>
             public Place[] Places { get; }
 
             private Leaderboard(Place[] places, Entry[] notEligable = null)
@@ -68,11 +95,14 @@ namespace VoteMyst.Controllers
                 NotEligable = notEligable;
             }
 
+            /// <summary>
+            /// Creates a new leaderboard for the specified event.
+            /// </summary>
             public static Leaderboard FromEvent(Event ev, DatabaseHelperProvider helpers)
             {
                 Place[] places = ev.Entries
                     .Where(entry => helpers.Events.CanUserWin(entry.Author, ev))
-                    .Select(entry => Place.FromEntry(entry, helpers))
+                    .Select(entry => Place.FromEntry(entry))
                     .OrderByDescending(place => place.Votes)
                     .ThenBy(place => place.Entry.ID)
                     .ToArray();
@@ -119,8 +149,6 @@ namespace VoteMyst.Controllers
         /// </summary>
         public IActionResult Index()
         {
-            UserAccount user = GetCurrentUser();
-
             return View(DatabaseHelpers.Events.GetAllEventsGrouped());
         }
 
@@ -152,17 +180,11 @@ namespace VoteMyst.Controllers
         /// Displays the hosts of an event. Only available for event hosts.
         /// </summary>
         [Route("events/{id}/hosts")]
+        [CheckEventExists]
+        [RequireEventPermission(EventPermissions.EditEventSettings)]
         public IActionResult Hosts(string id)
         {
-            UserAccount user = GetCurrentUser();
             Event e = DatabaseHelpers.Events.GetEventByUrl(id);
-            if (e == null)
-                return NotFound();
-
-            EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, e);
-            if (!permissions.HasFlag(EventPermissions.EditEventSettings))
-                return Forbid();
-
             return View(e);
         }
         /// <summary>
@@ -170,16 +192,12 @@ namespace VoteMyst.Controllers
         /// </summary>
         [HttpPost]
         [Route("events/{id}/hosts/add")]
+        [CheckEventExists]
+        [RequireEventPermission(EventPermissions.EditEventSettings)]
         public IActionResult AddHost(string id, [FromForm] string userDisplayId)
         {
             UserAccount user = GetCurrentUser();
             Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(id);
-            if (targetEvent == null)
-                return NotFound();
-
-            EventPermissions userPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
-            if (!userPermissions.HasFlag(EventPermissions.EditEventSettings))
-                return Forbid();
 
             UserAccount targetUser = DatabaseHelpers.Context.QueryByDisplayID<UserAccount>(userDisplayId);
             if (targetUser != null)
@@ -197,16 +215,12 @@ namespace VoteMyst.Controllers
         /// </summary>
         [HttpPost]
         [Route("events/{id}/hosts/remove")]
+        [CheckEventExists]
+        [RequireEventPermission(EventPermissions.EditEventSettings)]
         public IActionResult RemoveHost(string id, [FromForm] string userDisplayId)
         {
             UserAccount user = GetCurrentUser();
             Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(id);
-            if (targetEvent == null)
-                return NotFound();
-
-            EventPermissions userPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
-            if (!userPermissions.HasFlag(EventPermissions.EditEventSettings))
-                return Forbid();
 
             UserAccount targetUser = DatabaseHelpers.Context.QueryByDisplayID<UserAccount>(userDisplayId);
             if (targetUser == null)
@@ -224,17 +238,11 @@ namespace VoteMyst.Controllers
         /// Displays the settings of an event.
         /// </summary>
         [Route("events/{id}/settings")]
+        [CheckEventExists]
+        [RequireEventPermission(EventPermissions.EditEventSettings)]
         public IActionResult Settings(string id)
         {
-            UserAccount user = GetCurrentUser();
             Event e = DatabaseHelpers.Events.GetEventByUrl(id);
-            if (e == null)
-                return NotFound();
-
-            EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, e);
-            if (!permissions.HasFlag(EventPermissions.EditEventSettings))
-                return Forbid();
-
             return View(e);
         }
         /// <summary>
@@ -242,6 +250,8 @@ namespace VoteMyst.Controllers
         /// </summary>
         [HttpPost]
         [Route("events/{id}/settings")]
+        [CheckEventExists]
+        [RequireEventPermission(EventPermissions.EditEventSettings)]
         public IActionResult Settings(string id, [FromForm, Bind] Event eventChanges)
         {
             UserAccount user = GetCurrentUser();
@@ -338,6 +348,9 @@ namespace VoteMyst.Controllers
             }
         }
 
+        /// <summary>
+        /// Casts a vote on the specified entry.
+        /// </summary>
         [HttpPost]
         [Route("vote/cast/{entryDisplayId}")]
         public IActionResult CastVote(string entryDisplayId)
@@ -375,6 +388,9 @@ namespace VoteMyst.Controllers
             return Ok(new VoteActionResult(true, true));
         }
         
+        /// <summary>
+        /// Removes the vote on the specified entry.
+        /// </summary>
         [HttpPost]
         [Route("vote/remove/{entryDisplayId}")]
         public IActionResult RemoveVote(string entryDisplayId)

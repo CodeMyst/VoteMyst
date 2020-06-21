@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 using VoteMyst.Database;
-using VoteMyst.PermissionSystem;
 using VoteMyst.Controllers.Validation;
 
 namespace VoteMyst.Controllers

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 
 using VoteMyst.Database;
-using VoteMyst.PermissionSystem;
+using VoteMyst.Authorization;
 
 namespace VoteMyst.Controllers
 {
