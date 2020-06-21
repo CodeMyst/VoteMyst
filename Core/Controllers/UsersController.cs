@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 using VoteMyst.Database;
-using VoteMyst.PermissionSystem;
+using VoteMyst.Authorization;
 
 using SixLabors.ImageSharp;
 

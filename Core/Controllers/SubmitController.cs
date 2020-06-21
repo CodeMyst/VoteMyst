@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Logging;
 
 using VoteMyst.Database;
-using VoteMyst.PermissionSystem;
+using VoteMyst.Authorization;
 
 namespace VoteMyst.Controllers
 {
@@ -33,7 +33,9 @@ namespace VoteMyst.Controllers
         /// Shows the submission page for the event with the specified ID.
         /// </summary>
         [Route("events/{id}/submit")]
+        [CheckEventExists]
         [RequireGlobalPermission(GlobalPermissions.ParticipateInEvents)]
+        [RequireEventPermission(EventPermissions.ParticipateInEvent)]
         public IActionResult Index(string id)
         {
             UserAccount currentUser = GetCurrentUser();
@@ -62,7 +64,9 @@ namespace VoteMyst.Controllers
         /// </summary>
         [HttpPost]
         [Route("events/{id}/submit")]
+        [CheckEventExists]
         [RequireGlobalPermission(GlobalPermissions.ParticipateInEvents)]
+        [RequireEventPermission(EventPermissions.ParticipateInEvent)]
         public IActionResult Index(string id, 
             [FromForm] IFormFile file, 
             [FromForm] string storyContent, 
