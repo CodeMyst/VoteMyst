@@ -77,6 +77,10 @@ header h1 .version {
 hr {
     border-color: var(--color-gray);
 }
+hr.thin {
+    margin: 0.2rem 0;
+    border-color: var(--color-gray);
+}
 
 footer {
     margin: 2rem 0;
