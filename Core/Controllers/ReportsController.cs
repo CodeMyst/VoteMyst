@@ -48,6 +48,8 @@ namespace VoteMyst.Controllers
 
             if (currentUser.ID == targetEntry.Author.ID)
                 return BadRequest("Reporting own posts is not allowed.");
+            if (targetEntry.Reports.Any(r => r.ReportAuthor.ID == currentUser.ID))
+                return BadRequest("A report on this entry by the current user already exists.");
 
             DatabaseHelpers.Entries.ReportEntry(targetEntry, currentUser, reportSubmission.Reason);
 

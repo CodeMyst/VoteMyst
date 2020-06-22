@@ -5,6 +5,7 @@
 
 @model Entry
 @{
+    bool isGuest = !User.Identity.IsAuthenticated;
     UserAccount user = ProfileBuilder.FromPrincipal(User);
     UserAccount author = Model.Author;
 
@@ -12,8 +13,9 @@
     bool votingOpen = e.GetCurrentState() == EventState.Voting;
     bool displayUser = e.GetCurrentState() == EventState.Closed;
     bool isSelfPost = user.ID == author.ID;
-    bool canVote = votingOpen && !isSelfPost;
+    bool canVote = votingOpen && !isSelfPost && !isGuest;
     bool hasVoted = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, Model) != null;
+    bool canReport = !isSelfPost && !isGuest && !Model.Reports.Any(r => r.ReportAuthor.ID == user.ID);
 }
 
 <div class="post" id=@Model.DisplayID
@@ -46,7 +48,7 @@
             }
         </span>
         <span class="r">
-            @if (!isSelfPost)
+            @if (canReport)
             {
                 <span class="report" title="Report this post" onclick="reportPost(this)">
                     <i class="fas fa-flag"></i>
