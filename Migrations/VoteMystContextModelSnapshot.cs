@@ -95,9 +95,6 @@ namespace VoteMyst.Migrations
                         .IsRequired()
                         .HasColumnType("VARCHAR(16)");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<int>("EventType")
                         .HasColumnType("int");
 
@@ -108,6 +105,9 @@ namespace VoteMyst.Migrations
                         .HasColumnType("bigint unsigned");
 
                     b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("SubmissionEndDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Title")
@@ -160,23 +160,33 @@ namespace VoteMyst.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("EntryID")
+                    b.Property<int?>("EntryAuthorID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EntryID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EventID")
                         .HasColumnType("int");
 
                     b.Property<string>("Reason")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
-                    b.Property<int>("Status")
+                    b.Property<int?>("ReportAuthorID")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserID")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
+                    b.HasIndex("EntryAuthorID");
+
                     b.HasIndex("EntryID");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("EventID");
+
+                    b.HasIndex("ReportAuthorID");
 
                     b.ToTable("Reports");
                 });
@@ -278,17 +288,21 @@ namespace VoteMyst.Migrations
 
             modelBuilder.Entity("VoteMyst.Database.Report", b =>
                 {
+                    b.HasOne("VoteMyst.Database.UserAccount", "EntryAuthor")
+                        .WithMany()
+                        .HasForeignKey("EntryAuthorID");
+
                     b.HasOne("VoteMyst.Database.Entry", "Entry")
                         .WithMany("Reports")
-                        .HasForeignKey("EntryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EntryID");
 
-                    b.HasOne("VoteMyst.Database.UserAccount", "User")
-                        .WithMany("AuthoredReports")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("VoteMyst.Database.Event", "Event")
+                        .WithMany("Reports")
+                        .HasForeignKey("EventID");
+
+                    b.HasOne("VoteMyst.Database.UserAccount", "ReportAuthor")
+                        .WithMany()
+                        .HasForeignKey("ReportAuthorID");
                 });
 
             modelBuilder.Entity("VoteMyst.Database.Vote", b =>

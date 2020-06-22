@@ -25,14 +25,18 @@ namespace VoteMyst.Controllers
 
         private readonly ILogger _logger;
 
-        public ReportsController(ILogger<SubmitController> logger, IServiceProvider serviceProvider) : base(serviceProvider) 
+        public ReportsController(ILogger<ReportsController> logger, IServiceProvider serviceProvider) : base(serviceProvider) 
         { 
             _logger = logger;
         }
 
-        public IActionResult Index()
+        [Route("events/{id}/reports")]
+        [CheckEventExists]
+        [RequireEventPermission(EventPermissions.ManageEntries)]
+        public IActionResult Index(string id)
         {
-            return View();
+            Event e = DatabaseHelpers.Events.GetEventByUrl(id);
+            return View(e);
         }
 
         [HttpPost]
@@ -44,6 +48,8 @@ namespace VoteMyst.Controllers
 
             if (currentUser.ID == targetEntry.Author.ID)
                 return BadRequest("Reporting own posts is not allowed.");
+            if (targetEntry.Reports.Any(r => r.ReportAuthor.ID == currentUser.ID))
+                return BadRequest("A report on this entry by the current user already exists.");
 
             DatabaseHelpers.Entries.ReportEntry(targetEntry, currentUser, reportSubmission.Reason);
 
@@ -60,7 +66,6 @@ namespace VoteMyst.Controllers
             if (!permissions.HasFlag(EventPermissions.ManageEntries))
                 return Unauthorized();
 
-            // Note: This will also delete the report (and all votes linked to the entry), so the "approved" status will never actually be visible.
             DatabaseHelpers.Entries.DeleteEntry(r.Entry);
             DatabaseHelpers.Entries.UpdateEntryReportStatus(r, ReportStatus.Approved);
 

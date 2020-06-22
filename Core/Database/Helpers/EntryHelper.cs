@@ -99,7 +99,9 @@ namespace VoteMyst.Database
             Report report = new Report
             {
                 Entry = entry,
-                User = reportAuthor,
+                EntryAuthor = entry.Author,
+                Event = entry.Event,
+                ReportAuthor = reportAuthor,
                 Reason = reason,
                 Status = ReportStatus.Pending
             };

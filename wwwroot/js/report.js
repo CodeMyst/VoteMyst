@@ -21,6 +21,7 @@ function reportPost(element) {
                 fetch(`/reports/submit`, requestBody)
                     .then(result => {
                         if (result.ok) {
+                            post.querySelector(".report").remove();
                             promptModal({
                                 title: "Report submitted",
                                 content: "Thank you for submitting the report. A staff member has been notified and will look into the matter shortly.",

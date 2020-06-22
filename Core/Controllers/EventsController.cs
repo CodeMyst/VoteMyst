@@ -293,7 +293,7 @@ namespace VoteMyst.Controllers
 
             targetEvent.RevealDate = eventChanges.RevealDate;
             targetEvent.StartDate = eventChanges.StartDate;
-            targetEvent.EndDate = eventChanges.EndDate;
+            targetEvent.SubmissionEndDate = eventChanges.SubmissionEndDate;
             targetEvent.VoteEndDate = eventChanges.VoteEndDate;
 
             DatabaseHelpers.Context.UpdateAndSave(targetEvent);

@@ -26,7 +26,7 @@
                 <p>Event starts</p>
             </div>
             <div class=@(eventState == EventState.Ongoing ? "active" : "")>
-                <p class="local-date" --unix-timestamp="@Model.EndDate.ToUnixSeconds()">@Model.EndDate</p>
+                <p class="local-date" --unix-timestamp="@Model.SubmissionEndDate.ToUnixSeconds()">@Model.SubmissionEndDate</p>
                 <p>Submissions close</p>
             </div>
             <div class=@(eventState == EventState.Voting ? "active" : "")>
@@ -43,7 +43,7 @@
                 <div class="timer event-timer" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">Starts in</div>
                 break;
             case EventState.Ongoing:
-                <div class="timer event-timer" --unix-timestamp="@Model.EndDate.ToUnixSeconds()">Submissions close in</div>
+                <div class="timer event-timer" --unix-timestamp="@Model.SubmissionEndDate.ToUnixSeconds()">Submissions close in</div>
                 break;
             case EventState.Voting:
                 <div class="timer event-timer" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
@@ -59,6 +59,10 @@
             <a href="@modelUrl/submit">Submit</a>
         }
 
+        @if (eventPermissions.HasFlag(EventPermissions.ManageEntries))
+        {
+            <a href="@modelUrl/reports">Reports</a>
+        }
         @if (eventPermissions.HasFlag(EventPermissions.EditEventSettings))
         {
             @* <a href="@modelUrl/participants">Participants</a> *@

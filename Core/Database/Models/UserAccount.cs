@@ -46,16 +46,23 @@ namespace VoteMyst.Database
         [Display(Name = "Badge")]
         public AccountBadge AccountBadge { get; set; }
 
+        /// <summary>
+        /// The <see cref="Authorization"/>s associated with this account.
+        /// </summary>
         public virtual ICollection<Authorization> Authorizations { get; set; }
+        /// <summary>
+        /// The entries submitted by this account.
+        /// </summary>
         public virtual ICollection<Entry> Entries { get; set; }
-        public virtual ICollection<Report> AuthoredReports { get; set; }
+        /// <summary>
+        /// The votes authored by this account.
+        /// </summary>
         public virtual ICollection<Vote> AuthoredVotes { get; set; }
 
         public UserAccount()
         {
             Authorizations = new HashSet<Authorization>();
             Entries = new HashSet<Entry>();
-            AuthoredReports = new HashSet<Report>();
             AuthoredVotes = new HashSet<Vote>();
         }
 
