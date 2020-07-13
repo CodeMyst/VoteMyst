@@ -14,6 +14,8 @@
     var resolvedReports = Model.Reports.Where(r => r.Status != ReportStatus.Pending).ToArray();
 }
 
+<partial name="_EventPageHeader" for="@Model" />
+
 <h1>Open Reports</h1>
 
 @if (pendingReports.Length > 0)
@@ -84,8 +86,4 @@ else
 else 
 {
     <p class="reports-empty">No reports were resolved yet!</p>
-}
-
-@section Scripts {
-    <script src="~/js/report.js" asp-append-version="true"></script>
 }

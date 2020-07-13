@@ -11,14 +11,4 @@ sidebar.querySelector(".toggle").addEventListener("click", e => {
 container.addEventListener("click", e => {
     body.classList.remove('sidebar-open');
     sidebar.removeAttribute("expanded");
-})
-
-// Constructs the body for common POST requests
-function buildApiPostBody() {
-    return {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }
-}
+});

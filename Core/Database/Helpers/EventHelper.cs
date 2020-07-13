@@ -165,13 +165,21 @@ namespace VoteMyst.Database
         /// </summary>
         public bool RegisterUserAsHost(UserAccount user, Event e) 
         {
-            EventPermissionModifier modifier = new EventPermissionModifier 
+            EventPermissionModifier modifier = context.EventPermissionModifiers.FirstOrDefault(m => m.Event.ID == e.ID && m.User.ID == user.ID);
+
+            if (modifier == null)
             {
-                Event = e,
-                User = user,
-                Permissions = EventPermissions.Host
-            };
-            context.EventPermissionModifiers.Add(modifier);
+                context.EventPermissionModifiers.Add(new EventPermissionModifier
+                {
+                    Event = e,
+                    User = user,
+                    Permissions = EventPermissions.Host
+                });
+            }
+            else
+            {
+                modifier.Permissions = EventPermissions.Host;
+            }
 
             return context.SaveChanges() > 0;
         }
