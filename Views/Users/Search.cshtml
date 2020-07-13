@@ -5,12 +5,12 @@
     ViewData["Title"] = "Search User";
     Layout = "_Layout";
 
-    string queryParameter = Context.Request.Query["name"];
+    string query = @Context.Request.Query["name"];
 }
 
 <form class="inline-form" asp-controller="Users" asp-action="Search" method="GET">
     <label for="name">Username:</label>
-    <input name="name" value="@queryParameter" type="text" autocomplete="off" />
+    <input name="name" value="@query" type="text" autocomplete="off" />
     <button type="submit">Find User</button>
 </form>
 
@@ -20,8 +20,11 @@
 
     <p>@Model.Length users found.</p>
 
-    foreach (UserAccount user in Model)
-    {
-        <partial name="_UserInfo" for="@user" />
-    }
+    <div class="user-list">
+        @foreach (UserAccount user in Model)
+        {
+            <partial name="_UserInfo" for="@user" />
+            <hr>
+        }
+    </div>
 }

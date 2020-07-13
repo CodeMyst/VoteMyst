@@ -20,20 +20,6 @@
     <p class="event-hosts">Hosted by @Html.Raw(string.Join(", ", hosts))</p>
     <p class="event-description">@Model.Description</p>
     <div class="event-datebox">
-        <div class="event-dates">
-            <div class=@(eventState == EventState.Revealed ? "active" : "")>
-                <p class="local-date" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">@Model.StartDate</p>
-                <p>Event starts</p>
-            </div>
-            <div class=@(eventState == EventState.Ongoing ? "active" : "")>
-                <p class="local-date" --unix-timestamp="@Model.SubmissionEndDate.ToUnixSeconds()">@Model.SubmissionEndDate</p>
-                <p>Submissions close</p>
-            </div>
-            <div class=@(eventState == EventState.Voting ? "active" : "")>
-                <p class="local-date" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">@Model.VoteEndDate</p>
-                <p>Votings close</p>
-            </div>
-        </div>
         @switch(eventState)
         {
             case EventState.Hidden:
@@ -49,6 +35,20 @@
                 <div class="timer event-timer" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
                 break;
         }
+        <div class="event-dates">
+            <div class=@(eventState == EventState.Revealed ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">@Model.StartDate</p>
+                <p>Event starts</p>
+            </div>
+            <div class=@(eventState == EventState.Ongoing ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.SubmissionEndDate.ToUnixSeconds()">@Model.SubmissionEndDate</p>
+                <p>Submissions close</p>
+            </div>
+            <div class=@(eventState == EventState.Voting ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">@Model.VoteEndDate</p>
+                <p>Votings close</p>
+            </div>
+        </div>
     </div>
 
     <div class="event-navigation">

@@ -62,6 +62,7 @@ namespace VoteMyst
                 options.ClientId = Configuration["Discord:ClientId"];
                 options.ClientSecret = Configuration["Discord:ClientSecret"];
                 options.CallbackPath = new PathString("/signin-discord");
+                options.AccessDeniedPath = new PathString("/");
 
                 options.AuthorizationEndpoint = "https://discordapp.com/api/oauth2/authorize";
                 options.TokenEndpoint = "https://discordapp.com/api/oauth2/token";

@@ -66,7 +66,6 @@
     align-items: center;
     padding: 0.3rem 0.5rem;
     font-size: 1rem;
-    width: min-content;
 }
 .user-info:hover {
     color: inherit;
@@ -86,6 +85,17 @@
 }
 .user-info .user-badge {
     padding: 0 1rem;
+}
+
+
+.user-list {
+    width: 100%;
+}
+.user-list .user-info {
+    width: 100%;
+}
+.user-list hr {
+    margin: 0.2rem 0 0.4rem;
 }
 
 
