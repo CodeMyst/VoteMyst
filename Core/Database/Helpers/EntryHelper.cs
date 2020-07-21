@@ -87,7 +87,12 @@ namespace VoteMyst.Database
         /// </summary>
         public bool DeleteEntry(Entry entry)
         {
+            // Make sure that no foreign keys exist in other columns of this entry
+            entry.Event.Entries.Remove(entry);
+            context.Reports.RemoveRange(entry.Reports);
+
             context.Entries.Remove(entry);
+
             return context.SaveChanges() > 0;
         }
 

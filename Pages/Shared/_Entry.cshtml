@@ -10,12 +10,14 @@
     UserAccount author = Model.Author;
 
     Event e = Model.Event;
+    EventPermissions eventPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, e);
     bool votingOpen = e.GetCurrentState() == EventState.Voting;
     bool displayUser = e.GetCurrentState() == EventState.Closed;
     bool isSelfPost = user.ID == author.ID;
     bool canVote = votingOpen && !isSelfPost && !isGuest;
     bool hasVoted = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, Model) != null;
     bool canReport = !isSelfPost && !isGuest && !Model.Reports.Any(r => r.ReportAuthor.ID == user.ID);
+    bool canDelete = isSelfPost || user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents) || eventPermissions.HasFlag(EventPermissions.ManageEntries);
 }
 
 <div class="post" id=@Model.DisplayID
@@ -32,7 +34,7 @@
         </div>
     }
     <div class="post-image">
-        <img src="/@Model.GetRelativeUrl()" />
+        <img draggable="false" src="/@Model.GetRelativeUrl()" />
     </div>
 
     <div class="post-toolbar">
@@ -48,12 +50,9 @@
             }
         </span>
         <span class="r">
-            @if (canReport)
-            {
-                <span class="report" title="Report this post" onclick="reportPost(this)">
-                    <i class="fas fa-flag"></i>
-                </span>
-            }
+            <span class="menu" title="More options for this post" onclick="showEntryMenu(this, @canReport.ToString().ToLower(), @canDelete.ToString().ToLower())">
+                <i class="fas fa-fw fa-ellipsis-v"></i>
+            </span>
         </span>
     </div>
 </div>

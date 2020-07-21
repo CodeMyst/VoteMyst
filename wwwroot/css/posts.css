@@ -124,12 +124,12 @@
 .post .post-toolbar .r {
     margin: auto 0 auto auto;
 }
-.post .post-toolbar .report {
+.post .post-toolbar .menu {
     color: var(--color-gray);
     cursor: pointer;
 }
-.post .post-toolbar .report:hover {
-    color: var(--color-error-text);
+.post .post-toolbar .menu:hover {
+    color: var(--color-light-gray);
 }
 .post .vote {
     border: 1px solid var(--color-gray);

@@ -54,7 +54,7 @@
     <div class="event-navigation">
         <a href="@modelUrl">Overview</a>
 
-        @if (eventState == EventState.Ongoing)
+        @if (User.Identity.IsAuthenticated && eventState == EventState.Ongoing && eventPermissions.HasFlag(EventPermissions.ParticipateInEvent))
         {
             <a href="@modelUrl/submit">Submit</a>
         }

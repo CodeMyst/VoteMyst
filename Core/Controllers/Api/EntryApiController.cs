@@ -21,9 +21,34 @@ namespace VoteMyst.Controllers.Api
 
         [HttpPost]
         [Route("api/entry/{id}/delete")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Delete(string id)
         {
-            throw new NotImplementedException();
+            Entry entry = DatabaseHelpers.Context.QueryByDisplayID<Entry>(id);
+            Event entryEvent = entry.Event;
+
+            UserAccount user = GetCurrentUser();
+            UserAccount author = entry.Author;
+
+            // Verify that the user has the authority to delete the post.
+            // This is true if the user posted the entry, the user is a global admin
+            //   or the user is an event moderator.
+            if (user.ID == author.ID 
+                || user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents)
+                || DatabaseHelpers.Events.GetUserPermissionsForEvent(user, entryEvent).HasFlag(EventPermissions.ManageEntries))
+            {
+                DatabaseHelpers.Entries.DeleteEntry(entry);
+
+                _logger.LogInformation("{0} deleted the entry {1}.", user, entry);
+
+                return Ok();
+            }
+            else 
+            {
+                return Unauthorized("The current user lacks the authority to delete this post.");
+            }
         }
 
         [HttpPost]
@@ -63,8 +88,6 @@ namespace VoteMyst.Controllers.Api
 
                 return Ok(new VoteResult(true, true));
             }
-
-            
         }
 
         [HttpPost]
