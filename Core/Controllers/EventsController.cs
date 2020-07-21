@@ -19,26 +19,6 @@ namespace VoteMyst.Controllers
     public class EventsController : VoteMystController
     {
         /// <summary>
-        /// Represents the result of a voting action.
-        /// </summary>
-        public class VoteActionResult
-        {
-            /// <summary>
-            /// Indicates if the action was successful.
-            /// </summary>
-            public bool ActionSuccess { get; set; }
-            /// <summary>
-            /// Indicates if the entry has a vote after the action has performed.
-            /// </summary>
-            public bool HasVote { get; set; }
-
-            public VoteActionResult(bool success, bool hasVote)
-            {
-                ActionSuccess = success;
-                HasVote = hasVote;
-            }
-        }
-        /// <summary>
         /// Represents a leaderboard for an event.
         /// </summary>
         public class Leaderboard : IEnumerable<Leaderboard.Place> 
@@ -187,52 +167,6 @@ namespace VoteMyst.Controllers
             Event e = DatabaseHelpers.Events.GetEventByUrl(id);
             return View(e);
         }
-        /// <summary>
-        /// Provides the endpoint to add a host to an event.
-        /// </summary>
-        [HttpPost]
-        [Route("events/{id}/hosts/add")]
-        [CheckEventExists]
-        [RequireEventPermission(EventPermissions.EditEventSettings)]
-        public IActionResult AddHost(string id, [FromForm] string userDisplayId)
-        {
-            UserAccount user = GetCurrentUser();
-            Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(id);
-
-            UserAccount targetUser = DatabaseHelpers.Context.QueryByDisplayID<UserAccount>(userDisplayId);
-            if (targetUser != null)
-            {
-                if (user.ID != targetUser.ID)
-                {
-                    DatabaseHelpers.Events.RegisterUserAsHost(targetUser, targetEvent);
-                }
-            }
-
-            return Redirect(targetEvent.GetUrl() + "/hosts");
-        }
-        /// <summary>
-        /// Provides the endpoint to remove a host from an event.
-        /// </summary>
-        [HttpPost]
-        [Route("events/{id}/hosts/remove")]
-        [CheckEventExists]
-        [RequireEventPermission(EventPermissions.EditEventSettings)]
-        public IActionResult RemoveHost(string id, [FromForm] string userDisplayId)
-        {
-            UserAccount user = GetCurrentUser();
-            Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(id);
-
-            UserAccount targetUser = DatabaseHelpers.Context.QueryByDisplayID<UserAccount>(userDisplayId);
-            if (targetUser == null)
-                return NotFound();
-
-            if (user.ID != targetUser.ID)
-            {
-                DatabaseHelpers.Events.RemoveUserAsHost(targetUser, targetEvent);
-            }
-
-            return Redirect(targetEvent.GetUrl() + "/hosts");
-        }
 
         /// <summary>
         /// Displays the settings of an event.
@@ -348,74 +282,13 @@ namespace VoteMyst.Controllers
             }
         }
 
-        /// <summary>
-        /// Casts a vote on the specified entry.
-        /// </summary>
-        [HttpPost]
-        [Route("vote/cast/{entryDisplayId}")]
-        public IActionResult CastVote(string entryDisplayId)
+        [Route("events/{id}/reports")]
+        [CheckEventExists]
+        [RequireEventPermission(EventPermissions.ManageEntries)]
+        public IActionResult Reports(string id)
         {
-            // Disallow anonymous voting
-            if (!User.Identity.IsAuthenticated)
-                return Forbid();
-
-            Entry entry = DatabaseHelpers.Context.QueryByDisplayID<Entry>(entryDisplayId);
-            Event entryEvent = entry.Event;
-
-            UserAccount user = GetCurrentUser();
-            UserAccount author = entry.Author;
-            
-            // Disallow voting on own posts
-            if (user.ID == author.ID)
-                return Unauthorized();
-
-            // Only allow voting while its open
-            if (entryEvent.GetCurrentState() != EventState.Voting)
-                return Unauthorized();
-
-            Vote vote = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, entry);
-            Console.WriteLine(vote);
-
-            // Make sure a vote by the user on the specified entry does not exist yet
-            if (vote != null)
-                return Ok(new VoteActionResult(false, true));
-            
-            // If all checks passed, cast the vote
-            DatabaseHelpers.Votes.AddVote(entry, user);
-
-            _logger.LogInformation("User {0} cast a vote on the entry with ID {1}.", user.Username, entryDisplayId);
-
-            return Ok(new VoteActionResult(true, true));
-        }
-        
-        /// <summary>
-        /// Removes the vote on the specified entry.
-        /// </summary>
-        [HttpPost]
-        [Route("vote/remove/{entryDisplayId}")]
-        public IActionResult RemoveVote(string entryDisplayId)
-        {
-            // Disallow anonymous voting
-            if (!User.Identity.IsAuthenticated)
-                return Forbid();
-                
-            UserAccount user = GetCurrentUser();
-            Entry entry = DatabaseHelpers.Context.QueryByDisplayID<Entry>(entryDisplayId);
-            Vote vote = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, entry);
-            Event entryEvent = entry.Event;
-
-            // Only allow deleting votes if voting is still open
-             if (entryEvent.GetCurrentState() != EventState.Voting)
-                return Unauthorized();
-
-            // Make sure a vote exists that can be deleted
-            if (vote == null)
-                return Ok(new VoteActionResult(false, false));
-
-            _logger.LogInformation("User {0} removed their vote on the entry with ID {1}.", user.Username, entryDisplayId);
-
-            DatabaseHelpers.Votes.DeleteVote(vote);
-            return Ok(new VoteActionResult(true, false));
+            Event e = DatabaseHelpers.Events.GetEventByUrl(id);
+            return View(e);
         }
     }
 }
