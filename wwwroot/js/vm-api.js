@@ -91,6 +91,7 @@ function showEntryMenu(element, canReport, canDelete) {
 
     let items = [{
         content: "Copy Link",
+        consumed: "Link copied!",
         icon: "fa-link",
         action: async function() {
             let url = location.protocol + '//' + location.host+location.pathname + "#" + post.id;

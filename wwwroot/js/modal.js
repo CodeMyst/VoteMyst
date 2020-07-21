@@ -19,6 +19,7 @@
     - items (array): An array of items that are displayed
         - icon (string): The FA class of the desired icon.
         - content (string): The text in the item.
+        - consumed (string): The text to shown once the item is consumed.
         - action (function): The action to execute when the option is used.
         - enabled (bool) [true]: If false, pressing the option won't do anything.
         - style (string): A CSS string for content styling.
@@ -113,7 +114,15 @@ function showContextMenu(config) {
                     if (item.action) {
                         item.action();
                     }
-                    contextMenu.blur();
+
+                    if (item.consumed) {
+                        contextItem.querySelector(".content").innerHTML = item.consumed;
+                        contextItem.classList.add("disabled");
+                        contextItem.removeEventListener("click");
+                    }
+                    else {
+                        contextMenu.blur();
+                    }
                 });
             }
 
