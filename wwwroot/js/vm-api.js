@@ -85,6 +85,66 @@ function toggleVote(element) {
     document.activeElement = null;
 }
 
+function showEntryMenu(element, canReport, canDelete) {
+    const post = element.closest('.post');
+    let rect = element.getBoundingClientRect();
+
+    let items = [{
+        content: "Copy Link",
+        icon: "fa-link",
+        action: async function() {
+            let url = location.protocol + '//' + location.host+location.pathname + "#" + post.id;
+            await navigator.clipboard.writeText(url);
+        } 
+    }, {
+        content: "Report Post",
+        icon: "fa-flag",
+        style: "warning",
+        enabled: canReport,
+        action: () => reportPost(post)
+    }];
+
+    if (canDelete) {
+        items.push({
+            icon: "fa-trash",
+            content: "Delete Post",
+            style: "warning",
+            action: () => deletePostConfirm(post)
+        })
+    }
+
+    showContextMenu({
+        positionX: rect.x + rect.width,
+        positionY: rect.y,
+        items: items
+    });
+}
+
+function deletePostConfirm(post) {
+    promptModal({
+        title: "Delete post",
+        content: "Are you sure you want to delete this post?<br><b>This action cannot be undone.</b>",
+        width: 450,
+        buttons: [{
+            content: "Yes",
+            style: "ok",
+            action: () => deletePost(post),
+        }, {
+            content: "No",
+            style: "cancel"
+        }]
+    })
+}
+function deletePost(post) {
+    fetch(`/api/entry/${post.id}/delete`, buildApiPostBody())
+        .then(result => {
+            if (result.ok) {
+                post.remove();
+            }
+        })
+        .catch();
+}
+
 // -- Events --
 
 
@@ -93,8 +153,7 @@ function toggleVote(element) {
 
 // -- Reports --
 
-function reportPost(element) {
-    const post = element.closest('.post');
+function reportPost(post) {
     promptModal({
         title: "Report post",
         content:
@@ -116,14 +175,15 @@ function reportPost(element) {
                 fetch(`/api/reports/submit`, requestBody)
                     .then(result => {
                         if (result.ok) {
-                            post.querySelector(".report").remove();
                             promptModal({
                                 title: "Report submitted",
                                 content: "Thank you for submitting the report. A staff member has been notified and will look into the matter shortly.",
                                 width: 450,
+                                closeable: false,
                                 buttons: [{
                                     content: "Got it!",
-                                    style: "ok"
+                                    style: "ok",
+                                    action: () => window.location.reload()
                                 }]
                             })
                         }
@@ -138,7 +198,7 @@ function reportPost(element) {
 }
 
 function deleteReportedPost() {
-    executeActionForReport(event.target.closest(".report"), "delete");
+    executeActionForReport(event.target.closest(".report"), "approve");
 }
 function rejectReport() {
     executeActionForReport(event.target.closest(".report"), "reject");

@@ -1,25 +1,33 @@
 /*
     modal.js - Copyright © YilianSource 2020
 
-    Provides functionality to display modal dialog windows.
+    Provides functionality to display modal dialog windows and context menus.
 
-    Options:
+    Modal Config:
     - title (string): The title of the modal window.
     - content (string): The text inside the window. HTML content possible.
     - closeable (bool) [true]: Should the window be closeable via an 'x' in the top-right?
     - width (number): The desired width in pixels. Note that the window will never exceed 90% of the viewport width.
-    - buttons (array): An array of buttons that should be displayed. These have
-                       the following properties:
+    - buttons (array): An array of buttons that should be displayed. These have the following properties:
         - content (string): The text inside the button.
         - style (string) [default]: The name of the style to use (default/ok/cancel).
         - action (function): The action to execute when the button is pressed.
         - close (bool) [true]: Should the window be closed after the button press?
+
+    Context Menu Config:
+    - positionX, positionY (number): If not set, the cursor position will be used as the origin.
+    - items (array): An array of items that are displayed
+        - icon (string): The FA class of the desired icon.
+        - content (string): The text in the item.
+        - action (function): The action to execute when the option is used.
+        - enabled (bool) [true]: If false, pressing the option won't do anything.
+        - style (string): A CSS string for content styling.
+
 */
 
 function promptModal(config) {
     let modalElement = document.createElement("div");
-    modalElement.classList.add("modal");
-    modalElement.classList.add("no-select");
+    modalElement.classList = "modal no-select";
 
     if (config.title) {
         let titleElement = document.createElement("h1");
@@ -83,4 +91,57 @@ function closeModal(modal) {
 }
 function closeAllModals() {
     document.querySelectorAll(".modal").forEach(modal => closeModal(modal));
+}
+
+function showContextMenu(config) {
+    let contextMenu = document.createElement("div");
+    contextMenu.classList = "context-menu no-select";
+    contextMenu.tabIndex = -1;
+    contextMenu.addEventListener("blur", function() {
+        contextMenu.remove();
+    }, true);
+
+    // Items
+    if (config.items) {
+        config.items.forEach(item => {
+            let contextItem = document.createElement("div");
+            let itemEnabled = item.enabled == undefined || item.enabled;
+            contextItem.classList.add("item");
+
+            if (itemEnabled) {
+                contextItem.addEventListener("click", function() {
+                    if (item.action) {
+                        item.action();
+                    }
+                    contextMenu.blur();
+                });
+            }
+
+            if (item.style) {
+                contextItem.classList.add(item.style);
+            }
+            if (!itemEnabled) {
+                contextItem.classList.add("disabled");
+            }
+
+            let inner = "";
+            if (item.icon) {
+                inner += `<i class="fas ${item.icon}"></i>`;
+            }
+            if (item.content) {
+                inner += `<span class="content">${item.content}</span>`;
+            }
+
+            contextItem.innerHTML = inner;
+            contextMenu.appendChild(contextItem);
+        });
+    }
+
+    document.body.appendChild(contextMenu);
+    contextMenu.focus();
+    
+    // Positioning
+    let rect = contextMenu.getBoundingClientRect();
+    contextMenu.style.top = (config.positionY - rect.height) + "px";
+    contextMenu.style.left = config.positionX + "px";
 }
