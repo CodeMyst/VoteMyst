@@ -12,3 +12,19 @@ container.addEventListener("click", e => {
     body.classList.remove('sidebar-open');
     sidebar.removeAttribute("expanded");
 });
+
+// Shows the cookie disclaimer if it hasn't been read yet.
+const cookieStorageKey = 'readCookies';
+const cookieDisclaimer = document.querySelector(".cookie-disclaimer");
+if (localStorage.getItem(cookieStorageKey)) {
+    cookieDisclaimer.remove();
+}
+else {
+    cookieDisclaimer.classList.remove("hidden");
+}
+
+function confirmCookies() {
+    // Confirms that the user read the cookie disclaimer.
+    localStorage.setItem(cookieStorageKey, true);
+    cookieDisclaimer.remove();
+}
