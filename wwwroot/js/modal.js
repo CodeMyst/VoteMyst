@@ -24,6 +24,10 @@
         - enabled (bool) [true]: If false, pressing the option won't do anything.
         - style (string): A CSS string for content styling.
 
+    Notification Config:
+    - content (string): The content of the notification.
+    - duration (number) [5]: The duration that the notification is visible for, before fading out.
+    - style (string) [blank]: The name of the style to use (blank/success/error/warning).
 */
 
 function promptModal(config) {
@@ -115,14 +119,7 @@ function showContextMenu(config) {
                         item.action();
                     }
 
-                    if (item.consumed) {
-                        contextItem.querySelector(".content").innerHTML = item.consumed;
-                        contextItem.classList.add("disabled");
-                        contextItem.removeEventListener("click");
-                    }
-                    else {
-                        contextMenu.blur();
-                    }
+                    contextMenu.blur();
                 });
             }
 
@@ -153,4 +150,25 @@ function showContextMenu(config) {
     let rect = contextMenu.getBoundingClientRect();
     contextMenu.style.top = (config.positionY - rect.height) + "px";
     contextMenu.style.left = config.positionX + "px";
+}
+
+const notificationContainer = document.querySelector("#notifications");
+
+function showNotification(config) {
+    let notification = document.createElement("div");
+    notification.classList.add("notification");
+
+    let style = config.style ?? "blank";
+    notification.classList.add(style);
+
+    let duration = config.duration ?? 5;
+    notification.style = `animation: popup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), popup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) ${duration - 0.5}s 1 reverse;`;
+
+    if (config.content) {
+        notification.innerHTML = config.content;
+    }
+
+    notificationContainer.appendChild(notification);
+
+    window.setTimeout(() => notification.remove(), duration * 1000);
 }
