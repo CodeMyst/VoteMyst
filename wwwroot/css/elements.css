@@ -190,3 +190,57 @@
 .inline-form > * {
     margin: 0.3rem 0;
 }
+
+.cookie-disclaimer {
+    position: fixed;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    box-sizing: border-box;
+
+    margin: auto;
+    padding: 1rem;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    width: 800px;
+    max-width: 90vw;
+
+    border-radius: 0.5rem;
+    color: var(--color-light-gray);
+    background-color: var(--color-dark-gray);
+    box-shadow: 4px 4px 8px rgb(0, 0, 0, 0.1);
+}
+.cookie-disclaimer.hidden {
+    display: none;
+}
+.cookie-disclaimer h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 2rem;
+    margin: 0 0 0.3rem 0;
+}
+.cookie-disclaimer p {
+    font-size: 0.9rem;
+    line-height: 1.4rem;
+    margin: 0;
+}
+.cookie-disclaimer .ok {
+    cursor: pointer;
+    background-color: var(--color-success-text);
+    color: var(--color-nano);
+    font-weight: bold;
+    padding: 0.3rem 1rem;
+    text-align: center;
+    border-radius: 1rem;
+}
+
+@media (max-width: 640px) {
+    .cookie-disclaimer {
+        flex-direction: column;
+    }
+    .cookie-disclaimer p {
+        margin-bottom: 0.5rem;
+    }
+}
