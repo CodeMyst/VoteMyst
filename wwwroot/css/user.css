@@ -24,11 +24,10 @@
     letter-spacing: 0.05em;
 }
 
+
 .login-widget {
-    background-color: var(--color-service-discord);
 }
 .login-widget:hover {
-    background-color: var(--color-dark-gray);
 }
 .login-widget img {
     height: 80%;
@@ -37,6 +36,63 @@
 .login-widget p {
     margin: auto 0px auto 15px;
     color: var(--color-white);
+}
+
+.login-container {
+    padding: 1rem 2rem;
+    max-width: 500px;
+    margin: auto;
+    border: 1px solid var(--color-gray);
+    border-radius: 1rem;
+}
+.login-container h1 {
+    font-size: 1.4rem;
+    line-height: 2rem;
+    margin: 0.5rem 0;
+}
+.login-container p.sub {
+    font-size: 0.8rem;
+    line-height: 1.4rem;
+}
+.oauth-services {
+
+}
+.oauth-service {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+    box-sizing: border-box;
+    width: 50%;
+    height: 48px;
+    border-radius: 24px;
+    padding: 4px;
+    margin: 6px auto;
+    color: white;
+    background-color: var(--color-gray);
+}
+.oauth-service:hover {
+    background-color: var(--color-dark-gray);
+}
+.oauth-service img {
+    height: 100%;
+    margin: auto 0.3rem auto 25%;
+}
+.oauth-service span {
+    display: block;
+    margin: auto auto auto 0.3rem;
+}
+.oauth-discord {
+    background-color: var(--color-service-discord);
+}
+.oauth-itch {
+    background-color: var(--color-service-itch);
+}
+
+@media (max-width: 640px) {
+    .oauth-service {
+        width: 100%;
+    }
 }
 
 

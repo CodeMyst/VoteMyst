@@ -1,0 +1,25 @@
+@using VoteMyst.OAuth
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+
+<div class="login-container">
+    <h1 class="login-note">Please select a service you want to create an account through.</h1>
+    <p class="sub">Your initial username and avatar will be retrieved via this service. You can always change those later.</p>
+
+    <p><b>Already have an account here?</b> Then sign in via the service you used to create the account with.</p>
+
+    <div class="oauth-services">
+        @foreach (OAuthService service in OAuthProvider.Services)
+        {
+            <a href="/login/@service.AssociatedService">
+                <div class="oauth-service oauth-@(service.Identifier.ToLower())">
+                    <img draggable="false" src="@service.IconUrl"/>
+                    <span>@service.DisplayName</span>
+                </div>
+            </a>
+        }
+    </div>
+</div>

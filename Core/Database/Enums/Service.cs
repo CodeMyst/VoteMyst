@@ -2,6 +2,7 @@ namespace VoteMyst.Database
 {
     public enum Service
     {
-        Discord
+        Discord,
+        Itch
     }
 }

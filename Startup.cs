@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
+using VoteMyst.OAuth;
 using VoteMyst.Database;
 
 namespace VoteMyst
@@ -41,61 +42,7 @@ namespace VoteMyst
             services.AddRouting(options => options.LowercaseUrls = true );
             services.AddMvc(options => options.EnableEndpointRouting = false );
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "Discord";
-            })
-
-            .AddCookie(options =>
-            {
-                options.ExpireTimeSpan = new TimeSpan (7, 0, 0, 0);
-                options.Cookie = new CookieBuilder ()
-                {
-                    Name = "DiscordCookie"
-                };
-            })
-
-            .AddOAuth ("Discord", options =>
-            {
-                options.ClientId = Configuration["Discord:ClientId"];
-                options.ClientSecret = Configuration["Discord:ClientSecret"];
-                options.CallbackPath = new PathString("/signin-discord");
-                options.AccessDeniedPath = new PathString("/");
-
-                options.AuthorizationEndpoint = "https://discordapp.com/api/oauth2/authorize";
-                options.TokenEndpoint = "https://discordapp.com/api/oauth2/token";
-                options.UserInformationEndpoint = "https://discordapp.com/api/users/@me";
-
-                options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id", ClaimValueTypes.UInteger64);
-                options.ClaimActions.MapJsonKey(ClaimTypes.Name, "username", ClaimValueTypes.String);
-                options.ClaimActions.MapJsonKey("urn:discord:discriminator", "discriminator", ClaimValueTypes.UInteger32);
-                options.ClaimActions.MapJsonKey("urn:discord:avatar", "avatar", ClaimValueTypes.String);
-                options.ClaimActions.MapJsonKey("urn:discord:verified", "verified", ClaimValueTypes.Boolean);
-
-                options.SaveTokens = true;
-
-                options.Events = new OAuthEvents
-                {
-                    OnCreatingTicket = async context =>
-                    {
-                        var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
-                        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
-
-                        var response = await context.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, context.HttpContext.RequestAborted);
-                        response.EnsureSuccessStatusCode();
-
-                        var user = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
-
-                        context.RunClaimActions(user.RootElement);
-                    }
-                };
-
-                options.Scope.Add("identify");
-                options.Scope.Add("guilds");
-            });
+            services.AddAuthenticationServices();
 
             services.AddDbContext<VoteMystContext>(options => options
                 .UseMySql(Configuration["MySQLConnection"])

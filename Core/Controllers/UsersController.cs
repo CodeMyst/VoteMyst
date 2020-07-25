@@ -43,7 +43,7 @@ namespace VoteMyst.Controllers
 
             _logger.LogWarning("{0} wiped their account.", selfUser);
 
-            return Logout();
+            return Redirect("/logout");
         }
 
         /// <summary>
@@ -61,25 +61,6 @@ namespace VoteMyst.Controllers
             }
 
             return View(queryResult);
-        }
-        
-        /// <summary>
-        /// Provides the endpoint to log in via authorization methods. Redirects to "/users/me" afterwards.
-        /// </summary>
-        [Route("login")]
-        public IActionResult Login()
-        {
-            return Challenge(new AuthenticationProperties { RedirectUri = "/users/me" });
-        }
-
-        /// <summary>
-        /// Provides the endpoint to log out from the current session. This also clears the session cookies.
-        /// </summary>
-        [Route("logout")]
-        public IActionResult Logout()
-        {
-            Response.Cookies.Delete("DiscordCookie");
-            return RedirectToAction("Index", "Home");
         }
 
         /// <summary>

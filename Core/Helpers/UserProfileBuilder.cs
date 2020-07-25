@@ -1,10 +1,13 @@
+using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
 
 using Microsoft.AspNetCore.Hosting;
 
 using VoteMyst.Database;
+using VoteMyst.OAuth;
 
 namespace VoteMyst
 {
@@ -24,34 +27,52 @@ namespace VoteMyst
             if (!principal.Identity.IsAuthenticated)
                 return _helpers.Users.Guest();
 
+            // Find the required claim values
             string nameIdentifier = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (principal.Identity.AuthenticationType == "Discord") 
+            string name = principal.FindFirstValue(ClaimTypes.Name);
+            string avatar = principal.FindFirstValue("avatar");
+
+            // Retrieve the appropriate authentication service via the AuthenticationType
+            OAuthService authService = OAuthProvider.GetService(principal.Identity.AuthenticationType);
+            if (authService == null)
+                throw new InvalidOperationException($"Invalid authentication type. Valid types are {string.Join(", ", OAuthProvider.AvailableTypes)}.");
+
+            UserAccount user = _helpers.Authorization.GetAuthorizedUser(authService.AssociatedService, nameIdentifier);
+            if (user == null)
             {
-                UserAccount user = _helpers.Authorization.GetAuthorizedUser(Service.Discord, nameIdentifier);
-                if (user == null) 
+                // A user account does not exist yet; we need to create one
+                user = _helpers.Users.NewUser(name);
+
+                if (!string.IsNullOrEmpty(avatar)) 
                 {
-                    user = _helpers.Users.NewUser(principal.FindFirstValue(ClaimTypes.Name));
+                    // Locate the avatar URL
+                    string avatarUrl = null;
+                    string targetPath = Path.Combine(_environment.WebRootPath, $"assets/avatars/{user.DisplayID}.png");
 
-                    string discordAvatar = principal.FindFirstValue("urn:discord:avatar");
-                    if (!string.IsNullOrEmpty(discordAvatar))
+                    switch (authService.AssociatedService)
                     {
-                        // Download the avatar image
-                        string sourceUrl = $"https://cdn.discordapp.com/avatars/{nameIdentifier}/{discordAvatar}.png";
-                        string targetPath = Path.Combine(_environment.WebRootPath, $"assets/avatars/{user.DisplayID}.png");
-
-                        Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
-                        using (var client = new WebClient())
-                        {
-                            client.DownloadFile(sourceUrl, targetPath);
-                        }
+                        case Service.Discord:
+                            // The source URL is a combination of the user ID and the avatar hash.
+                            // Source: https://discord.com/developers/docs/reference#image-formatting
+                            avatarUrl = $"https://cdn.discordapp.com/avatars/{nameIdentifier}/{avatar}.png";
+                            break;
+                        case Service.Itch:
+                            avatarUrl = avatar;
+                            break;
                     }
 
-                    _helpers.Authorization.AddAuthorizedUser(user, nameIdentifier.ToString(), Service.Discord);
+                    Console.WriteLine(avatarUrl);
+
+                    // Ensure a directory for avatars exists
+                    Directory.CreateDirectory(Path.GetDirectoryName(targetPath));
+                    using var client = new WebClient();
+                    client.DownloadFile(avatarUrl, targetPath);
                 }
-                return user;
+
+                _helpers.Authorization.AddAuthorizedUser(user, nameIdentifier, authService.AssociatedService);
             }
-            
-            return null;
+
+            return user;
         }
 
         public UserAccount FromId(string displayId)

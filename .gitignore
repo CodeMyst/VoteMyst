@@ -6,3 +6,4 @@ obj/
 *.csproj.user
 assets/
 appsettings.json
+oauth.json
