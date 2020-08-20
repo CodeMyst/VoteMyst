@@ -101,6 +101,7 @@
 
 .user-profile {
     display: flex;
+    position: relative;
     flex-direction: row;
     margin: 3rem 0;
 }

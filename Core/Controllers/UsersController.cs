@@ -34,6 +34,25 @@ namespace VoteMyst.Controllers
         }
 
         /// <summary>
+        /// Provides the endpoint to log in via authorization methods. Redirects to "/users/me" afterwards.
+        /// </summary>
+        [Route("login")]
+        public IActionResult Login()
+        {
+            return Challenge(new AuthenticationProperties { RedirectUri = "/users/me" });
+        }
+
+        /// <summary>
+        /// Provides the endpoint to log out from the current session. This also clears the session cookies.
+        /// </summary>
+        [Route("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("DiscordCookie");
+            return RedirectToAction("Index", "Home");
+        }
+
+        /// <summary>
         /// Wipes the data of the current user and subsequentially logs him out.
         /// </summary>
         public IActionResult WipeAccount() 
@@ -61,25 +80,6 @@ namespace VoteMyst.Controllers
             }
 
             return View(queryResult);
-        }
-        
-        /// <summary>
-        /// Provides the endpoint to log in via authorization methods. Redirects to "/users/me" afterwards.
-        /// </summary>
-        [Route("login")]
-        public IActionResult Login()
-        {
-            return Challenge(new AuthenticationProperties { RedirectUri = "/users/me" });
-        }
-
-        /// <summary>
-        /// Provides the endpoint to log out from the current session. This also clears the session cookies.
-        /// </summary>
-        [Route("logout")]
-        public IActionResult Logout()
-        {
-            Response.Cookies.Delete("DiscordCookie");
-            return RedirectToAction("Index", "Home");
         }
 
         /// <summary>
@@ -210,6 +210,21 @@ namespace VoteMyst.Controllers
 
             DatabaseHelpers.Context.UpdateAndSave(targetUser);
 
+            return targetUser.ID == selfUser.ID
+                ? RedirectToAction("me")
+                : RedirectToAction("display", new { id });
+        }
+        
+        public IActionResult RefreshDataFromService(string id)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+
+            UserAccount targetUser = ProfileBuilder.FromId(id);
+            UserAccount selfUser = GetCurrentUser();
+
+            ProfileBuilder.UpdateDataFromService(User);
+            
             return targetUser.ID == selfUser.ID
                 ? RedirectToAction("me")
                 : RedirectToAction("display", new { id });

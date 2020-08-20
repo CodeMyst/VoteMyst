@@ -14,11 +14,11 @@ body {
 }
 
 body::-webkit-scrollbar {
-    width: 10px;
+    width: 12px;
 }
 ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
     background: var(--color-dark-gray);
