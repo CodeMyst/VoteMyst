@@ -52,15 +52,19 @@
                 <a id="removeAvatar" href="#">Remove</a>
             </td>
         </tr>
-        <tr>
-            <th></th>
-            <td>
-                <a class="button" asp-controller="users" asp-action="refreshdatafromservice"
-                    asp-route-id="@Model.DisplayID">
-                    Update Username & Avatar via Discord
-                </a>
-            </td>
-        </tr>
+
+        @if (selfUser == Model)
+        {
+            <tr>
+                <th></th>
+                <td>
+                    <button type="submit" formaction="/users/@(Model.DisplayID)/refreshdatafromservice"
+                        method="post">
+                        Update Username & Avatar via Discord
+                    </button>
+                </td>
+            </tr>
+        }
 
         @if (selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers))
         {

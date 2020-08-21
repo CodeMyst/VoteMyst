@@ -215,6 +215,8 @@ namespace VoteMyst.Controllers
                 : RedirectToAction("display", new { id });
         }
         
+        [HttpPost]
+        [Route("users/{id}/refreshdatafromservice")]
         public IActionResult RefreshDataFromService(string id)
         {
             if (!User.Identity.IsAuthenticated)
@@ -223,11 +225,14 @@ namespace VoteMyst.Controllers
             UserAccount targetUser = ProfileBuilder.FromId(id);
             UserAccount selfUser = GetCurrentUser();
 
+            if (targetUser != selfUser)
+                return Unauthorized();
+
             ProfileBuilder.UpdateDataFromService(User);
+
+            _logger.LogInformation("{0} refreshed their data from Discord.", selfUser);
             
-            return targetUser.ID == selfUser.ID
-                ? RedirectToAction("me")
-                : RedirectToAction("display", new { id });
+            return RedirectToAction("me");
         }
     }
 }
