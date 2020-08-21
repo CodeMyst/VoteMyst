@@ -100,7 +100,16 @@ namespace VoteMyst.Database
                 .Where(x => x.VoteEndDate > DateTime.UtcNow)
                 .OrderBy(x => x.VoteEndDate)
                 .ToArray();
-        
+
+        /// <summary>
+        /// Retrieves all events that are planned and visible by everyone.
+        /// </summary>
+        /// <returns></returns>
+        public Event[] GetPlannedEvents()
+            => context.Events
+                .Where(x => x.StartDate > DateTime.UtcNow && x.RevealDate <= DateTime.UtcNow)
+                .ToArray();
+
         /// <summary>
         /// Retrieves all events that are planned and visible by the given user.
         /// </summary>
