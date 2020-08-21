@@ -10,6 +10,9 @@
         <div class="event-info">
             <span class="event-header">
                 <h1 class="event-title">@Model.Title</h1>
+                <span class="event-type event-@Model.EventType.ToString().ToLower()">
+                    @Model.EventType
+                </span>
                 <span class="event-timestamp">@Model.StartDate.ToString("MMMM yyyy")</span>
                 @if (eventState == EventState.Hidden)
                 {

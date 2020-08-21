@@ -10,6 +10,10 @@
 
     UserAccount currentUser = ProfileBuilder.FromPrincipal(User);
     Event[] observableHiddenEvents = Model[EventState.Hidden].Where(e => DatabaseHelpers.Events.CanViewHiddenEvent(currentUser, e)).ToArray();
+
+    bool showActiveEvents = (Model[EventState.Ongoing].Count() + Model[EventState.Voting].Count()) > 0;
+    bool showPlannedEvents = Model[EventState.Revealed].Count() > 0 || observableHiddenEvents.Length > 0;
+    bool showClosedEvents = Model[EventState.Closed].Count() > 0;
 }
 
 @if (currentUser.Permissions.HasFlag(GlobalPermissions.CreateEvents))
@@ -20,7 +24,7 @@
 }
 
 <div class="events">
-    @if ((Model[EventState.Ongoing].Count() + Model[EventState.Voting].Count()) > 0)
+    @if (showActiveEvents)
     {
         <div class="events-active">
             <h1>Active events</h1>
@@ -32,7 +36,11 @@
             </div>
         </div>
     }
-    @if (Model[EventState.Revealed].Count() > 0 || observableHiddenEvents.Length > 0)
+    @if (showActiveEvents && showPlannedEvents)
+    {
+        <hr>
+    }
+    @if (showPlannedEvents)
     {
         <div class="events-planned">
             <h1>Planned events</h1>
@@ -48,7 +56,11 @@
             </div>
         </div>
     }
-    @if (Model[EventState.Closed].Count() > 0)
+    @if (showPlannedEvents && showClosedEvents)
+    {
+        <hr>
+    }
+    @if (showClosedEvents)
     {
         <div class="events-finished">
             <h1>Finished events</h1>

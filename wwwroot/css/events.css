@@ -30,6 +30,20 @@
 .event .event-info .event-header > *{
     padding-right: 0.5rem;
 }
+.event .event-info .event-header .event-type {
+    padding: 0.05rem 0.9rem;
+    margin: 0.4rem 0 auto 0;
+    border-radius: 0.8rem;
+    border: 1px solid white;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.8rem;
+    letter-spacing: 0.08rem;
+}
+.event .event-art {
+    color: var(--color-event-art) !important;
+    border-color: var(--color-event-art) !important;
+}
 .event .event-timestamp {
     color: var(--color-light-gray);
     margin: 0 0 auto auto;
