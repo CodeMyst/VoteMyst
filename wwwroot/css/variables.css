@@ -8,14 +8,16 @@
     --color-badge-admin: #9a90ff;
     --color-badge-moderator: #90ff99;
     --color-badge-betatester: #d0d83d;
-    --color-badge-banned: #bd1c1c;
+    --color-badge-banned: #ac2727;
     --color-service-discord: #7289DA;
     --color-event-art: #71e4be;
 
+    --default-border-radius: 0.3rem;
     --user-widget-height: 48px;
-    --panel-border-radius: 0.3rem;
     --sidebar-width: 200px;
     --sidebar-toggle-duration: 0.2s;
+
+    --border-drop-shadow: 3px solid var(--color-drop-shadow);
 
     font-size: 16px;
     line-height: 24px;

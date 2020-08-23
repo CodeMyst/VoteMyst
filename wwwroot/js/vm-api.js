@@ -46,7 +46,7 @@ function getEntryId(post) {
     return post.getAttribute("id");
 }
 function castVote(element) {
-    const post = element.closest('.post');
+    const post = element.closest('.entry');
     if (!element.hasAttribute(votedAttribute)) {
         fetch(`/api/entry/${getEntryId(post)}/votes/cast`, buildApiPostBody())
             .then(jsonOrReject)
@@ -61,7 +61,7 @@ function castVote(element) {
     }
 }
 function removeVote(element) {
-    const post = element.closest('.post');
+    const post = element.closest('.entry');
     if (element.hasAttribute(votedAttribute)) {
         fetch(`/api/entry/${getEntryId(post)}/votes/remove`, buildApiPostBody())
             .then(jsonOrReject)
@@ -86,7 +86,7 @@ function toggleVote(element) {
 }
 
 function showEntryMenu(element, canReport, canDelete) {
-    const post = element.closest('.post');
+    const post = element.closest('.entry');
     let rect = element.getBoundingClientRect();
 
     let items = [{

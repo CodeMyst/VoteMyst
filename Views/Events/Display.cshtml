@@ -26,16 +26,16 @@
 
 @if (eventState != EventState.Revealed)
 {
-    <div class="post-display-options">
-        <div id="post-display-option-large"><img src="/img/post-display-large.svg"/></div>
-        <div id="post-display-option-middle"><img src="/img/post-display-middle.svg"/></div>
-        <div id="post-display-option-small"><img src="/img/post-display-smallest.svg"/></div>
+    <div class="entry-display-options">
+        <div id="entry-display-option-large"><img src="/img/post-display-large.svg"/></div>
+        <div id="entry-display-option-middle"><img src="/img/post-display-middle.svg"/></div>
+        <div id="entry-display-option-small"><img src="/img/post-display-smallest.svg"/></div>
     </div>
 }
 
 @if (eventState == EventState.Ongoing || eventState == EventState.Voting)
 {
-    <div class="posts">
+    <div class="entries">
         @foreach (var e in entries)
         {
             <partial name="_Entry" for="@e" />
@@ -48,7 +48,7 @@
 
     <h2>Leaderboard</h2>
     <div class="leaderboard">
-        <div class="posts">
+        <div class="entries">
             @foreach (var place in leaderboard)
             {
                 <partial name="_EntryPlace" for="@place" />
@@ -59,7 +59,7 @@
     @if (leaderboard.NotEligable != null && leaderboard.NotEligable.Length > 0)
     {
         <h2>Not eligible to win</h2>
-        <div class="posts">
+        <div class="entries">
             @foreach (var e in leaderboard.NotEligable)
             {
                 <partial name="_Entry" for="@e" />

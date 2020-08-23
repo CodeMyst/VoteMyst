@@ -14,8 +14,8 @@
 /* Styling for the home page */
 @import url(home.css);
 
-/* Styling for entry posts */
-@import url(posts.css);
+/* Styling for entries */
+@import url(entry.css);
 
 /* Styling for event displays */
 @import url(events.css);

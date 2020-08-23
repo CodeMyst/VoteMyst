@@ -1,39 +1,29 @@
-.panel {
-    display: block;
-    position: relative;
-    box-sizing: border-box;
-
-    padding: 1rem;
-    margin: 1rem 0;
-    width: 100%;
-    
-    background-color: var(--color-dark-gray);
-    border-radius: var(--panel-border-radius);
-}
-.panel.small {
+.message {
+    padding: 0.8rem 1.6rem;
     width: 100%;
     max-width: 640px;
+    color: var(--color-white);
+    border-bottom: 2px solid var(--color-drop-shadow);
+    border-radius: var(--default-border-radius);
 }
-.panel.message {
-    padding: 0.8rem 1.6rem;
-}
-.panel > * {
+.message > * {
     margin: 0;
 }
 .message.success {
-    background-color: var(--color-success-panel);
+    background-color: var(--color-success);
 }
 .message.warning {
-    background-color: var(--color-warning-panel);
+    background-color: var(--color-warning);
+    color: var(--color-nano);
 }
 .message.error {
-    background-color: var(--color-error-panel);
+    background-color: var(--color-error);
 }
 .disclaimer {
     margin: 1rem 0;
     padding: 0 2rem;
     font-size: 0.9rem;
-    color: var(--color-light-gray);
+    color: var(--color-gray-5);
     white-space: normal;
 }
 
@@ -209,7 +199,7 @@
     font-size: 0.9rem;
     white-space: normal;
 }
-.flag-container input {
+.flag-container .checkbox {
     margin: auto 0.5rem auto auto;
 }
 

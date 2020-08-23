@@ -1,10 +1,10 @@
-.post-display-options {
+.entry-display-options {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     margin: 1rem 0;
 }
-.post-display-options > div {
+.entry-display-options > div {
     transition: opacity 0.2s;
     opacity: 0.3;
     border-radius: 4px;
@@ -13,69 +13,60 @@
     margin: 0 5px;
     cursor: pointer;
 }
-.post-display-options > div > img {
+.entry-display-options > div > img {
     width: 100%;
 }
-.post-display-options > div.active, .post-display-options > div:hover {
+.entry-display-options > div.active, .entry-display-options > div:hover {
     opacity: 1;
 }
 
-.posts {    
+.entries {    
     display: grid;
     margin: 1rem 0;
     grid-gap: 6vmin;
     grid-template-columns: repeat(2, auto);
     grid-template-rows: auto;
 }
-.posts-aspect-large {
+.entry-aspect-large {
     grid-template-columns: repeat(1, 1fr);
 }
-.posts-aspect-middle {
+.entry-aspect-middle {
     grid-template-columns: repeat(2, 1fr);
 }
-.posts-aspect-small {
+.entry-aspect-small {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.posts-aspect-large .post-image {
-    padding: 1rem 0 !important;
-}
-.posts-aspect-large .post-image img {
-    position: initial !important;
-    max-height: 90vh !important;
+.entry-aspect-large .entry-image {
+    max-height: 60vh;
 }
 
 @media (max-width: 640px) {
-    .post-display-options {
+    .entry-display-options {
         display: none;
     }
 
     /* Achieve the effect of adding the 'post-aspect-large' class. */
-    .posts {
+    .entries {
         grid-template-columns: repeat(1, 1fr);
     }
-    .post-image {
-        padding: 1rem 0 !important;
-    }
-    .post-image img {
-        position: initial !important;
-        max-height: 90vh !important;
+    .entry-image {
+        max-height: 60vh;
     }
 }
 
-.post {
+.entry {
     display: flex;
     position: relative;
     flex-direction: column;
-    background-color: var(--color-dark-gray);
+    background-color: var(--color-gray-0);
     margin: auto 0;
-    height: fit-content;
     width: 100%;
     border-radius: 10px;
     overflow: hidden;
     box-sizing: border-box;
 }
-.post .post-user, .post .post-toolbar {
+.entry .entry-user, .entry .entry-toolbar {
     display: flex;
     flex-direction: row;
     cursor: default;
@@ -83,55 +74,60 @@
     margin: 0.4rem 0.8rem;
     height: 32px;
 }
-.post .post-user > a {
+.entry .entry-user > a {
     display: inherit;
 }
-.post .post-user .avatar {
+.entry .entry-user .avatar {
     height: 32px;
     width: 32px;
 }
-.post .post-user .avatar > p {
+.entry .entry-user .avatar > p {
     font-size: 0.9rem;
 }
-.post .post-user .username {
+.entry .entry-user .username {
     font-size: 0.9rem;
     margin: auto 0.4rem;
     color: var(--color-white);
 }
-.post .post-user .post-date {
+.entry .entry-user .entry-date {
     font-size: 0.8rem;
     margin: auto 0 auto auto;
     color: var(--color-light-gray);
 }
-.post .post-image {
+.entry .entry-image {
     width: 100%;
-    padding-top: 100%;
+    margin: 0.5rem 0;
     position: relative;
 }
-.post .post-image img {
+.entry .entry-image img {
     display: block;
     position: absolute;
     top: 0; left: 0;
-    bottom: 0; right: 0;
+    right: 0; bottom: 0;
     margin: auto;
     border-radius: 0.5rem;
     max-width: 95%;
-    max-height: 95%;
+    max-height: 100%;
 }
-.post .post-toolbar .l {
+.entry-image:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+.entry .entry-toolbar .l {
     margin: auto auto auto 0;
 }
-.post .post-toolbar .r {
+.entry .entry-toolbar .r {
     margin: auto 0 auto auto;
 }
-.post .post-toolbar .menu {
+.entry .entry-toolbar .menu {
     color: var(--color-gray);
     cursor: pointer;
 }
-.post .post-toolbar .menu:hover {
+.entry .entry-toolbar .menu:hover {
     color: var(--color-light-gray);
 }
-.post .vote {
+.entry .vote {
     border: 1px solid var(--color-gray);
     border-radius: 0.5rem;
     padding: 0.3rem 0.6rem;
@@ -140,47 +136,62 @@
     user-select: none;
     transition: border-color 0.2s, color 0.2s;
 }
-.post .vote > *:nth-child(3) {
+.entry .vote > *:nth-child(3) {
     padding-left: 0.2rem;
 }
-.post .vote > *:last-child {
+.entry .vote > *:last-child {
     margin-left: -0.25rem;
     display: none;
 }
 
-.post[self-post] {
+.entry.entry-preview {
+    height: 100px;
+    width: auto;
+    margin: 0.5rem;
+}
+.entry.entry-preview .entry-image {
+    height: inherit;
+    margin: auto;
+}
+.entry.entry-preview .entry-image img {
+    position: relative;
+    max-width: unset;
+    height: 100%;
+}
+
+.entry[self-post] {
     border: 2px solid var(--color-mystge);
 }
-.post:target {
+.entry:target {
     border: 2px solid var(--color-mystlue);
 }
 
-.post .broken-heart {
+.entry .broken-heart {
     display: none;
 }
-.post .vote[voted] > *:last-child {
+.entry .vote[voted] > *:last-child {
     display: inline-block;
 }
 
-.post .vote[voted] {
+.entry .vote[voted] {
     border-color: var(--color-success-text);
     color: var(--color-success-text);
 }
 
 /* Hover effects should not be supported on mobile, due to the sticky :hover effect. */
 @media (hover: hover) {
-    .post .vote:hover {
+    .entry .vote:hover {
         border-color: var(--color-success-text);
         color: var(--color-success-text);
     }
-    .post .vote[voted]:hover {
+    .entry .vote[voted]:hover {
         border-color: var(--color-error-text);
         color: var(--color-error-text);
     }
-    .post .vote[voted]:hover .heart {
+    .entry .vote[voted]:hover .heart {
         display: none;
     }
-    .post .vote[voted]:hover .broken-heart {
+    .entry .vote[voted]:hover .broken-heart {
         display: inline-block;
     }
 }

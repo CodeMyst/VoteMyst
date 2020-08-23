@@ -70,22 +70,27 @@ header h1 .version {
     position: absolute;
     top: 44px;
     right: 0;
-    color: var(--color-gray);
+    color: var(--color-gray-2);
     font-size: 0.9rem;
 }
 
 hr {
-    border-color: var(--color-gray);
+    border-color: var(--color-gray-1);
 }
 hr.thin {
     margin: 0.2rem 0;
-    border-color: var(--color-gray);
 }
 
 footer {
-    margin: 2rem 0;
+    margin: 1.5rem 0;
     text-align: center;
     font-size: 0.9em;
+    background-color: var(--color-gray-0);
+    border-radius: var(--default-border-radius);
+}
+footer p {
+    margin: 0;
+    padding: 0.5rem 0.2rem;
 }
 footer a {
     font-weight: bold;

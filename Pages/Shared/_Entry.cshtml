@@ -20,24 +20,24 @@
     bool canDelete = isSelfPost || user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents) || eventPermissions.HasFlag(EventPermissions.ManageEntries);
 }
 
-<div class="post" id=@Model.DisplayID
+<div class="entry" id=@Model.DisplayID
     @(canVote ? "allow-vote" : "")
     @(isSelfPost ? "self-post" : "") >
     @if(displayUser)
     {
-        <div class="post-user">
+        <div class="entry-user">
             <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayID">
                 <partial name="_Avatar" for="@author" />
                 <p class="username">@author.Username</p>
             </a>
-            <p class="post-date local-date" --unix-timestamp="@Model.SubmitDate.ToUnixSeconds()" --date-only>@Model.SubmitDate.ToString("dd/MM/yyyy")</p>
+            <p class="entry-date local-date" --unix-timestamp="@Model.SubmitDate.ToUnixSeconds()" --date-only>@Model.SubmitDate.ToString("dd/MM/yyyy")</p>
         </div>
     }
-    <div class="post-image">
+    <div class="entry-image">
         <img draggable="false" src="/@Model.GetRelativeUrl()" />
     </div>
 
-    <div class="post-toolbar">
+    <div class="entry-toolbar">
         <span class="l">
             @if (canVote)
             {

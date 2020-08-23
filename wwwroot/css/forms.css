@@ -84,3 +84,42 @@ form .row-layout > div {
 form .row-layout p {
     margin: 0.2rem 0;
 }
+
+
+.checkbox {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 26px;
+    height: 26px;
+    background-color: black;
+    border-radius: 10px;
+    outline: none !important;
+}
+.checkbox > * {
+    width: inherit;
+    height: inherit;
+    margin: 0;
+}
+.checkbox > input[type=checkbox] {
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+.checkbox > div {
+    position: absolute;
+    border: 0 solid var(--color-mystge);
+    border-width: 0 4px 4px 0;
+    border-radius: 3px;
+    opacity: 0;
+    pointer-events: none;
+    width: 6px;
+    height: 12px;
+    top: 5px;
+    left: 8px;
+    transform: rotate(45deg);
+}
+.checkbox > input[type=checkbox]:checked + div {
+    opacity: 1;
+}

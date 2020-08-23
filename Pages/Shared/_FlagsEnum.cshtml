@@ -1,7 +1,6 @@
 @using System.ComponentModel.DataAnnotations
 
 @model Enum
-
 @{
     Type modelType = Model.GetType();
     ulong enumValue = (ulong)(object)Model;
@@ -26,7 +25,7 @@
                     <h1>@(display?.Name ?? value.ToString())</h1>
                     <p>@(display?.Description ?? string.Empty)</p>
                 </div>
-                <input type="checkbox" data-flag="@integerValue" @(hasFlag ? "checked" : "")/>
+                <checkbox checked="@hasFlag" data-flag="@integerValue"/>
             </div>
             <hr>
         }
@@ -36,8 +35,8 @@
 <script>
     const parent = document.currentScript.parentNode;
 
-    const targetField = parent.querySelectorAll("input")[0];
-    const flagFields = Array.from(parent.querySelectorAll("input")).slice(1);
+    const targetField = parent.querySelector("input[type=hidden]");
+    const flagFields = parent.querySelectorAll("input[type=checkbox]");
 
     flagFields.forEach(flag => {
         flag.addEventListener("change", e => {
