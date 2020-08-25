@@ -1,13 +1,14 @@
-@using VoteMyst.Database
-
 @model FeaturedEvents
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Home";
     Layout = "_Layout";
+
+    bool showTopOngoing = Model.TopOngoingEvents.Length > 0;
+    bool showRecentUpcoming = Model.RecentUpcomingEvents.Length > 0;
 }
 
 <div class="events">
-    @if (Model.TopOngoingEvents.Length + Model.RecentUpcomingEvents.Length == 0)
+    @if (!showTopOngoing && !showRecentUpcoming)
     {
         <div class="no-events">
             <h1>It's empty here ...</h1>
@@ -17,7 +18,7 @@
     }
     else
     {
-        if (Model.TopOngoingEvents.Length > 0)
+        if (showTopOngoing)
         {
             <h1>Top Ongoing Events</h1>
     
@@ -31,12 +32,12 @@
             </div>
         }
     
-        if (Model.TopOngoingEvents.Length > 0 && Model.RecentUpcomingEvents.Length > 0)
+        if (showTopOngoing && showRecentUpcoming)
         {
             <hr>
         }
     
-        if (Model.RecentUpcomingEvents.Length > 0)
+        if (showRecentUpcoming)
         {
             <h1>Upcoming Events</h1>
     

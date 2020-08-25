@@ -26,7 +26,7 @@
 
     Notification Config:
     - content (string): The content of the notification.
-    - duration (number) [5]: The duration that the notification is visible for, before fading out.
+    - duration (number) [4]: The duration that the notification is visible for, before fading out.
     - style (string) [blank]: The name of the style to use (blank/success/error/warning).
 */
 
@@ -148,8 +148,12 @@ function showContextMenu(config) {
     
     // Positioning
     let rect = contextMenu.getBoundingClientRect();
-    contextMenu.style.top = (config.positionY - rect.height) + "px";
+    contextMenu.style.top = (config.positionY) + "px";
     contextMenu.style.left = config.positionX + "px";
+
+    if (config.positionX + rect.width > window.innerWidth) {
+        contextMenu.style.left = (config.positionX - rect.width) + "px";
+    }
 }
 
 const notificationContainer = document.querySelector("#notifications");
@@ -158,11 +162,9 @@ function showNotification(config) {
     let notification = document.createElement("div");
     notification.classList.add("notification");
 
+    let duration = config.duration ?? 4;
     let style = config.style ?? "blank";
     notification.classList.add(style);
-
-    let duration = config.duration ?? 5;
-    notification.style = `animation: popup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), popup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) ${duration - 0.5}s 1 reverse;`;
 
     if (config.content) {
         notification.innerHTML = config.content;

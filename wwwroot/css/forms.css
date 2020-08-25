@@ -3,13 +3,18 @@ form {
 }
 
 input[type=text], input[type="date"], input[type="datetime"], input[type="datetime-local"], select, textarea {
-    background-color: var(--color-dark-gray);
+    background-color: var(--color-gray-1);
     color: var(--color-white);
     border: none;
-    border-radius: 0.5rem;
+    border-top: 2px inset var(--color-drop-shadow);
+    border-radius: 0.4rem;
     font-family: inherit;
+    max-width: 100%;
     padding: 0.4rem 0.5rem;
     box-sizing: border-box;
+}
+input[type=text]:hover, input[type="date"]:hover, input[type="datetime"]:hover, input[type="datetime-local"]:hover, select:hover, textarea:hover {
+    background-color: var(--color-gray-2);
 }
 input[type=text], textarea {
     width: 100%;
@@ -46,12 +51,8 @@ button:hover, .button:hover {
     color: var(--color-white);
 }
 
-.form-submit {
-    display: flex;
-}
-.form-submit div {
-    margin: auto 30px;
-    color: var(--color-mysted);
+select option {
+    font-size: 2;
 }
 
 form table {
@@ -80,6 +81,8 @@ form .row-layout div.break {
 }
 form .row-layout > div {
     margin: 0 0.6rem 0.3rem;
+    max-width: 100%;
+    overflow: auto;
 }
 form .row-layout p {
     margin: 0.2rem 0;
@@ -92,16 +95,19 @@ form .row-layout p {
     vertical-align: middle;
     width: 26px;
     height: 26px;
-    background-color: black;
-    border-radius: 10px;
+    min-width: 26px;
+    background-color: var(--color-gray-1);
+    border-top: 2px inset var(--color-drop-shadow);
+    border-radius: 0.4rem;
     outline: none !important;
 }
-.checkbox > * {
+.checkbox:hover {
+    background-color: var(--color-gray-2);
+}
+.checkbox > input[type=checkbox] {
     width: inherit;
     height: inherit;
     margin: 0;
-}
-.checkbox > input[type=checkbox] {
     position: absolute;
     top: 0;
     opacity: 0;
@@ -119,6 +125,10 @@ form .row-layout p {
     top: 5px;
     left: 8px;
     transform: rotate(45deg);
+    box-shadow: 1px 1px 0 black;
+}
+.checkbox:hover > div {
+    border-color: var(--color-mystlue);
 }
 .checkbox > input[type=checkbox]:checked + div {
     opacity: 1;

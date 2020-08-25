@@ -10,9 +10,8 @@
 
     UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
 
-    Entry[] entries = Model.Entries.ToArray();
-    int totalVotes = entries.Sum(e => e.Votes.Count);
-    int totalSubmissions = entries.Length;
+    int totalVotesEarned = Model.Entries.Sum(e => e.Votes.Count);
+    int totalVotesGiven = Model.AuthoredVotes.Count;
 
     bool allowSelfEditing = (selfUser.ID == Model.ID && selfUser.Permissions.HasFlag(GlobalPermissions.ManageSelf)) || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers);
     bool allowLogout = selfUser.ID == Model.ID;
@@ -45,12 +44,12 @@
                 <td>@Model.JoinDate.ToString("dd/MM/yyyy")</td>
             </tr>
             <tr>
-                <th>Events joined:</th>
-                <td>@totalVotes</td>
+                <th>Votes earned:</th>
+                <td>@totalVotesEarned</td>
             </tr>
             <tr>
-                <th>Votes earned:</th>
-                <td>@totalVotes</td>
+                <th>Votes given:</th>
+                <td>@totalVotesGiven</td>
             </tr>
         </table>
         <h1>Event Submissions (@(Model.Entries.Count))</h1>

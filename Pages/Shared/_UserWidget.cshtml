@@ -1,13 +1,8 @@
-@using VoteMyst
-@using VoteMyst.Database
-
-@inject UserProfileBuilder _profileBuilder
-
 @{
-    UserAccount user = User.Identity.IsAuthenticated ? _profileBuilder.FromPrincipal(User) : null;
+    UserAccount user = ViewBag.UserAccount;
 }
 
-@if (user != null)
+@if (!ViewBag.IsGuest)
 {
     <a href="/users/me" class="widget user-widget">
         <partial name="_Avatar" for="@user" />

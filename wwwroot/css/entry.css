@@ -60,6 +60,7 @@
     position: relative;
     flex-direction: column;
     background-color: var(--color-gray-0);
+    border-bottom: var(--border-drop-shadow);
     margin: auto 0;
     width: 100%;
     border-radius: 10px;
@@ -92,7 +93,7 @@
 .entry .entry-user .entry-date {
     font-size: 0.8rem;
     margin: auto 0 auto auto;
-    color: var(--color-light-gray);
+    color: var(--color-gray-6);
 }
 .entry .entry-image {
     width: 100%;
@@ -121,11 +122,11 @@
     margin: auto 0 auto auto;
 }
 .entry .entry-toolbar .menu {
-    color: var(--color-gray);
+    color: var(--color-gray-4);
     cursor: pointer;
 }
 .entry .entry-toolbar .menu:hover {
-    color: var(--color-light-gray);
+    color: var(--color-gray-6);
 }
 .entry .vote {
     border: 1px solid var(--color-gray);

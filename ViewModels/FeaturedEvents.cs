@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
+
 using VoteMyst.Database;
 
-namespace VoteMyst 
+namespace VoteMyst.ViewModels
 {
     public class FeaturedEvents
     {

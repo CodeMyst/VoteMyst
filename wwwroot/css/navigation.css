@@ -5,9 +5,11 @@
 
     background-color: var(--color-gray-0);
     border-radius: var(--default-border-radius);
+    border-bottom: var(--border-drop-shadow);
 }
 .desktop-nav ul {
     padding: 0.8rem;
+    margin: 0;
 }
 .desktop-nav li {
     display: inline;
@@ -33,17 +35,18 @@
     top: 0;
     left: 0;
     z-index: 100;
+    transform: translateX(0);
 
     filter: none;
     background-color: var(--color-gray-0);
 
-    transition: left var(--sidebar-toggle-duration);
+    transition: transform var(--sidebar-toggle-duration);
 }
 #sidebar[expanded] {
     filter: drop-shadow(0 0 20px rgb(0, 0, 0, 1));
 }
 #sidebar:not([expanded]) {
-    left: calc(-1 * var(--sidebar-width));
+    transform: translateX(calc(-1 * var(--sidebar-width)));
 }
 #sidebar .toggle {
     display: flex;
@@ -55,12 +58,12 @@
     position: fixed;
     left: 0px;
     top: 8px;
+    transform: translateX(var(--sidebar-width));
 
     cursor: pointer;
     color: var(--color-gray-5);   
     background-color: var(--color-gray-0);
     border-radius: 0 24px 24px 0;
-    transition: left var(--sidebar-toggle-duration);
 }
 #sidebar .toggle .fas {
     font-size: 1.5rem;
@@ -68,9 +71,6 @@
 }
 #sidebar:not([expanded]) .toggle {
     filter: drop-shadow(0 0 10px rgb(0, 0, 0, 1));
-}
-#sidebar[expanded] .toggle {
-    left: calc(0px + var(--sidebar-width))
 }
 
 #sidebar ul {

@@ -51,6 +51,8 @@ namespace VoteMyst
 
             user.Username = FetchUsername(principal);
             DownloadAvatar(principal, user);
+
+            _helpers.Context.UpdateAndSave(user);
         }
 
         private string FetchUsername(ClaimsPrincipal principal)

@@ -43,7 +43,7 @@ namespace VoteMyst.Controllers.Api
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult RemoveHost(string eventId, [FromBody] string userId)
+        public IActionResult RemoveHost(string eventId, string userId)
         {
             UserAccount user = GetCurrentUser();
             Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(eventId);

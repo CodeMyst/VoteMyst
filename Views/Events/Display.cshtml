@@ -1,46 +1,69 @@
-@inject DatabaseHelperProvider DatabaseHelpers
-
-@using VoteMyst.Database
 @using VoteMyst.Controllers
+
+@using LeaderboardPlace = Controllers.EventsController.Leaderboard.Place
+
+@inject DatabaseHelperProvider DatabaseHelpers
 
 @model Event
 @{
     ViewData["Title"] = Model.Title;
     Layout = "_Layout";
 
+    UserAccount user = ViewBag.UserAccount;
+
     EventState eventState = Model.GetCurrentState();
     IEnumerable<Entry> entries = Model.Entries;
 
     if (Model.Settings.HasFlag(EventSettings.RandomizeEntries))
         entries = entries.Shuffle();
+
+    EntryViewModel ConvertEntryToViewModel(Entry entry)
+        => new EntryViewModel(entry, user, DatabaseHelpers);
+    EntryPlaceViewModel ConvertPlaceToViewModel(LeaderboardPlace place)
+        => new EntryPlaceViewModel(place, user, DatabaseHelpers);
+
+    EventViewModel eventViewModel = new EventViewModel(Model, user, DatabaseHelpers);
 }
 
-@section ContentMeta
-{
-    <meta property="og:title" content="@Model.Title" />
-    <meta property="og:description" content="@Model.Description" />
-    <meta property="og:image" content="/img/trophy.png" />
+<partial name="_EventPageHeader" for="@eventViewModel" />
+
+@{
+    if (!ViewBag.IsGuest && eventState == EventState.Voting
+        && Model.Settings.HasFlag(EventSettings.RequireVoteToWin)
+        && Model.Entries.Count > 1 && !user.AuthoredVotes.Any(v => v.Entry.Event.ID == Model.ID)
+        && DatabaseHelpers.Entries.GetEntryOfUserInEvent(Model, user) != null)
+    {
+    <div class="message small warning">
+        In order to win this event, you need to cast a vote on another entry. You are currently ineligible to win.
+    </div>
+    }
 }
 
-<partial name="_EventPageHeader" for="@Model" />
-
-@if (eventState != EventState.Revealed)
+@if (eventState != EventState.Revealed && eventState != EventState.Hidden)
 {
     <div class="entry-display-options">
-        <div id="entry-display-option-large"><img src="/img/post-display-large.svg"/></div>
-        <div id="entry-display-option-middle"><img src="/img/post-display-middle.svg"/></div>
-        <div id="entry-display-option-small"><img src="/img/post-display-smallest.svg"/></div>
+        <div id="entry-display-option-large"><img src="/img/post-display-large.svg" /></div>
+        <div id="entry-display-option-middle"><img src="/img/post-display-middle.svg" /></div>
+        <div id="entry-display-option-small"><img src="/img/post-display-smallest.svg" /></div>
     </div>
 }
 
 @if (eventState == EventState.Ongoing || eventState == EventState.Voting)
 {
-    <div class="entries">
-        @foreach (var e in entries)
-        {
-            <partial name="_Entry" for="@e" />
-        }
-    </div>
+    @if (entries.Count() > 0)
+    {
+        <div class="entries">
+            @foreach (Entry entry in entries)
+            {
+                EntryViewModel viewModel = ConvertEntryToViewModel(entry);
+                <partial name="_Entry" for="@viewModel" />
+            }
+        </div>
+    }
+    else
+    {
+        <p>Nothing has been submit yet!</p>
+    }
 }
 @if (eventState == EventState.Closed)
 {
@@ -49,9 +72,10 @@
     <h2>Leaderboard</h2>
     <div class="leaderboard">
         <div class="entries">
-            @foreach (var place in leaderboard)
+            @foreach (LeaderboardPlace place in leaderboard)
             {
-                <partial name="_EntryPlace" for="@place" />
+                EntryPlaceViewModel viewModel = ConvertPlaceToViewModel(place);
+                <partial name="_EntryPlace" for="@viewModel" />
             }
         </div>
     </div>
@@ -60,9 +84,10 @@
     {
         <h2>Not eligible to win</h2>
         <div class="entries">
-            @foreach (var e in leaderboard.NotEligable)
+            @foreach (Entry entry in leaderboard.NotEligable)
             {
-                <partial name="_Entry" for="@e" />
+                EntryViewModel viewModel = ConvertEntryToViewModel(entry);
+                <partial name="_Entry" for="@viewModel" />
             }
         </div>
     }

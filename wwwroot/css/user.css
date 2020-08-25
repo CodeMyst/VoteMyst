@@ -5,7 +5,14 @@
     height: var(--user-widget-height);
 
     border-radius: calc(var(--user-widget-height) / 2);
+    border-bottom: var(--border-drop-shadow);
     cursor: pointer;
+}
+.widget p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 100%;
+    white-space: nowrap;
 }
 
 .user-widget {
@@ -28,7 +35,7 @@
     background-color: var(--color-service-discord);
 }
 .login-widget:hover {
-    background-color: var(--color-dark-gray);
+    background-color: var(--color-gray-2);
 }
 .login-widget img {
     height: 80%;
@@ -107,10 +114,11 @@
     padding: 1rem;
     background-color: var(--color-gray-0);
     border-radius: var(--default-border-radius);
+    border-bottom: var(--border-drop-shadow);
 }
 
 .user-profile .user-info-column {
-    margin: 0.5rem 0;
+    margin: auto 0;
     flex-grow: 0;
     flex-shrink: 0;
 }
@@ -240,8 +248,8 @@
     height: 128px;
     width: 128px;
     overflow: hidden;
-    border-radius: 50%;
     background-color: var(--color-dark-gray);
+    border-bottom: var(--border-drop-shadow);
 }
 .editable-avatar img {
     height: 100%;
@@ -268,6 +276,7 @@
 @media (max-width: 640px) {
     .widget {
         margin: 10px auto 10px 10px;
+        border: none;
     }
 
     .user-profile {

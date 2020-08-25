@@ -127,7 +127,7 @@ function showEntryMenu(element, canReport, canDelete) {
 function deletePostConfirm(post) {
     promptModal({
         title: "Delete post",
-        content: "Are you sure you want to delete this post?<br><b>This action cannot be undone.</b>",
+        content: "<p>Are you sure you want to delete this post?<br><b>This action cannot be undone.</b></p>",
         width: 450,
         buttons: [{
             content: "Yes",
@@ -151,6 +151,37 @@ function deletePost(post) {
 
 // -- Events --
 
+function addHost(eventId, userDisplayId) {
+    if (eventId && userDisplayId) {
+        fetch(`/api/events/${eventId}/hosts/add/${userDisplayId}`, buildApiPostBody())
+            .then(result => {
+                if (result.ok) {
+                    window.location.reload();
+                    return "";
+                }
+                else {
+                    return result.text();
+                }
+            })
+            .then(error => {
+                document.getElementById("addHostNote").innerText = error;
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
+}
+function removeHost(eventId, userDisplayId) {
+    if (eventId && userDisplayId) {
+        fetch(`/api/events/${eventId}/hosts/remove/${userDisplayId}`, buildApiPostBody())
+            .then(result => {
+                if (result.ok) {
+                    document.querySelector(`input[value='${userDisplayId}']`).parentElement.remove();
+                }
+            })
+            .catch();
+    }
+}
 
 // -- Users --
 
@@ -162,7 +193,7 @@ function reportPost(post) {
         title: "Report post",
         content:
               "<textarea id=\"report-reason\" style=\"font: inherit;\" maxlength=\"512\" placeholder=\"Please enter a brief description of why you want to report the post.\"></textarea>"
-            + "<br>Note that unreasonable usage of the report system will be punished.",
+            + "<p>Note that unreasonable usage of the report system will be punished.</p>",
         width: 450,
         buttons: [{
             content: "Submit",

@@ -1,73 +1,70 @@
-@inject UserProfileBuilder ProfileBuilder
-@inject DatabaseHelperProvider DatabaseHelpers
+@model EventViewModel
 
-@using VoteMyst.Database
-
-@model Event
-@{
-    UserAccount currentUser = ProfileBuilder.FromPrincipal(User);
-    EventPermissions eventPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(currentUser, Model);
-
-    EventState eventState = Model.GetCurrentState();
-    string modelUrl = Model.GetUrl();
-    string[] hosts = DatabaseHelpers.Events.GetEventHosts(Model)
-        .Select(h => $"<a href=\"{h.GetUrl()}\">{h.Username}</a>")
-        .ToArray();
+@section ContentMeta
+{
+    <meta property="og:title" content="@Model.Event.Title" />
+    <meta property="og:description" content="@Model.Event.Description" />
+    <meta property="og:image" content="/img/trophy.png" />
 }
 
 <div class="event-page">
-    <h1 class="event-title">@Model.Title</h1>
-    <p class="event-hosts">Hosted by @Html.Raw(string.Join(", ", hosts))</p>
-    <p class="event-description">@Model.Description</p>
+    <h1 class="event-title">@Model.Event.Title</h1>
+    <p class="event-hosts">Hosted by @Html.Raw(string.Join(", ", Model.Hosts))</p>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Event.Description))
+    {
+        <p class="event-description">@Model.Event.Description</p>
+    }
+
     <div class="event-datebox">
-        @switch(eventState)
+        @switch(Model.EventState)
         {
             case EventState.Hidden:
-                <div class="timer event-timer" --unix-timestamp="@Model.RevealDate.ToUnixSeconds()">Reveal in</div>
+                <div class="timer event-timer" --unix-timestamp="@Model.Event.RevealDate.ToUnixSeconds()">Reveal in</div>
                 break;
             case EventState.Revealed:
-                <div class="timer event-timer" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">Starts in</div>
+                <div class="timer event-timer" --unix-timestamp="@Model.Event.StartDate.ToUnixSeconds()">Starts in</div>
                 break;
             case EventState.Ongoing:
-                <div class="timer event-timer" --unix-timestamp="@Model.SubmissionEndDate.ToUnixSeconds()">Submissions close in</div>
+                <div class="timer event-timer" --unix-timestamp="@Model.Event.SubmissionEndDate.ToUnixSeconds()">Submissions close in</div>
                 break;
             case EventState.Voting:
-                <div class="timer event-timer" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
+                <div class="timer event-timer" --unix-timestamp="@Model.Event.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
                 break;
         }
         <div class="event-dates">
-            <div class=@(eventState == EventState.Revealed ? "active" : "")>
-                <p class="local-date" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">@Model.StartDate</p>
+            <div class=@(Model.EventState == EventState.Revealed ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.Event.StartDate.ToUnixSeconds()">@Model.Event.StartDate</p>
                 <p>Event starts</p>
             </div>
-            <div class=@(eventState == EventState.Ongoing ? "active" : "")>
-                <p class="local-date" --unix-timestamp="@Model.SubmissionEndDate.ToUnixSeconds()">@Model.SubmissionEndDate</p>
+            <div class=@(Model.EventState == EventState.Ongoing ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.Event.SubmissionEndDate.ToUnixSeconds()">@Model.Event.SubmissionEndDate</p>
                 <p>Submissions close</p>
             </div>
-            <div class=@(eventState == EventState.Voting ? "active" : "")>
-                <p class="local-date" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">@Model.VoteEndDate</p>
+            <div class=@(Model.EventState == EventState.Voting ? "active" : "")>
+                <p class="local-date" --unix-timestamp="@Model.Event.VoteEndDate.ToUnixSeconds()">@Model.Event.VoteEndDate</p>
                 <p>Votings close</p>
             </div>
         </div>
     </div>
 
     <div class="event-navigation">
-        <a href="@modelUrl">Overview</a>
+        <a href="@Model.Event.GetUrl()">Overview</a>
 
-        @if (User.Identity.IsAuthenticated && eventState == EventState.Ongoing && eventPermissions.HasFlag(EventPermissions.ParticipateInEvent))
+        @if (User.Identity.IsAuthenticated && Model.EventState == EventState.Ongoing 
+            && Model.EventPermissions.HasFlag(EventPermissions.ParticipateInEvent))
         {
-            <a href="@modelUrl/submit">Submit</a>
+            <a href="@Model.Event.GetUrl()/submit">Submit</a>
         }
 
-        @if (eventPermissions.HasFlag(EventPermissions.ManageEntries))
+        @if (Model.EventPermissions.HasFlag(EventPermissions.ManageEntries))
         {
-            <a href="@modelUrl/reports">Reports</a>
+            <a href="@Model.Event.GetUrl()/reports">Reports</a>
         }
-        @if (eventPermissions.HasFlag(EventPermissions.EditEventSettings))
+        @if (Model.EventPermissions.HasFlag(EventPermissions.EditEventSettings))
         {
-            @* <a href="@modelUrl/participants">Participants</a> *@
-            <a href="@modelUrl/hosts">Hosts</a>
-            <a href="@modelUrl/settings">Settings</a>
+            <a href="@Model.Event.GetUrl()/hosts">Hosts</a>
+            <a href="@Model.Event.GetUrl()/settings">Settings</a>
         }
     </div>
 

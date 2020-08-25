@@ -1,48 +1,40 @@
 @inject DatabaseHelperProvider DatabaseHelpers
-@inject UserProfileBuilder ProfileBuilder
-
-@using VoteMyst.Database
 
 @model Event
 @{
     ViewData["Title"] = Model.Title;
     Layout = "_Layout";
 
-    UserAccount currentUser = ProfileBuilder.FromPrincipal(User);
+    UserAccount currentUser = ViewBag.UserAccount;
     IEnumerable<UserAccount> hosts = DatabaseHelpers.Events.GetEventHosts(Model);
+
+    EventViewModel eventViewModel = new EventViewModel(Model, ViewBag.UserAccount, DatabaseHelpers);
 }
 
-@section ContentMeta
-{
-    <meta property="og:title" content="@Model.Title" />
-    <meta property="og:description" content="@Model.Description" />
-    <meta property="og:image" content="/img/trophy.png" />
-}
-
-<partial name="_EventPageHeader" for="@Model" />
+<partial name="_EventPageHeader" for="@eventViewModel" />
 
 <h1>Event Hosts</h1>
 
-<form class="inline-form" action="hosts/add" method="post" enctype="multipart/form-data" autocomplete="off">
+<form class="inline-form" autocomplete="off">
     <label for="userDisplayId">User Display ID:</label>
     <input type="text" id="userDisplayId" name="userDisplayId" />
-    <button type="submit">Add Host</button>
+    <a class="button" onclick="addHost('@Model.DisplayID', document.getElementById('userDisplayId').value)">Add Host</a>
+    <span class="note" style="color: var(--color-error)" id="addHostNote"></span>
 </form>
 
 <hr>
 
 @foreach (UserAccount host in hosts)
 {
-    <form action="hosts/remove" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="userDisplayId" value="@host.DisplayID" />
-        <a class="user-info event-host" href="@host.GetUrl()">
-            <partial name="_Avatar" for="@host" />
-            <p>@host.Username</p>
-            
-            @if (host.ID != currentUser.ID)
-            {
-                <button type="submit">Remove Host</button>
-            }
-        </a>
-    </form>
+<div class="event-host">
+    <input type="hidden" name="userDisplayId" value="@host.DisplayID" />
+    <a class="user-info event-host" href="@host.GetUrl()">
+        <partial name="_Avatar" for="@host" />
+        <p>@host.Username</p>
+    </a>
+    @if (host.ID != currentUser.ID)
+    {
+        <a class="button" onclick="removeHost('@Model.DisplayID', this.parentElement.querySelector('input').value)">Remove Host</a>
+    }
+</div>
 }

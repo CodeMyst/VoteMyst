@@ -3,6 +3,7 @@
     width: 100%;
     max-width: 640px;
     color: var(--color-white);
+    margin: 0.5rem 0;
     border-bottom: 2px solid var(--color-drop-shadow);
     border-radius: var(--default-border-radius);
 }
@@ -42,7 +43,7 @@
 }
 .timer > * {
     padding: 0.2rem 0.7rem;
-    border-left: 2px solid var(--color-dark-gray);
+    border-left: 2px solid var(--color-gray-1);
     line-height: 1.1rem;
 }
 .timer .prefix {
@@ -94,8 +95,8 @@
     max-width: 90vw;
     max-height: 90vh;
 
-    background-color: var(--color-dark-gray);
-    border-radius: var(--panel-border-radius);
+    background-color: var(--color-gray-0);
+    border-radius: var(--default-border-radius);
     box-shadow: 3px 5px 10px rgb(0, 0, 0, 0.5);
 }
 .modal .title {
@@ -139,38 +140,41 @@
     color: var(--color-white);
 }
 .modal .buttons .modal-button.ok {
-    border-color: var(--color-success-text);
-    color: var(--color-success-text);
+    border-color: var(--color-success);
+    color: var(--color-success);
 }
 .modal .buttons .modal-button.cancel {
-    border-color: var(--color-error-text);
-    color: var(--color-error-text);
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+.modal input, .modal select, .modal textarea {
+    background-color: var(--color-gray-1);
 }
 
 .context-menu {
     position: fixed;
-    border-radius: 5px;
-    background-color: var(--color-dark-gray);
-    box-shadow: 0px 1px 10px rgb(0, 0, 0, 0.5);
+    border-radius: var(--default-border-radius);
+    border-bottom: var(--border-drop-shadow);
+    background-color: var(--color-gray-1);
     padding: 2px;
     min-width: 180px;
     outline: none;
 }
 .context-menu .item {
-    padding: 0.2rem 0.4rem;
+    padding: 0.2rem 0.8rem;
     color: var(--color-white);
     border-radius: 5px;
 }
 .context-menu .item.warning {
-    color: var(--color-error-text);
+    color: var(--color-error);
     font-weight: bold;
 }
 .context-menu .item.disabled {
-    color: var(--color-gray);
+    color: var(--color-gray-4);
     font-weight: normal;
 }
 .context-menu .item:not(.disabled):hover {
-    background-color: var(--color-gray);
+    background-color: var(--color-gray-0);
     cursor: pointer;
 }
 .context-menu .content {
@@ -193,6 +197,7 @@
     font-weight: bold;
     line-height: 1.6rem;
     letter-spacing: 0.05rem;
+    white-space: normal;
 }
 .flag-description p {
     margin: 0 10px 4px 0;
@@ -223,17 +228,17 @@
     box-sizing: border-box;
 
     margin: auto;
-    padding: 1rem;
+    padding: 1rem 2rem;
     bottom: 2rem;
     left: 0;
     right: 0;
     width: 800px;
     max-width: 90vw;
 
-    border-radius: 0.5rem;
-    color: var(--color-light-gray);
-    background-color: var(--color-dark-gray);
-    box-shadow: 4px 4px 8px rgb(0, 0, 0, 0.1);
+    border-radius: var(--default-border-radius);
+    border-bottom: var(--border-drop-shadow);
+    color: var(--color-gray-7);
+    background-color: var(--color-gray-1);
 }
 .cookie-disclaimer.hidden {
     display: none;
@@ -251,12 +256,12 @@
 }
 .cookie-disclaimer .ok {
     cursor: pointer;
-    background-color: var(--color-success-text);
+    background-color: var(--color-success);
     color: var(--color-nano);
     font-weight: bold;
     padding: 0.3rem 1rem;
     text-align: center;
-    border-radius: 1rem;
+    border-radius: var(--default-border-radius);
 }
 
 @media (max-width: 640px) {
@@ -283,26 +288,22 @@
     margin: 0.3rem;
     padding: 0.5rem 1.5rem;
     border-radius: 0.3rem;
+    border-bottom: var(--border-drop-shadow);
     font-weight: bold;
 }
 .notification.blank {
-    background-color: var(--color-dark-gray);
-    color: var(--color-light-gray);
+    background-color: var(--color-gray-0);
+    color: var(--color-gray-7);
 }
 .notification.success {
-    background-color: var(--color-success-text);
+    background-color: var(--color-success);
 }
 .notification.error {
-    background-color: var(--color-error-text);
+    background-color: var(--color-error);
 }
 .notification.warning {
-    background-color: var(--color-warning-text);
+    background-color: var(--color-warning);
 }
 .notification.success, .notification.error, .notification.warning {
     color: var(--color-nano);
-}
-
-@keyframes popup {
-    from { transform: scale(0); }
-    to { transform: scale(1); }
 }

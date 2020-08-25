@@ -4,12 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 using VoteMyst.Database;
 using VoteMyst.Authorization;
+using VoteMyst.Controllers.Api;
 
 namespace VoteMyst.Controllers
 {
@@ -118,10 +119,12 @@ namespace VoteMyst.Controllers
         }
 
         private readonly ILogger _logger;
+        private readonly EventApiController _apiController;
 
         public EventsController(ILogger<EventsController> logger, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _logger = logger;
+            _apiController = serviceProvider.GetService<EventApiController>();
         }
 
         /// <summary>
