@@ -143,13 +143,7 @@
     flex-direction: row;
 }
 .event-host .button {
-    height: 28px;
-    line-height: 28px;
     margin: 0 0 0 auto;
-    background-color: var(--color-mysted);
-}
-.event-host .button:hover {
-    background-color: var(--color-mystlue);
 }
 
 .submission-button {

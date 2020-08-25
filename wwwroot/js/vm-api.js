@@ -183,6 +183,32 @@ function removeHost(eventId, userDisplayId) {
     }
 }
 
+function deleteEventConfirm(eventId) {
+    let eventTitle = document.querySelector(".event-page .event-title").innerText;
+    promptModal({
+        title: "Delete event",
+        content: `<p>Are you sure you want to delete the event <b>${eventTitle}</b>?<br><br><b>This action cannot be undone.</b></p>`,
+        width: 450,
+        buttons: [{
+            content: "Yes",
+            style: "ok",
+            action: () => deleteEvent(eventId),
+        }, {
+            content: "No",
+            style: "cancel"
+        }]
+    })
+}
+function deleteEvent(eventId) {
+    fetch(`/api/events/${eventId}/delete`, buildApiPostBody())
+        .then(result => {
+            if (result.ok) {
+                window.location.assign("/events");
+            }
+        })
+        .catch();
+}
+
 // -- Users --
 
 

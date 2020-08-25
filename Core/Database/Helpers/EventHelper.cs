@@ -32,6 +32,16 @@ namespace VoteMyst.Database
         }
 
         /// <summary>
+        /// Deletes the specified event.
+        /// </summary>
+        public bool DeleteEvent(Event e)
+        {
+            context.Events.Remove(e);
+
+            return context.SaveChanges() > 0;
+        }
+
+        /// <summary>
         /// Retrieves an event by its URL. Note that both the <see cref="Event.DisplayID"/> and the <see cref="Event.URL"/> apply here.
         /// </summary>
         public Event GetEventByUrl(string url)

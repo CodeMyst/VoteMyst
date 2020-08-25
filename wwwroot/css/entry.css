@@ -129,10 +129,10 @@
     color: var(--color-gray-6);
 }
 .entry .vote {
-    border: 1px solid var(--color-gray);
     border-radius: 0.5rem;
+    border: 1px solid var(--color-gray-6);
+    color: var(--color-gray-6);
     padding: 0.3rem 0.6rem;
-    color: var(--color-gray);
     cursor: pointer;
     user-select: none;
     transition: border-color 0.2s, color 0.2s;
@@ -175,19 +175,19 @@
 }
 
 .entry .vote[voted] {
-    border-color: var(--color-success-text);
-    color: var(--color-success-text);
+    border-color: var(--color-success);
+    color: var(--color-success);
 }
 
 /* Hover effects should not be supported on mobile, due to the sticky :hover effect. */
 @media (hover: hover) {
     .entry .vote:hover {
-        border-color: var(--color-success-text);
-        color: var(--color-success-text);
+        border-color: var(--color-success);
+        color: var(--color-success);
     }
     .entry .vote[voted]:hover {
-        border-color: var(--color-error-text);
-        color: var(--color-error-text);
+        border-color: var(--color-error);
+        color: var(--color-error);
     }
     .entry .vote[voted]:hover .heart {
         display: none;

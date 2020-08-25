@@ -19,8 +19,8 @@
     <label for="userDisplayId">User Display ID:</label>
     <input type="text" id="userDisplayId" name="userDisplayId" />
     <a class="button" onclick="addHost('@Model.DisplayID', document.getElementById('userDisplayId').value)">Add Host</a>
-    <span class="note" style="color: var(--color-error)" id="addHostNote"></span>
 </form>
+<p class="note" style="color: var(--color-error)" id="addHostNote"></p>
 
 <hr>
 
@@ -34,7 +34,7 @@
     </a>
     @if (host.ID != currentUser.ID)
     {
-        <a class="button" onclick="removeHost('@Model.DisplayID', this.parentElement.querySelector('input').value)">Remove Host</a>
+        <a class="button thin danger" onclick="removeHost('@Model.DisplayID', this.parentElement.querySelector('input').value)">Remove Host</a>
     }
 </div>
 }

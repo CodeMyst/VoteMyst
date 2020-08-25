@@ -65,5 +65,27 @@ namespace VoteMyst.Controllers.Api
 
             return Ok();
         }
+
+        [HttpPost]
+        [Route("api/events/{eventId}/delete")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public IActionResult Delete(string eventId)
+        {
+            UserAccount user = GetCurrentUser();
+            Event targetEvent = DatabaseHelpers.Events.GetEventByUrl(eventId);
+
+            if (targetEvent == null)
+                return BadRequest("The specified event does not exist.");
+
+            EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
+            if (!permissions.HasFlag(EventPermissions.EditEventSettings))
+                return Unauthorized();
+
+            DatabaseHelpers.Events.DeleteEvent(targetEvent);
+
+            return Ok();
+        }
     }
 }
