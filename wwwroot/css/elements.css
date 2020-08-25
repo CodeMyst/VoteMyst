@@ -6,6 +6,7 @@
     margin: 0.5rem 0;
     border-bottom: 2px solid var(--color-drop-shadow);
     border-radius: var(--default-border-radius);
+    box-sizing: border-box;
 }
 .message > * {
     margin: 0;
@@ -20,6 +21,10 @@
 .message.error {
     background-color: var(--color-error);
 }
+.message a {
+    color: var(--color-gray-7);
+}
+
 .disclaimer {
     margin: 1rem 0;
     padding: 0 2rem;
@@ -262,6 +267,9 @@
     padding: 0.3rem 1rem;
     text-align: center;
     border-radius: var(--default-border-radius);
+}
+.cookie-disclaimer .ok:hover {
+    background-color: var(--color-gray-5);
 }
 
 @media (max-width: 640px) {
