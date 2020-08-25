@@ -89,6 +89,15 @@ footer {
     border-bottom: var(--border-drop-shadow);
     border-radius: var(--default-border-radius);
 }
+footer.fixed {
+    position: fixed;
+    width: 90%;
+    max-width: 960px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 1.5rem auto;
+}
 footer p {
     margin: 0;
     padding: 0.5rem 0.2rem;
