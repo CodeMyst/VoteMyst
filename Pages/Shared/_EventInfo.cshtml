@@ -1,5 +1,3 @@
-@using VoteMyst.Database
-
 @model Event
 @{
     EventState eventState = Model.GetCurrentState();
@@ -21,7 +19,7 @@
             </span>
             
             <p class="event-description">
-                @(string.IsNullOrEmpty(Model.Description) ? "No description was provided." : Model.Description)
+                @(string.IsNullOrWhiteSpace(Model.Description) ? Html.Raw("No description was provided.") : Html.TextNewlines(Model.Description))
             </p>
         </div>
     

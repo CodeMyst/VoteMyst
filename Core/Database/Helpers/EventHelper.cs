@@ -32,12 +32,23 @@ namespace VoteMyst.Database
         }
 
         /// <summary>
+        /// Deletes the specified event.
+        /// </summary>
+        public bool DeleteEvent(Event e)
+        {
+            context.Events.Remove(e);
+
+            return context.SaveChanges() > 0;
+        }
+
+        /// <summary>
         /// Retrieves an event by its URL. Note that both the <see cref="Event.DisplayID"/> and the <see cref="Event.URL"/> apply here.
         /// </summary>
         public Event GetEventByUrl(string url)
             => context.Events
                 .AsEnumerable()
-                .FirstOrDefault(x => x.GetValidDisplayUrl().Equals(url, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(x => x.URL.Equals(url, StringComparison.InvariantCultureIgnoreCase)
+                    || x.DisplayID.Equals(url));
 
         /// <summary>
         /// Returns all events that start between the two given dates.
@@ -128,8 +139,11 @@ namespace VoteMyst.Database
         /// </summary>
         public bool CanUserWin(UserAccount user, Event e)
         {
-            EventPermissions antiWinningPermissions = EventPermissions.EditEventSettings | EventPermissions.ManageEntries | EventPermissions.ManageVotes;
-            return ((GetUserPermissionsForEvent(user, e) & antiWinningPermissions) == 0);
+            if (!e.Settings.HasFlag(EventSettings.ExcludeStaffFromWinning))
+                return true;
+
+            EventPermissions staffPermissions = EventPermissions.EditEventSettings | EventPermissions.ManageEntries | EventPermissions.ManageVotes;
+            return (GetUserPermissionsForEvent(user, e) & staffPermissions) == 0;
         }
 
         /// <summary>

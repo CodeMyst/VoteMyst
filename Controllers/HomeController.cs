@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using VoteMyst.Database;
+using VoteMyst.ViewModels;
 
 namespace VoteMyst.Controllers
 {

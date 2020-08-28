@@ -1,14 +1,11 @@
 @inject DatabaseHelperProvider DatabaseHelpers
-@inject UserProfileBuilder ProfileBuilder
-
-@using VoteMyst.Database
 
 @model Dictionary<EventState, Event[]>
 @{
     ViewData["Title"] = "Browse";
     Layout = "_Layout";
 
-    UserAccount currentUser = ProfileBuilder.FromPrincipal(User);
+    UserAccount currentUser = ViewBag.UserAccount;
     Event[] observableHiddenEvents = Model[EventState.Hidden].Where(e => DatabaseHelpers.Events.CanViewHiddenEvent(currentUser, e)).ToArray();
 
     bool showActiveEvents = (Model[EventState.Ongoing].Count() + Model[EventState.Voting].Count()) > 0;

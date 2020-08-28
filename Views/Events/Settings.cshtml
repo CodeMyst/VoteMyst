@@ -1,7 +1,5 @@
 @inject DatabaseHelperProvider DatabaseHelpers
 
-@using VoteMyst.Database
-
 @model Event
 @{
     ViewData["Title"] = Model.Title;
@@ -9,16 +7,11 @@
 
     EventState eventState = Model.GetCurrentState();
     IEnumerable<Entry> shuffledEntries = Model.Entries.Shuffle();
+
+    EventViewModel eventViewModel = new EventViewModel(Model, ViewBag.UserAccount, DatabaseHelpers);
 }
 
-@section ContentMeta
-{
-    <meta property="og:title" content="@Model.Title" />
-    <meta property="og:description" content="@Model.Description" />
-    <meta property="og:image" content="/img/trophy.png" />
-}
-
-<partial name="_EventPageHeader" for="@Model" />
+<partial name="_EventPageHeader" for="@eventViewModel" />
 
 <h1>Edit Event Settings</h1>
 
@@ -87,5 +80,9 @@
             <td><partial name="_FlagsEnum" for="@Model.Settings" /></td>
         </tr>
     </table>
-    <button type="submit">Save Changes</button>
+
+    <div class="buttons">
+        <button type="submit">Save Changes</button>
+        <a style="margin-left: auto;" class="button danger" onclick="deleteEventConfirm('@(Model.DisplayID)')">Delete Event</a>
+    </div>
 </form>

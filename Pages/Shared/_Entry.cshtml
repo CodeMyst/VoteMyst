@@ -1,47 +1,27 @@
-@using VoteMyst.Database
+@model EntryViewModel
 
-@inject UserProfileBuilder ProfileBuilder
-@inject DatabaseHelperProvider DatabaseHelpers
-
-@model Entry
-@{
-    bool isGuest = !User.Identity.IsAuthenticated;
-    UserAccount user = ProfileBuilder.FromPrincipal(User);
-    UserAccount author = Model.Author;
-
-    Event e = Model.Event;
-    EventPermissions eventPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, e);
-    bool votingOpen = e.GetCurrentState() == EventState.Voting;
-    bool displayUser = e.GetCurrentState() == EventState.Closed;
-    bool isSelfPost = user.ID == author.ID;
-    bool canVote = votingOpen && !isSelfPost && !isGuest;
-    bool hasVoted = DatabaseHelpers.Votes.GetVoteByUserOnEntry(user, Model) != null;
-    bool canReport = !isSelfPost && !isGuest && !Model.Reports.Any(r => r.ReportAuthor.ID == user.ID);
-    bool canDelete = isSelfPost || user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents) || eventPermissions.HasFlag(EventPermissions.ManageEntries);
-}
-
-<div class="post" id=@Model.DisplayID
-    @(canVote ? "allow-vote" : "")
-    @(isSelfPost ? "self-post" : "") >
-    @if(displayUser)
+<div class="entry" id="@Model.Entry.DisplayID"
+    @Html.ConditionalAttribute(Model.CanVote, "allow-vote")
+    @Html.ConditionalAttribute(Model.IsSelfPost, "self-post") >
+    @if(Model.DisplayUser)
     {
-        <div class="post-user">
-            <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayID">
-                <partial name="_Avatar" for="@author" />
-                <p class="username">@author.Username</p>
+        <div class="entry-user">
+            <a asp-controller="users" asp-action="display" asp-route-id="@Model.Author.DisplayID">
+                <partial name="_Avatar" for="@Model.Author" />
+                <p class="username">@Model.Author.Username</p>
             </a>
-            <p class="post-date local-date" --unix-timestamp="@Model.SubmitDate.ToUnixSeconds()" --date-only>@Model.SubmitDate.ToString("dd/MM/yyyy")</p>
+            <p class="entry-date local-date" --unix-timestamp="@Model.Entry.SubmitDate.ToUnixSeconds()" --date-only>@Model.Entry.SubmitDate.ToString("dd/MM/yyyy")</p>
         </div>
     }
-    <div class="post-image">
-        <img draggable="false" src="/@Model.GetRelativeUrl()" />
+    <div class="entry-image">
+        <img draggable="false" src="/@Model.Entry.GetRelativeUrl()" />
     </div>
 
-    <div class="post-toolbar">
+    <div class="entry-toolbar">
         <span class="l">
-            @if (canVote)
+            @if (Model.CanVote)
             {
-                <span class="vote" onclick="toggleVote(this)" @(hasVoted ? "voted" : "")>
+                <span class="vote" onclick="toggleVote(this)" @Html.ConditionalAttribute(Model.HasVoted, "voted")>
                     <i class="heart fas fa-heart"></i>
                     <i class="broken-heart fas fa-heart-broken"></i>
                     <span>Vote</span>
@@ -50,7 +30,8 @@
             }
         </span>
         <span class="r">
-            <span class="menu" title="More options for this post" onclick="showEntryMenu(this, @canReport.ToString().ToLower(), @canDelete.ToString().ToLower())">
+            <span class="menu" title="More options for this post"
+                  onclick="showEntryMenu(this, @Model.CanReport.ToString().ToLower(), @Model.CanDelete.ToString().ToLower())">
                 <i class="fas fa-fw fa-ellipsis-v"></i>
             </span>
         </span>

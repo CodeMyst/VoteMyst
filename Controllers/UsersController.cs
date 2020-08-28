@@ -88,6 +88,9 @@ namespace VoteMyst.Controllers
         [Route("users/{id}")]
         public IActionResult Display(string id) 
         {
+            if (!User.Identity.IsAuthenticated)
+                return View("Forbidden");
+
             UserAccount targetUser = ProfileBuilder.FromId(id);
             UserAccount selfUser = GetCurrentUser();
 
@@ -106,7 +109,7 @@ namespace VoteMyst.Controllers
         public IActionResult Me()
         {
             if (!User.Identity.IsAuthenticated)
-                return Forbid();
+                return View("Forbidden");
 
             UserAccount selfUser = GetCurrentUser();
 
