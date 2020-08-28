@@ -16,7 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
 using VoteMyst.Database;
-using System.Web;
+using VoteMyst.Maintenance;
 
 namespace VoteMyst
 {
@@ -126,7 +126,7 @@ namespace VoteMyst
             app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
             
             app.UseStaticFiles();
-
+            
             app.UseRouting();
 
             // add the https scheme to oauth redirect urls

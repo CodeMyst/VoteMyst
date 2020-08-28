@@ -8,7 +8,10 @@ namespace VoteMyst.Database
     public class Configuration
     {
         public string this[string key]
-            => GetValue(key);
+        {
+            get => GetValue(key);
+            set => SetValue(key, value);
+        }
 
         private readonly VoteMystContext _databaseContext;
 
