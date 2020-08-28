@@ -81,10 +81,15 @@ namespace VoteMyst
         {
             using Process p = new Process();
 
+            // Populate the start information with the file to execute and the arguments.
             p.StartInfo.FileName = filename;
             p.StartInfo.Arguments = string.Join(' ', args);
             p.StartInfo.UseShellExecute = false;
+
+            // Redirect the standard output so we can read the results ...
             p.StartInfo.RedirectStandardOutput = true;
+            // ... and the standard error so we don't get process errors in our console.
+            p.StartInfo.RedirectStandardError = true;
 
             p.Start();
 
