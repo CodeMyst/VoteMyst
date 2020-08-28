@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,14 +25,16 @@ namespace VoteMyst.Controllers.Api
                 return BadRequest("The specified event does not exist.");
 
             EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
-            if (!permissions.HasFlag(EventPermissions.EditEventSettings))
+            if (!permissions.HasFlag(EventPermissions.EditEventSettings) && !user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents))
                 return Unauthorized();
+
+            UserAccount[] hosts = DatabaseHelpers.Events.GetEventHosts(targetEvent);
 
             UserAccount targetUser = DatabaseHelpers.Context.QueryByDisplayID<UserAccount>(userId);
             if (targetUser == null)
                 return BadRequest("The specified user does not exist.");
-            if (user.ID == targetUser.ID)
-                return BadRequest("Cannot set self as host.");
+            if (hosts.Contains(targetUser))
+                return BadRequest("That user is already a host.");
 
             DatabaseHelpers.Events.RegisterUserAsHost(targetUser, targetEvent);
 
@@ -52,14 +55,18 @@ namespace VoteMyst.Controllers.Api
                 return BadRequest("The specified event does not exist.");
 
             EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
-            if (!permissions.HasFlag(EventPermissions.EditEventSettings))
+            if (!permissions.HasFlag(EventPermissions.EditEventSettings) && !user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents))
                 return Unauthorized();
+
+            UserAccount[] hosts = DatabaseHelpers.Events.GetEventHosts(targetEvent);
 
             UserAccount targetUser = DatabaseHelpers.Context.QueryByDisplayID<UserAccount>(userId);
             if (targetUser == null)
                 return BadRequest("The specified user does not exist.");
             if (user.ID == targetUser.ID)
                 return BadRequest("Cannot remove self from hosts.");
+            if (hosts.Length <= 1)
+                return BadRequest("The number of hosts may not fall below 0.");
 
             DatabaseHelpers.Events.RemoveUserAsHost(targetUser, targetEvent);
 
@@ -80,7 +87,7 @@ namespace VoteMyst.Controllers.Api
                 return BadRequest("The specified event does not exist.");
 
             EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
-            if (!permissions.HasFlag(EventPermissions.EditEventSettings))
+            if (!permissions.HasFlag(EventPermissions.EditEventSettings) && !user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents))
                 return Unauthorized();
 
             DatabaseHelpers.Events.DeleteEvent(targetEvent);

@@ -58,7 +58,8 @@ else
         <table class="report-overview-table">
             <tr>
                 <th>Link</th>
-                <th>Author</th>
+                <th>Entry Author</th>
+                <th>Report Author</th>
                 <th>Reason</th>
                 <th>Status</th>
             </tr>
@@ -75,6 +76,7 @@ else
                         <td class="deleted">&lt;entry deleted&gt;</td>
                     }
                     <td class="author"><partial name="_UserInfo" for="@report.EntryAuthor"/></td>
+                    <td class="author"><partial name="_UserInfo" for="@report.ReportAuthor"/></td>
                     <td class="reason">@report.Reason</td>
                     <td class="status @report.Status.ToString().ToLower()">@report.Status</td>
                 </tr>

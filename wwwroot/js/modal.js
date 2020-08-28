@@ -160,7 +160,7 @@ const notificationContainer = document.querySelector("#notifications");
 
 function showNotification(config) {
     let notification = document.createElement("div");
-    notification.classList.add("notification");
+    notification.classList = "notification no-select";
 
     let duration = config.duration ?? 4;
     let style = config.style ?? "blank";

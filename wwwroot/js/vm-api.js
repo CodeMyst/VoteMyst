@@ -92,13 +92,23 @@ function showEntryMenu(element, canReport, canDelete) {
     let items = [{
         content: "Copy Link",
         icon: "fa-link",
-        action: async function() {
-            let url = location.protocol + '//' + location.host+location.pathname + "#" + post.id;
-            await navigator.clipboard.writeText(url);
-            showNotification({
-                content: "Link copied to clipboard!",
-                style: "success"
-            })
+        action: async function () {
+            try {
+                let url = location.protocol + '//' + location.host + location.pathname + "#" + post.id;
+                await navigator.clipboard.writeText(url);
+
+                showNotification({
+                    content: "Link copied to clipboard!",
+                    style: "success"
+                });
+            }
+            catch (err) {
+                //location.hash = post.id;
+                showNotification({
+                    content: "Copying the link to the clipboard failed.",
+                    style: "error"
+                });
+            }
         } 
     }, {
         content: "Report Post",

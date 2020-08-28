@@ -197,7 +197,7 @@ namespace VoteMyst.Controllers
                 return NotFound();
 
             EventPermissions userPermissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, targetEvent);
-            if (!userPermissions.HasFlag(EventPermissions.EditEventSettings))
+            if (!userPermissions.HasFlag(EventPermissions.EditEventSettings) && !user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents))
                 return Forbid();
 
             eventChanges.ID = targetEvent.ID;

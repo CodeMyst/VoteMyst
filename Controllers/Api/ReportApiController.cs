@@ -69,7 +69,7 @@ namespace VoteMyst.Controllers.Api
                 return BadRequest("The report is not pending and cannot be processed further.");
 
             EventPermissions permissions = DatabaseHelpers.Events.GetUserPermissionsForEvent(user, r.Entry.Event);
-            if (!permissions.HasFlag(EventPermissions.ManageEntries))
+            if (!permissions.HasFlag(EventPermissions.ManageEntries) && !user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents))
                 return Unauthorized();
 
             if (desiredStatus == ReportStatus.Approved)

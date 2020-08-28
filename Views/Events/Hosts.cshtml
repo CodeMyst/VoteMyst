@@ -6,7 +6,7 @@
     Layout = "_Layout";
 
     UserAccount currentUser = ViewBag.UserAccount;
-    IEnumerable<UserAccount> hosts = DatabaseHelpers.Events.GetEventHosts(Model);
+    UserAccount[] hosts = DatabaseHelpers.Events.GetEventHosts(Model);
 
     EventViewModel eventViewModel = new EventViewModel(Model, ViewBag.UserAccount, DatabaseHelpers);
 }
@@ -32,7 +32,7 @@
         <partial name="_Avatar" for="@host" />
         <p>@host.Username</p>
     </a>
-    @if (host.ID != currentUser.ID)
+    @if (host.ID != currentUser.ID && hosts.Length > 1)
     {
         <a class="button thin danger" onclick="removeHost('@Model.DisplayID', this.parentElement.querySelector('input').value)">Remove Host</a>
     }

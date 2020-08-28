@@ -10,11 +10,13 @@
 
     UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
 
-    int totalVotesEarned = Model.Entries.Sum(e => e.Votes.Count);
-    int totalVotesGiven = Model.AuthoredVotes.Count;
+    int totalVotesEarned = Model.Entries.Where(e => e.Event.GetCurrentState() == EventState.Closed).Sum(e => e.Votes.Count);
+    int totalVotesGiven = Model.AuthoredVotes.Where(v => v.Entry.Event.GetCurrentState() == EventState.Closed).Count();
 
     bool allowSelfEditing = (selfUser.ID == Model.ID && selfUser.Permissions.HasFlag(GlobalPermissions.ManageSelf)) || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers);
     bool allowLogout = selfUser.ID == Model.ID;
+
+    IEnumerable<Entry> visibleEntries = Model.Entries.Where(e => e.Event.GetCurrentState() == EventState.Closed);
 }
 
 @section ContentMeta
@@ -52,9 +54,9 @@
                 <td>@totalVotesGiven</td>
             </tr>
         </table>
-        <h1>Event Submissions (@(Model.Entries.Count))</h1>
+        <h1>Event Submissions (@(visibleEntries.Count()))</h1>
         <div class="submissions">
-            @foreach (Entry entry in Model.Entries)
+            @foreach (Entry entry in visibleEntries)
             {
                 <partial name="_EntryPreview" for="@entry"/>
             }

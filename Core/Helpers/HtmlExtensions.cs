@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 using Microsoft.AspNetCore.Html;
@@ -10,6 +11,11 @@ namespace VoteMyst
         public static IHtmlContent ConditionalAttribute(this IHtmlHelper html, bool condition, string attributeName)
         {
             return new HtmlString(condition ? attributeName : string.Empty);
+        }
+
+        public static IHtmlContent TextNewlines(this IHtmlHelper html, string text)
+        {
+            return new HtmlString(text.Replace(Environment.NewLine, "<br />"));
         }
     }    
 }

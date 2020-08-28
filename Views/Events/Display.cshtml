@@ -33,13 +33,13 @@
         && Model.Entries.Count > 1 && !user.AuthoredVotes.Any(v => v.Entry.Event.ID == Model.ID)
         && DatabaseHelpers.Entries.GetEntryOfUserInEvent(Model, user) != null)
     {
-    <div class="message small warning">
-        In order to win this event, you need to cast a vote on another entry. You are currently ineligible to win.
-    </div>
+        <div class="message small warning">
+            In order to win this event, you need to cast a vote on another entry. You are currently ineligible to win.
+        </div>
     }
 }
 
-@if (eventState != EventState.Revealed && eventState != EventState.Hidden)
+@if (eventState != EventState.Revealed && eventState != EventState.Hidden && Model.Entries.Count > 0)
 {
     <div class="entry-display-options">
         <div id="entry-display-option-large"><img src="/img/post-display-large.svg" /></div>
@@ -62,23 +62,34 @@
     }
     else
     {
-        <p>Nothing has been submit yet!</p>
+        <div class="notice">
+            <p>Nothing has been submit yet!</p>
+        </div>
     }
 }
 @if (eventState == EventState.Closed)
 {
     EventsController.Leaderboard leaderboard = EventsController.Leaderboard.FromEvent(Model, DatabaseHelpers);
 
-    <h2>Leaderboard</h2>
-    <div class="leaderboard">
-        <div class="entries">
-            @foreach (LeaderboardPlace place in leaderboard)
-            {
-                EntryPlaceViewModel viewModel = ConvertPlaceToViewModel(place);
-                <partial name="_EntryPlace" for="@viewModel" />
-            }
+    @if (leaderboard.Places != null && leaderboard.Places.Length > 0)
+    {
+        <h2>Leaderboard</h2>
+        <div class="leaderboard">
+            <div class="entries">
+                @foreach (LeaderboardPlace place in leaderboard)
+                {
+                    EntryPlaceViewModel viewModel = ConvertPlaceToViewModel(place);
+                    <partial name="_EntryPlace" for="@viewModel" />
+                }
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="notice">
+            <p>Nothing has been submit to this event.</p>
+        </div>
+    }
 
     @if (leaderboard.NotEligable != null && leaderboard.NotEligable.Length > 0)
     {

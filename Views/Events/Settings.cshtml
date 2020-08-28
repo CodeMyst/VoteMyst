@@ -80,6 +80,9 @@
             <td><partial name="_FlagsEnum" for="@Model.Settings" /></td>
         </tr>
     </table>
-    <button type="submit">Save Changes</button>
-    <a class="button danger" onclick="deleteEventConfirm('@(Model.DisplayID)')">Delete Event</a>
+
+    <div class="buttons">
+        <button type="submit">Save Changes</button>
+        <a style="margin-left: auto;" class="button danger" onclick="deleteEventConfirm('@(Model.DisplayID)')">Delete Event</a>
+    </div>
 </form>

@@ -13,7 +13,7 @@
 
     @if (!string.IsNullOrWhiteSpace(Model.Event.Description))
     {
-        <p class="event-description">@Html.Raw(Model.Event.Description.Replace(Environment.NewLine, "<br />"))</p>
+        <p class="event-description">@Html.TextNewlines(Model.Event.Description)</p>
     }
 
     <div class="event-datebox">
@@ -57,11 +57,13 @@
             <a href="@Model.Event.GetUrl()/submit">Submit</a>
         }
 
-        @if (Model.EventPermissions.HasFlag(EventPermissions.ManageEntries))
+        @if (Model.EventPermissions.HasFlag(EventPermissions.ManageEntries)
+            || Model.IsUserSiteAdmin)
         {
             <a href="@Model.Event.GetUrl()/reports">Reports</a>
         }
-        @if (Model.EventPermissions.HasFlag(EventPermissions.EditEventSettings))
+        @if (Model.EventPermissions.HasFlag(EventPermissions.EditEventSettings)
+            || Model.IsUserSiteAdmin)
         {
             <a href="@Model.Event.GetUrl()/hosts">Hosts</a>
             <a href="@Model.Event.GetUrl()/settings">Settings</a>

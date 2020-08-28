@@ -33,6 +33,22 @@
     white-space: normal;
 }
 
+.notice {
+    text-align: center;
+    margin: 1rem 0;
+}
+.notice > * {
+    display: inline-block;
+    width: 70%;
+    margin: 0;
+    padding: 1rem 0;
+    border: 1px solid var(--color-gray-0);
+    border-width: 1px 0px;
+}
+.notice > *:not(a) {
+    color: var(--color-gray-7);
+}
+
 .no-select {
     -webkit-user-select: none;
     -moz-user-select: none;

@@ -58,6 +58,12 @@ button.danger, .button.danger {
     background-color: var(--color-mysted);
 }
 
+.buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 select option {
     font-size: 2;
 }

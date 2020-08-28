@@ -26,7 +26,9 @@ namespace VoteMyst.Authorization
                 string eventId = Context.Request.RouteValues[_eventIdKey].ToString();
                 Event e = _databaseHelpers.Events.GetEventByUrl(eventId);
 
-                return e != null && _databaseHelpers.Events.GetUserPermissionsForEvent(User, e).HasFlag(_permissions);
+                return e != null && 
+                    (_databaseHelpers.Events.GetUserPermissionsForEvent(User, e).HasFlag(_permissions)
+                      || User.Permissions.HasFlag(GlobalPermissions.ManageAllEvents));
             }
         }
     }
