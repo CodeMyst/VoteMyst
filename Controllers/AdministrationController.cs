@@ -14,6 +14,12 @@ namespace VoteMyst.Controllers
     /// </summary>
     public class AdministrationController : VoteMystController
     {
+        public enum Operation
+        {
+            Activate,
+            Deactivate
+        }
+
         private Configuration _configuration;
 
         public AdministrationController(IServiceProvider serviceProvider) : base(serviceProvider)
@@ -33,13 +39,9 @@ namespace VoteMyst.Controllers
 
         [HttpPost]
         [Route("administration/maintenance/{operation}")]
-        public IActionResult ProcessMaintenanceOperation(string operation)
+        public IActionResult ProcessMaintenanceOperation(Operation operation)
         {
-            _configuration[MaintenanceModeConstants.ConfigurationKey] = operation.Equals("activate")
-                ? true.ToString()
-                : operation.Equals("deactivate")
-                    ? false.ToString()
-                    : throw new ArgumentException(nameof(operation));
+            _configuration[MaintenanceModeConstants.ConfigurationKey] = (operation == Operation.Activate).ToString();
 
             return RedirectToAction("Index");
         }
