@@ -91,7 +91,7 @@ namespace VoteMyst.Controllers
                 {
                     case EventType.Art:
                         validator.Verify(file != null, "A file to be uploaded needs to be specified.");
-                        validator.Verify(file.Length <= MaxFileMB * 1000000, "The specified file is too large.");
+                        validator.Verify(file.Length <= MaxFileMB * 1048576, "The specified file is too large.");
 
                         var typeProvider = new FileExtensionContentTypeProvider();
                         validator.Verify(typeProvider.TryGetContentType(file.FileName, out string contentType), "Unknown file type.");
@@ -117,8 +117,6 @@ namespace VoteMyst.Controllers
                 Entry existingEntry = DatabaseHelpers.Entries.GetEntryOfUserInEvent(ev, user);
                 if (existingEntry != null)
                 {
-                    DatabaseHelpers.Entries.DeleteEntry(existingEntry);
-
                     if (existingEntry.EntryType == EntryType.File)
                     {
                         // Retrieve the previous entry path, making sure to make the path relative instead of absolute
@@ -129,6 +127,8 @@ namespace VoteMyst.Controllers
                             System.IO.File.Delete(entryAssetPath);
                         }
                     }
+
+                    DatabaseHelpers.Entries.DeleteEntry(existingEntry);
                 }
                 
                 Entry entry = DatabaseHelpers.Entries.CreateFileEntry(ev, user, file, Environment);

@@ -3,13 +3,18 @@ form {
 }
 
 input[type=text], input[type="date"], input[type="datetime"], input[type="datetime-local"], select, textarea {
-    background-color: var(--color-dark-gray);
+    background-color: var(--color-gray-1);
     color: var(--color-white);
     border: none;
-    border-radius: 0.5rem;
+    border-top: 2px inset var(--color-drop-shadow);
+    border-radius: 0.4rem;
     font-family: inherit;
+    max-width: 100%;
     padding: 0.4rem 0.5rem;
     box-sizing: border-box;
+}
+input[type=text]:hover, input[type="date"]:hover, input[type="datetime"]:hover, input[type="datetime-local"]:hover, select:hover, textarea:hover {
+    background-color: var(--color-gray-2);
 }
 input[type=text], textarea {
     width: 100%;
@@ -25,7 +30,7 @@ input:focus, select:focus, textarea:focus {
 
 button, .button {
     display: inline-block;
-    margin: 1rem 0;
+    margin: 0.5rem 0;
     height: 38px;
     line-height: 38px;
     padding: 0 30px;
@@ -42,16 +47,25 @@ button, .button {
     white-space: nowrap;
 }
 button:hover, .button:hover {
-    background-color: var(--color-mystlue);
+    background-color: var(--color-mystlue) !important;
     color: var(--color-white);
 }
-
-.form-submit {
-    display: flex;
+button.thin, .button.thin {
+    height: 28px;
+    line-height: 28px;
 }
-.form-submit div {
-    margin: auto 30px;
-    color: var(--color-mysted);
+button.danger, .button.danger {
+    background-color: var(--color-mysted);
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+select option {
+    font-size: 2;
 }
 
 form table {
@@ -80,7 +94,55 @@ form .row-layout div.break {
 }
 form .row-layout > div {
     margin: 0 0.6rem 0.3rem;
+    max-width: 100%;
+    overflow: auto;
 }
 form .row-layout p {
     margin: 0.2rem 0;
+}
+
+
+.checkbox {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    background-color: var(--color-gray-1);
+    border-top: 2px inset var(--color-drop-shadow);
+    border-radius: 0.4rem;
+    outline: none !important;
+}
+.checkbox:hover {
+    background-color: var(--color-gray-2);
+}
+.checkbox > input[type=checkbox] {
+    width: inherit;
+    height: inherit;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+.checkbox > div {
+    position: absolute;
+    border: 0 solid var(--color-mystge);
+    border-width: 0 4px 4px 0;
+    border-radius: 3px;
+    opacity: 0;
+    pointer-events: none;
+    width: 6px;
+    height: 12px;
+    top: 5px;
+    left: 8px;
+    transform: rotate(45deg);
+    box-shadow: 1px 1px 0 black;
+}
+.checkbox:hover > div {
+    border-color: var(--color-mystlue);
+}
+.checkbox > input[type=checkbox]:checked + div {
+    opacity: 1;
 }

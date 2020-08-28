@@ -21,13 +21,13 @@ body::-webkit-scrollbar {
     height: 6px;
 }
 ::-webkit-scrollbar-track {
-    background: var(--color-dark-gray);
+    background: var(--color-gray-0);
 }
 ::-webkit-scrollbar-thumb {
-    background-color: var(--color-gray);
+    background-color: var(--color-gray-3);
 }
 ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-light-gray);
+    background-color: var(--color-gray-5);
 }
 
 a {
@@ -70,22 +70,37 @@ header h1 .version {
     position: absolute;
     top: 44px;
     right: 0;
-    color: var(--color-gray);
+    color: var(--color-gray-3);
     font-size: 0.9rem;
 }
 
 hr {
-    border-color: var(--color-gray);
+    border-color: var(--color-gray-1);
 }
 hr.thin {
     margin: 0.2rem 0;
-    border-color: var(--color-gray);
 }
 
 footer {
-    margin: 2rem 0;
+    margin: 1.5rem 0;
     text-align: center;
     font-size: 0.9em;
+    background-color: var(--color-gray-0);
+    border-bottom: var(--border-drop-shadow);
+    border-radius: var(--default-border-radius);
+}
+footer.fixed {
+    position: fixed;
+    width: 90%;
+    max-width: 960px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 1.5rem auto;
+}
+footer p {
+    margin: 0;
+    padding: 0.5rem 0.2rem;
 }
 footer a {
     font-weight: bold;

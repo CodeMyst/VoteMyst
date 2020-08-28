@@ -2,7 +2,7 @@ const lightbox = document.querySelector("#lightbox");
 const lightboxImage = lightbox.querySelector("img");
 
 function initializeLightbox() {
-    document.querySelectorAll(".post .post-image > img").forEach(source => {
+    document.querySelectorAll(".entry .entry-image > img").forEach(source => {
         source.addEventListener("click", e => openLightbox(source));
         source.style = "cursor: pointer";
     });

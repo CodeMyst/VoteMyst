@@ -46,7 +46,7 @@ function getEntryId(post) {
     return post.getAttribute("id");
 }
 function castVote(element) {
-    const post = element.closest('.post');
+    const post = element.closest('.entry');
     if (!element.hasAttribute(votedAttribute)) {
         fetch(`/api/entry/${getEntryId(post)}/votes/cast`, buildApiPostBody())
             .then(jsonOrReject)
@@ -61,7 +61,7 @@ function castVote(element) {
     }
 }
 function removeVote(element) {
-    const post = element.closest('.post');
+    const post = element.closest('.entry');
     if (element.hasAttribute(votedAttribute)) {
         fetch(`/api/entry/${getEntryId(post)}/votes/remove`, buildApiPostBody())
             .then(jsonOrReject)
@@ -86,19 +86,29 @@ function toggleVote(element) {
 }
 
 function showEntryMenu(element, canReport, canDelete) {
-    const post = element.closest('.post');
+    const post = element.closest('.entry');
     let rect = element.getBoundingClientRect();
 
     let items = [{
         content: "Copy Link",
         icon: "fa-link",
-        action: async function() {
-            let url = location.protocol + '//' + location.host+location.pathname + "#" + post.id;
-            await navigator.clipboard.writeText(url);
-            showNotification({
-                content: "Link copied to clipboard!",
-                style: "success"
-            })
+        action: async function () {
+            try {
+                let url = location.protocol + '//' + location.host + location.pathname + "#" + post.id;
+                await navigator.clipboard.writeText(url);
+
+                showNotification({
+                    content: "Link copied to clipboard!",
+                    style: "success"
+                });
+            }
+            catch (err) {
+                //location.hash = post.id;
+                showNotification({
+                    content: "Copying the link to the clipboard failed.",
+                    style: "error"
+                });
+            }
         } 
     }, {
         content: "Report Post",
@@ -127,7 +137,7 @@ function showEntryMenu(element, canReport, canDelete) {
 function deletePostConfirm(post) {
     promptModal({
         title: "Delete post",
-        content: "Are you sure you want to delete this post?<br><b>This action cannot be undone.</b>",
+        content: "<p>Are you sure you want to delete this post?<br><b>This action cannot be undone.</b></p>",
         width: 450,
         buttons: [{
             content: "Yes",
@@ -151,6 +161,63 @@ function deletePost(post) {
 
 // -- Events --
 
+function addHost(eventId, userDisplayId) {
+    if (eventId && userDisplayId) {
+        fetch(`/api/events/${eventId}/hosts/add/${userDisplayId}`, buildApiPostBody())
+            .then(result => {
+                if (result.ok) {
+                    window.location.reload();
+                    return "";
+                }
+                else {
+                    return result.text();
+                }
+            })
+            .then(error => {
+                document.getElementById("addHostNote").innerText = error;
+            })
+            .catch(e => {
+                console.log(e);
+            });
+    }
+}
+function removeHost(eventId, userDisplayId) {
+    if (eventId && userDisplayId) {
+        fetch(`/api/events/${eventId}/hosts/remove/${userDisplayId}`, buildApiPostBody())
+            .then(result => {
+                if (result.ok) {
+                    document.querySelector(`input[value='${userDisplayId}']`).parentElement.remove();
+                }
+            })
+            .catch();
+    }
+}
+
+function deleteEventConfirm(eventId) {
+    let eventTitle = document.querySelector(".event-page .event-title").innerText;
+    promptModal({
+        title: "Delete event",
+        content: `<p>Are you sure you want to delete the event <b>${eventTitle}</b>?<br><br><b>This action cannot be undone.</b></p>`,
+        width: 450,
+        buttons: [{
+            content: "Yes",
+            style: "ok",
+            action: () => deleteEvent(eventId),
+        }, {
+            content: "No",
+            style: "cancel"
+        }]
+    })
+}
+function deleteEvent(eventId) {
+    fetch(`/api/events/${eventId}/delete`, buildApiPostBody())
+        .then(result => {
+            if (result.ok) {
+                window.location.assign("/events");
+            }
+        })
+        .catch();
+}
 
 // -- Users --
 
@@ -162,7 +229,7 @@ function reportPost(post) {
         title: "Report post",
         content:
               "<textarea id=\"report-reason\" style=\"font: inherit;\" maxlength=\"512\" placeholder=\"Please enter a brief description of why you want to report the post.\"></textarea>"
-            + "<br>Note that unreasonable usage of the report system will be punished.",
+            + "<p>Note that unreasonable usage of the report system will be punished.</p>",
         width: 450,
         buttons: [{
             content: "Submit",

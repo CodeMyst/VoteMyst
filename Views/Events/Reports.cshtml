@@ -1,20 +1,19 @@
-﻿@using VoteMyst.Database
-
-@inject UserProfileBuilder ProfileBuilder
-@inject DatabaseHelperProvider DatabaseHelpers
+﻿@inject DatabaseHelperProvider DatabaseHelpers
 
 @model Event
 @{
     ViewData["Title"] = "Reports";
     Layout = "_Layout";
 
-    UserAccount user = ProfileBuilder.FromPrincipal(User);
+    UserAccount user = ViewBag.UserAccount;
 
     var pendingReports = Model.Reports.Where(r => r.Status == ReportStatus.Pending).ToArray();
     var resolvedReports = Model.Reports.Where(r => r.Status != ReportStatus.Pending).ToArray();
+
+    EventViewModel eventViewModel = new EventViewModel(Model, ViewBag.UserAccount, DatabaseHelpers);
 }
 
-<partial name="_EventPageHeader" for="@Model" />
+<partial name="_EventPageHeader" for="@eventViewModel" />
 
 <h1>Open Reports</h1>
 
@@ -59,7 +58,8 @@ else
         <table class="report-overview-table">
             <tr>
                 <th>Link</th>
-                <th>Author</th>
+                <th>Entry Author</th>
+                <th>Report Author</th>
                 <th>Reason</th>
                 <th>Status</th>
             </tr>
@@ -76,6 +76,7 @@ else
                         <td class="deleted">&lt;entry deleted&gt;</td>
                     }
                     <td class="author"><partial name="_UserInfo" for="@report.EntryAuthor"/></td>
+                    <td class="author"><partial name="_UserInfo" for="@report.ReportAuthor"/></td>
                     <td class="reason">@report.Reason</td>
                     <td class="status @report.Status.ToString().ToLower()">@report.Status</td>
                 </tr>
