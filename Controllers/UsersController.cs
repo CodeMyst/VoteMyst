@@ -135,6 +135,24 @@ namespace VoteMyst.Controllers
         }
 
         /// <summary>
+        /// Displays the personalized data of a user.
+        /// </summary>
+        [Route("users/{id}/data")]
+        public IActionResult Data(string id)
+        {
+            UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
+            UserAccount inspectedUser = ProfileBuilder.FromId(id);
+
+            if (inspectedUser == null)
+                return NotFound();
+            
+            if (!selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers) && selfUser.ID != inspectedUser.ID)
+                return Forbid();
+
+            return View(inspectedUser);
+        }
+
+        /// <summary>
         /// Provides the endpoint to edit a user.
         /// </summary>
         [HttpPost]

@@ -14,6 +14,7 @@
     int totalVotesGiven = Model.AuthoredVotes.Where(v => v.Entry.Event.GetCurrentState() == EventState.Closed).Count();
 
     bool allowSelfEditing = (selfUser.ID == Model.ID && selfUser.Permissions.HasFlag(GlobalPermissions.ManageSelf)) || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers);
+    bool allowDataView = selfUser.ID == Model.ID || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers);
     bool allowLogout = selfUser.ID == Model.ID;
 
     IEnumerable<Entry> visibleEntries = Model.Entries.Where(e => e.Event.GetCurrentState() == EventState.Closed);
@@ -67,13 +68,19 @@
         @if (allowSelfEditing)
         {
             <a class="edit-action" asp-controller="users" asp-action="edit" asp-route-id="@Model.DisplayID">
-                Edit<i class="fas fa-cog"></i>
+                Edit <i class="fas fa-cog"></i>
+            </a>
+        }
+        @if (allowDataView)
+        {
+            <a class="data-action" asp-controller="users" asp-action="data" asp-route-id="@Model.DisplayID">
+                Data <i class="fas fa-database"></i>
             </a>
         }
         @if (allowLogout)
         {
             <a class="logout-action" href="/logout">
-                Log Out<i class="fas fa-sign-out-alt"></i>
+                Log Out <i class="fas fa-sign-out-alt"></i>
             </a>
         }
     </div>

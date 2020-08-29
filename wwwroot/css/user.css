@@ -225,9 +225,9 @@
     color: var(--color-gray-4);
 }
 .user-profile .user-actions .fas {
-    margin-left: 0.4rem;
+    margin-left: 0.2rem;
 }
-.user-profile .user-actions .edit-action:hover {
+.user-profile .user-actions .edit-action:hover, .user-profile .user-actions .data-action:hover {
     color: var(--color-gray-7);
 }
 .user-profile .user-actions .logout-action:hover {
@@ -271,6 +271,18 @@
     display: block;
     width: 128px;
     text-align: center;
+}
+
+.data-view {
+    overflow-x: auto;
+}
+.data-table th {
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+.data-table td {
+    padding-right: 1.5rem;
 }
 
 @media (max-width: 640px) {

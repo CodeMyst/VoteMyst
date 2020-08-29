@@ -1,0 +1,117 @@
+@inject DatabaseHelperProvider DatabaseHelpers
+
+@model UserAccount
+@{
+    ViewData["Title"] = "User";
+
+    UserAccount selfUser = ViewBag.UserAccount;
+
+    IEnumerable<Authorization> authorizations = selfUser.Authorizations;
+    IEnumerable<Entry> entries = selfUser.Entries;
+    IEnumerable<EventPermissionModifier> eventPermissionModifiers = DatabaseHelpers.Context.EventPermissionModifiers.Where(e => e.User.ID == selfUser.ID).ToArray();
+    IEnumerable<Report> reports = DatabaseHelpers.Context.Reports.Where(r => r.ReportAuthor.ID == selfUser.ID).ToArray();
+    IEnumerable<Vote> votes = selfUser.AuthoredVotes;
+}
+
+<h1>Data</h1>
+
+<h3>Authorization</h3>
+
+<div class="data-view">
+    <table class="data-table">
+        <tr>
+            <th>Service</th>
+            <th>Hashed User ID</th>
+        </tr>
+
+        @foreach (Authorization authorization in authorizations)
+        {
+            <tr>
+                <td>@authorization.Service</td>
+                <td>@authorization.ServiceUserID</td>
+            </tr>
+        }
+    </table>
+</div>
+
+<h3>Entries</h3>
+
+<div class="data-view">
+    <table class="data-table">
+        <tr>
+            <th>ID</th>
+            <th>Event</th>
+            <th>Submitted</th>
+            <th>Type</th>
+            <th>Content</th>
+        </tr>
+
+        @foreach (Entry entry in entries)
+        {
+            <tr>
+                <td><a href="@entry.GetUrl()">@entry.DisplayID</a></td>
+                <td><a href="@entry.Event.GetUrl()">@entry.Event.Title</a></td>
+                <td><span class="local-date" --unix-timestamp="@entry.SubmitDate.ToUnixSeconds()">@entry.SubmitDate.ToString("dd/MM/yyyy HH:mm:ss")</span></td>
+                <td>@entry.EntryType.ToString()</td>
+                <td>@entry.Content</td>
+            </tr>
+        }
+    </table>
+</div>
+
+<h3>Event Permissions</h3>
+
+<div class="data-view">
+    <table class="data-table">
+        <tr>
+            <th>Event</th>
+            <th>Permissions</th>
+        </tr>
+
+        @foreach (EventPermissionModifier eventPermissionModifier in eventPermissionModifiers)
+        {
+            <tr>
+                <td><a href="@eventPermissionModifier.Event.GetUrl()">@eventPermissionModifier.Event.Title</a></td>
+                <td>@eventPermissionModifier.Permissions.ToString()</td>
+            </tr>
+        }
+    </table>
+</div>
+
+<h3>Authored Reports</h3>
+
+<div class="data-view">
+    <table class="data-table">
+        <tr>
+            <th>Entry</th>
+            <th>Reason</th>
+        </tr>
+
+        @foreach (Report report in reports)
+        {
+            <tr>
+                <td><a href="@report.Entry.GetUrl()">@report.Event.Title</a></td>
+                <td>@report.Reason</td>
+            </tr>
+        }
+    </table>
+</div>
+
+<h3>Votes</h3>
+
+<div class="data-view">
+    <table class="data-table">
+        <tr>
+            <th>Entry</th>
+            <th>Cast</th>
+        </tr>
+    
+        @foreach (Vote vote in votes)
+        {
+            <tr>
+                <td><a href="@vote.Entry.GetUrl()">@vote.Entry.Event.Title</a></td>
+                <td><span class="local-date" --unix-timestamp="@vote.VoteDate.ToUnixSeconds()">@vote.VoteDate.ToString("dd/MM/yyyy HH:mm:ss")</span></td>
+            </tr>
+        }
+    </table>
+</div>
