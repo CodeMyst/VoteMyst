@@ -1,0 +1,63 @@
+@page
+
+@inject SemVer Version
+
+@{ 
+    Layout = "";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Under Maintenance | VoteMyst</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="~/css/theme-dark.css" --theme />
+    <link rel="stylesheet" href="~/css/main.css" />
+    <link rel="icon" type="image/png" href="/img/trophy.png"/>
+
+    <meta property="og:site_name" content="VoteMyst" />
+</head>
+<style>
+    #maintenance-body {
+        display: flex;
+        height: 60vh;
+        width: 100%;
+    }
+    #maintenance-body .notice {
+        margin: auto;
+        width: inherit;
+    }
+</style>
+<body>
+    <div id="container">
+        <header>
+            <a href="/">
+                <h1>
+                    <img src="/img/trophy.png"/>
+                    <span>VoteMyst</span>
+                    <sub class="version">v<span>@Version.VersionString</span></sub>
+                </h1>
+            </a>
+        </header>
+        <p class="subheading">a simple website for event voting</p>
+
+        <div id="maintenance-body">
+            <div class="notice">
+                <p>
+                    The site is currently down for maintenance.<br />
+                    We'll try to be back soon!
+                </p>
+            </div>
+        </div>
+
+        <partial name="_Footer" />
+    </div>
+
+    <script>
+        document.querySelector("footer").classList.add("fixed");
+    </script>
+</body>
+</html>

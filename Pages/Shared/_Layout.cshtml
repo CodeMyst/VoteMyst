@@ -47,6 +47,13 @@
             <partial name="_NavigationItems" />
         </nav>
 
+        @if (Maintenance.MaintenanceModeMiddleware.CheckActiveAndEnabled(Context))
+        {
+            <div class="message warning">
+                Maintenance mode is active!
+            </div>
+        }
+
         @RenderBody()
 
         <partial name="_Footer" />

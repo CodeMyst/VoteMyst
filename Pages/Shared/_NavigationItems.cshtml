@@ -6,4 +6,9 @@
     {
         <li><a href="/users/search">find user</a></li>
     }
+
+    @if (ViewBag.UserAccount.Permissions.HasFlag(GlobalPermissions.SiteAdministrator))
+    {
+        <li><a href="/administration">administration</a></li>
+    }
 </ul>

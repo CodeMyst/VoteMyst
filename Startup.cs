@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
 using VoteMyst.Database;
+using VoteMyst.Maintenance;
 
 namespace VoteMyst
 {
@@ -105,6 +106,7 @@ namespace VoteMyst
             services.AddScoped<AvatarHelper>();
             services.AddScoped<DatabaseHelperProvider>();
             services.AddScoped<UserProfileBuilder>();
+            services.AddScoped<Configuration>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -124,7 +126,7 @@ namespace VoteMyst
             app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
             
             app.UseStaticFiles();
-
+            
             app.UseRouting();
 
             // add the https scheme to oauth redirect urls
@@ -140,6 +142,8 @@ namespace VoteMyst
 
             app.UseAuthorization();
             app.UseAuthentication();
+
+            app.UseMaintenanceMode();
 
             app.UseEndpoints(endpoints =>
             {

@@ -38,25 +38,16 @@ namespace VoteMyst.Controllers
         [RequireEventPermission(EventPermissions.ParticipateInEvent)]
         public IActionResult Index(string id)
         {
-            UserAccount currentUser = GetCurrentUser();
             Event currentEvent = DatabaseHelpers.Events.GetEventByUrl(id);
 
-            bool validEvent = SetupValidation(validator => 
-            {
-                validator.Verify(currentEvent != null);
-                validator.Verify(currentEvent.GetCurrentState() == EventState.Ongoing);
-            }).Run();
-
-            if (!validEvent)
+            if (currentEvent == null)
                 return NotFound();
+            if (currentEvent.GetCurrentState() != EventState.Ongoing)
+                return Redirect(currentEvent.GetUrl());
 
             ViewBag.MaxFileMB = MaxFileMB;
-            ViewBag.Event = currentEvent;
 
-            Entry currentEntry = DatabaseHelpers.Entries.GetEntryOfUserInEvent(currentEvent, currentUser);
-            ViewBag.Entry = currentEntry;
-
-            return View();
+            return View(currentEvent);
         }
 
         /// <summary>

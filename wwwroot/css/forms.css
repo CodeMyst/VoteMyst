@@ -54,6 +54,9 @@ button.thin, .button.thin {
     height: 28px;
     line-height: 28px;
 }
+button.ok, .button.ok {
+    background-color: var(--color-success);
+}
 button.danger, .button.danger {
     background-color: var(--color-mysted);
 }
