@@ -36,6 +36,11 @@ namespace VoteMyst.Database
         /// </summary>
         public bool DeleteEvent(Event e)
         {
+            // Make sure that no foreign keys exist in other columns of this event
+            context.Reports.RemoveRange(e.Reports);
+            context.Entries.RemoveRange(e.Entries);
+            context.Votes.RemoveRange(e.Entries.SelectMany(x => x.Votes));
+
             context.Events.Remove(e);
 
             return context.SaveChanges() > 0;

@@ -31,9 +31,8 @@ input:focus, select:focus, textarea:focus {
 button, .button {
     display: inline-block;
     margin: 0.5rem 0;
-    height: 38px;
-    line-height: 38px;
-    padding: 0 30px;
+    line-height: 1.4;
+    padding: 0.8rem 30px;
     background-color: var(--color-mystge);
     color: var(--color-nano);
     border: none;
@@ -44,7 +43,7 @@ button, .button {
     text-transform: uppercase;
     text-align: center;
     cursor: pointer;
-    white-space: nowrap;
+    white-space: normal;
 }
 button:hover, .button:hover {
     background-color: var(--color-mystlue) !important;
@@ -65,6 +64,8 @@ button.danger, .button.danger {
     display: flex;
     flex-direction: row;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 select option {

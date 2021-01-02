@@ -53,19 +53,6 @@ namespace VoteMyst.Controllers
         }
 
         /// <summary>
-        /// Wipes the data of the current user and subsequentially logs him out.
-        /// </summary>
-        public IActionResult WipeAccount() 
-        {
-            UserAccount selfUser = GetCurrentUser();
-            DatabaseHelpers.Users.WipeUser(selfUser);
-
-            _logger.LogWarning("{0} wiped their account.", selfUser);
-
-            return Logout();
-        }
-
-        /// <summary>
         /// Provides the page to search for users.
         /// </summary>
         [RequireGlobalPermission(GlobalPermissions.ManageUsers)]

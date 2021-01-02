@@ -221,6 +221,30 @@ function deleteEvent(eventId) {
 
 // -- Users --
 
+function deleteAccountConfirm() {
+    promptModal({
+        title: "Delete Account",
+        content: `<p>This action will permanently disable your account.<br/>Personalized data associated with your account will be removed aswell.</p><p>Confirm at your own risk.</p>`,
+        width: 450,
+        buttons: [{
+            content: "Okay, delete my account.",
+            style: "ok",
+            action: () => deleteAccount(),
+        }, {
+            content: "Cancel",
+            style: "cancel"
+        }]
+    })
+}
+function deleteAccount() {
+    fetch(`/api/users/delete`, buildApiPostBody())
+        .then(result => {
+            if (result.ok) {
+                window.location.assign("/logout");
+            }
+        })
+        .catch();
+}
 
 // -- Reports --
 
