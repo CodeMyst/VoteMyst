@@ -1,50 +1,36 @@
-@using VoteMyst.Database
-@using VoteMyst.Controllers
+@model EntryPlaceViewModel
 
-@inject UserProfileBuilder ProfileBuilder
-@inject DatabaseHelperProvider DatabaseHelpers
-
-@model EventsController.Leaderboard.Place
-@{
-    UserAccount user = ProfileBuilder.FromPrincipal(User);
-    UserAccount author = Model.Author;
-
-    Entry entry = Model.Entry;
-    bool isSelfPost = user.ID == author.ID;
-}
-
-<div class="post" id=@Model.Entry.DisplayID
-    @(isSelfPost ? "self-post" : "") >
-    <div class="post-user">
-        <div class="place" place="@Model.Number">
+<div class="entry" id="@Model.Entry.DisplayID"
+    @Html.ConditionalAttribute(Model.IsSelfPost, "self-post") >
+    <div class="entry-user">
+        <div class="place" place="@Model.Place.Number">
             <p>
-                @if (Model.Number <= 3)
+                @if (Model.Place.Number <= 3)
                 {
                     <i class="fas fa-trophy fa-lg"></i>
                 }
                 else 
                 {
-                    <span>@(Model.Number + ".")</span>
+                    <span>@(Model.Place.Number + ".")</span>
                 }
-                <i class="votecount">(@Model.Votes votes)</i>
+                <i class="votecount">(@Model.Place.Votes votes)</i>
             </p>
         </div>
-        <a asp-controller="users" asp-action="display" asp-route-id="@author.DisplayID">
-            <partial name="_Avatar" for="@author" />
-            <p class="username">@author.Username</p>
+        <a asp-controller="users" asp-action="display" asp-route-id="@Model.Author.DisplayID">
+            <partial name="_Avatar" for="@Model.Author" />
+            <p class="username">@Model.Author.Username</p>
         </a>
-        <p class="post-date local-date" --unix-timestamp="@entry.SubmitDate.ToUnixSeconds()" --date-only>@entry.SubmitDate.ToString("dd/MM/yyyy")</p>
+        <p class="entry-date local-date" --unix-timestamp="@Model.Entry.SubmitDate.ToUnixSeconds()" --date-only>@Model.Entry.SubmitDate.ToString("dd/MM/yyyy")</p>
     </div>
-    <div class="post-image">
+    <div class="entry-image">
         <img src="/@Model.Entry.GetRelativeUrl()" />
     </div>
 
-    <div class="post-toolbar">
-        <span class="l">
-        </span>
+    <div class="entry-toolbar">
         <span class="r">
-            <span class="report" title="Report this post" onclick="reportPost(this)">
-                <i class="fas fa-flag"></i>
+            <span class="menu" title="More options for this post" 
+                  onclick="showEntryMenu(this, @Model.CanReport.ToString().ToLower(), @Model.CanDelete.ToString().ToLower())">
+                <i class="fas fa-fw fa-ellipsis-v"></i>
             </span>
         </span>
     </div>

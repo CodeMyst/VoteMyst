@@ -1,44 +1,47 @@
-@using VoteMyst.Database
-
 @model Event
 @{
     EventState eventState = Model.GetCurrentState();
 }
 
-<div class="event">
-    <div class="event-info">
-        <span class="event-header">
-            <a class="event-title" href="@Model.GetUrl()">@Model.Title</a>
-            <span class="event-timestamp">@Model.StartDate.ToString("MMMM yyyy")</span>
-            @if (eventState == EventState.Hidden)
-            {
-                <span class="event-hidden">(hidden)</span>
-            }
-        </span>
-        
-        <p class="event-description">
-            @(string.IsNullOrEmpty(Model.Description) ? "No description was provided." : Model.Description)
-        </p>
-    </div>
-
-    @if (eventState != EventState.Closed)
-    {
-        <div class="event-state">
-            @switch(eventState)
-            {
-                case EventState.Hidden:
-                    <div class="timer" --unix-timestamp="@Model.RevealDate.ToUnixSeconds()">Reveal in</div>
-                    break;
-                case EventState.Revealed:
-                    <div class="timer" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">Starts in</div>
-                    break;
-                case EventState.Ongoing:
-                    <div class="timer" --unix-timestamp="@Model.EndDate.ToUnixSeconds()">Submissions close in</div>
-                    break;
-                case EventState.Voting:
-                    <div class="timer" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
-                    break;
-            }
+<a href="@Model.GetUrl()">
+    <div class="event">
+        <div class="event-info">
+            <span class="event-header">
+                <h1 class="event-title">@Model.Title</h1>
+                <span class="event-type event-@Model.EventType.ToString().ToLower()">
+                    @Model.EventType
+                </span>
+                <span class="event-timestamp">@Model.StartDate.ToString("MMMM yyyy")</span>
+                @if (eventState == EventState.Hidden)
+                {
+                    <span class="event-hidden">(hidden)</span>
+                }
+            </span>
+            
+            <p class="event-description">
+                @(string.IsNullOrWhiteSpace(Model.Description) ? Html.Raw("No description was provided.") : Html.TextNewlines(Model.Description))
+            </p>
         </div>
-    }
-</div>
+    
+        @if (eventState != EventState.Closed)
+        {
+            <div class="event-state">
+                @switch(eventState)
+                {
+                    case EventState.Hidden:
+                        <div class="timer" --unix-timestamp="@Model.RevealDate.ToUnixSeconds()">Reveal in</div>
+                        break;
+                    case EventState.Revealed:
+                        <div class="timer" --unix-timestamp="@Model.StartDate.ToUnixSeconds()">Starts in</div>
+                        break;
+                    case EventState.Ongoing:
+                        <div class="timer" --unix-timestamp="@Model.SubmissionEndDate.ToUnixSeconds()">Submissions close in</div>
+                        break;
+                    case EventState.Voting:
+                        <div class="timer" --unix-timestamp="@Model.VoteEndDate.ToUnixSeconds()">Voting closes in</div>
+                        break;
+                }
+            </div>
+        }
+    </div>
+</a>

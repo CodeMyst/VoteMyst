@@ -13,6 +13,7 @@ namespace VoteMyst.Database
         public DbSet<Vote> Votes { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<EventPermissionModifier> EventPermissionModifiers { get; set; }
+        public DbSet<ConfigurationValue> Configuration { get; set; }
 
         public VoteMystContext(DbContextOptions<VoteMystContext> options) : base(options)
         {

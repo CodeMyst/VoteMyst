@@ -14,15 +14,18 @@
 .reports .reason {
     white-space: normal;
 }
+.reports .deleted {
+    color: var(--color-gray);
+}
 .reports .author .user-info {
     padding: 0.3rem 0;
 }
 .reports .status.pending {
-    color: var(--color-light-gray);
+    color: var(--color-gray-7);
 }
 .reports .status.approved {
-    color: var(--color-success-text);
+    color: var(--color-success);
 }
 .reports .status.rejected {
-    color: var(--color-error-text);
+    color: var(--color-error);
 }

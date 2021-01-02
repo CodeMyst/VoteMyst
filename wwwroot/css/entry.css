@@ -1,0 +1,243 @@
+.entry-display-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin: 1rem 0;
+}
+.entry-display-options > div {
+    transition: opacity 0.2s;
+    opacity: 0.3;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+.entry-display-options > div > img {
+    width: 100%;
+}
+.entry-display-options > div.active, .entry-display-options > div:hover {
+    opacity: 1;
+}
+
+.entries {    
+    display: grid;
+    margin: 1rem 0;
+    grid-gap: 6vmin;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: auto;
+}
+.entry-aspect-large {
+    grid-template-columns: repeat(1, 1fr);
+}
+.entry-aspect-middle {
+    grid-template-columns: repeat(2, 1fr);
+}
+.entry-aspect-small {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.entry-aspect-large .entry-image {
+    max-height: 60vh;
+}
+
+@media (max-width: 640px) {
+    .entry-display-options {
+        display: none;
+    }
+
+    /* Achieve the effect of adding the 'post-aspect-large' class. */
+    .entries {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    .entry-image {
+        max-height: 60vh;
+    }
+}
+
+.entry {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    background-color: var(--color-gray-0);
+    border-bottom: var(--border-drop-shadow);
+    margin: auto 0;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.entry .entry-user, .entry .entry-toolbar {
+    display: flex;
+    flex-direction: row;
+    cursor: default;
+    align-items: center;
+    margin: 0.4rem 0.8rem;
+    height: 32px;
+}
+.entry .entry-user > a {
+    display: inherit;
+}
+.entry .entry-user .avatar {
+    height: 32px;
+    width: 32px;
+}
+.entry .entry-user .avatar > p {
+    font-size: 0.9rem;
+}
+.entry .entry-user .username {
+    font-size: 0.9rem;
+    margin: auto 0.4rem;
+    color: var(--color-white);
+}
+.entry .entry-user .entry-date {
+    font-size: 0.8rem;
+    margin: auto 0 auto auto;
+    color: var(--color-gray-6);
+}
+.entry .entry-image {
+    width: 100%;
+    margin: 0.5rem 0;
+    position: relative;
+}
+.entry .entry-image img {
+    display: block;
+    position: absolute;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    margin: auto;
+    border-radius: 0.5rem;
+    max-width: 95%;
+    max-height: 100%;
+}
+.entry-image:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+.entry .entry-toolbar .l {
+    margin: auto auto auto 0;
+}
+.entry .entry-toolbar .r {
+    margin: auto 0 auto auto;
+}
+.entry .entry-toolbar .menu {
+    color: var(--color-gray-4);
+    cursor: pointer;
+}
+.entry .entry-toolbar .menu:hover {
+    color: var(--color-gray-6);
+}
+.entry .vote {
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-gray-6);
+    color: var(--color-gray-6);
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.2s, color 0.2s;
+}
+.entry .vote > *:nth-child(3) {
+    padding-left: 0.2rem;
+}
+.entry .vote > *:last-child {
+    margin-left: -0.25rem;
+    display: none;
+}
+
+.entry.entry-preview {
+    height: 100px;
+    width: auto;
+    margin: 0.5rem;
+}
+.entry.entry-preview .entry-image {
+    height: inherit;
+    margin: auto;
+}
+.entry.entry-preview .entry-image img {
+    position: relative;
+    max-width: unset;
+    height: 100%;
+}
+
+.entry[self-post] {
+    border: 2px solid var(--color-mystge);
+}
+.entry:target {
+    border: 2px solid var(--color-mystlue);
+}
+
+.entry .broken-heart {
+    display: none;
+}
+.entry .vote[voted] > *:last-child {
+    display: inline-block;
+}
+
+.entry .vote[voted] {
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+/* Hover effects should not be supported on mobile, due to the sticky :hover effect. */
+@media (hover: hover) {
+    .entry .vote:hover {
+        border-color: var(--color-success);
+        color: var(--color-success);
+    }
+    .entry .vote[voted]:hover {
+        border-color: var(--color-error);
+        color: var(--color-error);
+    }
+    .entry .vote[voted]:hover .heart {
+        display: none;
+    }
+    .entry .vote[voted]:hover .broken-heart {
+        display: inline-block;
+    }
+}
+
+#lightbox {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000bb;
+}
+#lightbox:not([open]) {
+    display: none;
+}
+#lightbox .close {
+    position: absolute;
+    right: 0; top: 0;
+    width: 48px;
+    height: 48px;
+    line-height: 48px;
+
+    text-align: center;
+    cursor: pointer;
+
+    color: var(--color-light-gray);
+    background-color: var(--color-dark-gray);
+    border-radius: 16px;
+}
+#lightbox .content {
+    position: absolute;
+    margin: auto;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    width: 80vmin;
+    height: 80vmin;
+    background-color: var(--color-dark-gray);
+    border-radius: 1rem;
+    box-shadow: 0px 5px 10px rgb(0, 0, 0, 0.5)
+}
+#lightbox .content img {
+    position: absolute;
+    margin: auto;
+    top: 0; left: 0;
+    right: 0; bottom: 0;
+    border-radius: 0.5rem;
+    max-width: 95%;
+    max-height: 95%;
+}

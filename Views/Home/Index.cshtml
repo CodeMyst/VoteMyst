@@ -1,16 +1,54 @@
+@model FeaturedEvents
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Home";
     Layout = "_Layout";
+
+    bool showTopOngoing = Model.TopOngoingEvents.Length > 0;
+    bool showRecentUpcoming = Model.RecentUpcomingEvents.Length > 0;
 }
 
-<div class="welcome-container">
-    <h1>Welcome to VoteMyst!</h1>
-    <p>This is a service that is all about creative events!</p>
-    <p>
-        We love seeing people competing in creativity and skill - that's why we provide
-        the tools to host and participate in events to everyone!
-    </p>
-    <p>
-        Interested? Check out <a href="/events">the events</a>!
-    </p>
+<div class="events">
+    @if (!showTopOngoing && !showRecentUpcoming)
+    {
+        <div class="no-events">
+            <h1>It's empty here ...</h1>
+            <p>Currently, there are no events happening or planned.</p>
+            <p>Check back later to see if that has changed!</p>
+        </div>
+    }
+    else
+    {
+        if (showTopOngoing)
+        {
+            <h1>Top Ongoing Events</h1>
+    
+            foreach (Event e in Model.TopOngoingEvents)
+            {
+                <partial name="_EventInfo" for="@e" />
+            }
+    
+            <div class="notice">
+                <a href="/events">View all the events!</a>
+            </div>
+        }
+    
+        if (showTopOngoing && showRecentUpcoming)
+        {
+            <hr>
+        }
+    
+        if (showRecentUpcoming)
+        {
+            <h1>Upcoming Events</h1>
+    
+            foreach (Event e in Model.RecentUpcomingEvents)
+            {
+                <partial name="_EventInfo" for="@e" />
+            }
+    
+            <div class="notice">
+                <a href="/events">View all the events!</a>
+            </div>
+        }
+    }
 </div>

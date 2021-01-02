@@ -1,0 +1,90 @@
+﻿@inject DatabaseHelperProvider DatabaseHelpers
+
+@model Event
+@{
+    ViewData["Title"] = "Reports";
+    Layout = "_Layout";
+
+    UserAccount user = ViewBag.UserAccount;
+
+    var pendingReports = Model.Reports.Where(r => r.Status == ReportStatus.Pending).ToArray();
+    var resolvedReports = Model.Reports.Where(r => r.Status != ReportStatus.Pending).ToArray();
+
+    EventViewModel eventViewModel = new EventViewModel(Model, ViewBag.UserAccount, DatabaseHelpers);
+}
+
+<partial name="_EventPageHeader" for="@eventViewModel" />
+
+<h1>Open Reports</h1>
+
+@if (pendingReports.Length > 0)
+{
+    <div class="reports">
+        <table class="report-overview-table">
+            <tr>
+                <th>Link</th>
+                <th>Author</th>
+                <th>Reporter</th>
+                <th>Reason</th>
+                <th>Tools</th>
+            </tr>
+
+            @foreach (Report report in pendingReports)
+            {
+                <tr class="report" report-id="@report.ID">
+                    <td class="link"><a href="@report.Entry.GetUrl()">@report.Entry.Event.Title</a></td>
+                    <td class="author"><partial name="_UserInfo" for="@report.EntryAuthor"/></td>
+                    <td class="user"><partial name="_UserInfo" for="@report.ReportAuthor"/></td>
+                    <td class="reason">@report.Reason</td>
+                    <td class="tools">
+                        <a href="#" onclick="deleteReportedPost()">Delete Post</a> |
+                        <a href="#" onclick="rejectReport()">Reject</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+else 
+{
+    <p class="reports-empty">No reports are pending!</p>
+}
+
+<h1>Resolved Reports</h1>
+
+@if (resolvedReports.Length > 0)
+{
+    <div class="reports">
+        <table class="report-overview-table">
+            <tr>
+                <th>Link</th>
+                <th>Entry Author</th>
+                <th>Report Author</th>
+                <th>Reason</th>
+                <th>Status</th>
+            </tr>
+
+            @foreach (Report report in resolvedReports)
+            {
+                <tr class="report" report-id="@report.ID">
+                    @if (report.Entry != null) 
+                    {
+                        <td class="link"><a href="@report.Entry.GetUrl()">@report.Entry.Event.Title</a></td>
+                    }
+                    else
+                    {
+                        <td class="deleted">&lt;entry deleted&gt;</td>
+                    }
+                    <td class="author"><partial name="_UserInfo" for="@report.EntryAuthor"/></td>
+                    <td class="author"><partial name="_UserInfo" for="@report.ReportAuthor"/></td>
+                    <td class="reason">@report.Reason</td>
+                    <td class="status @report.Status.ToString().ToLower()">@report.Status</td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+else 
+{
+    <p class="reports-empty">No reports were resolved yet!</p>
+}

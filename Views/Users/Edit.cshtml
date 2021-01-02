@@ -1,14 +1,11 @@
-@using VoteMyst.Database
-
 @inject AvatarHelper AvatarHelper
-@inject UserProfileBuilder ProfileBuilder
 @inject DatabaseHelperProvider DatabaseHelpers
 
 @model UserAccount
 @{
     ViewData["Title"] = "User";
 
-    UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
+    UserAccount selfUser = ViewBag.UserAccount;
     string avatarUrl = AvatarHelper.GetRelativeAvatarUrl(Model, out string _initials);
 }
 
@@ -45,13 +42,26 @@
                 <input type="file" style="visibility:hidden;position:absolute;width:0" id="avatar" name="avatar" accept="image/png" />
                 <input type="hidden" style="visibility:hidden;position:absolute;" id="clearAvatar" name="clearAvatar" value="false" />
                 
-                <div class="editable-avatar">
+                <div class="avatar editable-avatar">
                     <img src="@(avatarUrl != null ? avatarUrl : "")" draggable="false" asp-append-version="true"/>
                     <a id="editAvatar" href="#">Edit</a>
                 </div>
                 <a id="removeAvatar" href="#">Remove</a>
             </td>
         </tr>
+
+        @if (selfUser == Model)
+        {
+            <tr>
+                <th></th>
+                <td>
+                    <button type="submit" formaction="/users/@(Model.DisplayID)/refreshdatafromservice"
+                        method="post">
+                        Update Username & Avatar via Discord
+                    </button>
+                </td>
+            </tr>
+        }
 
         @if (selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers))
         {
@@ -66,9 +76,10 @@
             </tr>
         }
     </table>
-    <div class="form-submit">
+
+    <div class="buttons">
         <button type="submit">Save Changes</button>
-        <div></div>
+        <a class="button danger" onclick="deleteAccountConfirm()">Delete Account</a>
     </div>
 </form>
 

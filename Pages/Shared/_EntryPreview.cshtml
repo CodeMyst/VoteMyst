@@ -1,0 +1,7 @@
+@model Entry
+
+<a class="entry entry-preview" href="@Model.GetUrl()">
+    <div class="entry-image">
+        <img draggable="false" src="/@Model.GetRelativeUrl()" />
+    </div>
+</a>

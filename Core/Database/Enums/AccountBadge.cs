@@ -6,6 +6,8 @@ namespace VoteMyst.Database
     {
         None,
         Banned = 1,
+        [Display(Name = "Beta Tester")]
+        BetaTester = 3,
         [Display(Name = "Site Moderator")]
         SiteModerator = 10,
         [Display(Name = "Site Admin")]

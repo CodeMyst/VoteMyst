@@ -32,12 +32,28 @@ namespace VoteMyst.Database
         }
 
         /// <summary>
+        /// Deletes the specified event.
+        /// </summary>
+        public bool DeleteEvent(Event e)
+        {
+            // Make sure that no foreign keys exist in other columns of this event
+            context.Reports.RemoveRange(e.Reports);
+            context.Entries.RemoveRange(e.Entries);
+            context.Votes.RemoveRange(e.Entries.SelectMany(x => x.Votes));
+
+            context.Events.Remove(e);
+
+            return context.SaveChanges() > 0;
+        }
+
+        /// <summary>
         /// Retrieves an event by its URL. Note that both the <see cref="Event.DisplayID"/> and the <see cref="Event.URL"/> apply here.
         /// </summary>
         public Event GetEventByUrl(string url)
             => context.Events
                 .AsEnumerable()
-                .FirstOrDefault(x => x.GetValidDisplayUrl().Equals(url, StringComparison.InvariantCultureIgnoreCase));
+                .FirstOrDefault(x => x.URL.Equals(url, StringComparison.InvariantCultureIgnoreCase)
+                    || x.DisplayID.Equals(url));
 
         /// <summary>
         /// Returns all events that start between the two given dates.
@@ -57,13 +73,13 @@ namespace VoteMyst.Database
         /// <summary>
         /// Retrieves all events, grouped by their respective state.
         /// </summary>
-        public Dictionary<EventState, IEnumerable<Event>> GetAllEventsGrouped()
+        public Dictionary<EventState, Event[]> GetAllEventsGrouped()
         {
             EventState[] states = (EventState[])Enum.GetValues(typeof(EventState));
             IEnumerable<KeyValuePair<EventState, Event>> eventsWithStates = context.Events
                 .OrderByDescending(e => e.StartDate)
                 .Select(e => new KeyValuePair<EventState, Event>(e.GetCurrentState(), e));
-            return states.ToDictionary(state => state, state => eventsWithStates.Where(e => e.Key == state).Select(e => e.Value));
+            return states.ToDictionary(state => state, state => eventsWithStates.Where(e => e.Key == state).Select(e => e.Value).ToArray());
         }
 
         /// <summary>
@@ -100,7 +116,16 @@ namespace VoteMyst.Database
                 .Where(x => x.VoteEndDate > DateTime.UtcNow)
                 .OrderBy(x => x.VoteEndDate)
                 .ToArray();
-        
+
+        /// <summary>
+        /// Retrieves all events that are planned and visible by everyone.
+        /// </summary>
+        /// <returns></returns>
+        public Event[] GetPlannedEvents()
+            => context.Events
+                .Where(x => x.StartDate > DateTime.UtcNow && x.RevealDate <= DateTime.UtcNow)
+                .ToArray();
+
         /// <summary>
         /// Retrieves all events that are planned and visible by the given user.
         /// </summary>
@@ -119,8 +144,11 @@ namespace VoteMyst.Database
         /// </summary>
         public bool CanUserWin(UserAccount user, Event e)
         {
-            EventPermissions antiWinningPermissions = EventPermissions.EditEventSettings | EventPermissions.ManageEntries | EventPermissions.ManageVotes;
-            return ((GetUserPermissionsForEvent(user, e) & antiWinningPermissions) == 0);
+            if (!e.Settings.HasFlag(EventSettings.ExcludeStaffFromWinning))
+                return true;
+
+            EventPermissions staffPermissions = EventPermissions.EditEventSettings | EventPermissions.ManageEntries | EventPermissions.ManageVotes;
+            return (GetUserPermissionsForEvent(user, e) & staffPermissions) == 0;
         }
 
         /// <summary>
@@ -143,6 +171,13 @@ namespace VoteMyst.Database
                 .ToArray();
 
         /// <summary>
+        /// Checks if the user can view the specified (hidden) event.
+        /// </summary>
+        public bool CanViewHiddenEvent(UserAccount user, Event e) 
+            => user.Permissions.HasFlag(GlobalPermissions.ManageAllEvents) 
+                || GetEventHosts(e).Contains(user);
+
+        /// <summary>
         /// Returns all events in which the user is registered as host.
         /// </summary>
         /// <param name="user"></param>
@@ -158,13 +193,21 @@ namespace VoteMyst.Database
         /// </summary>
         public bool RegisterUserAsHost(UserAccount user, Event e) 
         {
-            EventPermissionModifier modifier = new EventPermissionModifier 
+            EventPermissionModifier modifier = context.EventPermissionModifiers.FirstOrDefault(m => m.Event.ID == e.ID && m.User.ID == user.ID);
+
+            if (modifier == null)
             {
-                Event = e,
-                User = user,
-                Permissions = EventPermissions.Host
-            };
-            context.EventPermissionModifiers.Add(modifier);
+                context.EventPermissionModifiers.Add(new EventPermissionModifier
+                {
+                    Event = e,
+                    User = user,
+                    Permissions = EventPermissions.Host
+                });
+            }
+            else
+            {
+                modifier.Permissions = EventPermissions.Host;
+            }
 
             return context.SaveChanges() > 0;
         }

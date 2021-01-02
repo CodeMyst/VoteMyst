@@ -10,12 +10,14 @@
 
     UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
 
-    Entry[] entries = Model.Entries.ToArray();
-    int totalVotes = entries.Sum(e => e.Votes.Count);
-    int totalSubmissions = entries.Length;
+    int totalVotesEarned = Model.Entries.Where(e => e.Event.GetCurrentState() == EventState.Closed).Sum(e => e.Votes.Count);
+    int totalVotesGiven = Model.AuthoredVotes.Where(v => v.Entry.Event.GetCurrentState() == EventState.Closed).Count();
 
     bool allowSelfEditing = (selfUser.ID == Model.ID && selfUser.Permissions.HasFlag(GlobalPermissions.ManageSelf)) || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers);
+    bool allowDataView = selfUser.ID == Model.ID || selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers);
     bool allowLogout = selfUser.ID == Model.ID;
+
+    IEnumerable<Entry> visibleEntries = Model.Entries.Where(e => e.Event.GetCurrentState() == EventState.Closed);
 }
 
 @section ContentMeta
@@ -24,49 +26,62 @@
     <meta property="og:description" content="A VoteMyst user." />
 }
 
-<div class="panel user-profile">
-    <div class="user-profile-column">
+<div class="user-profile">
+    <div class="user-info-column">
         <partial name="_Avatar" for="@Model" />
         <p class="username">@Model.Username</p>
         @if(@Model.AccountBadge != AccountBadge.None) 
         {
             <p class="user-badge @Model.AccountBadge.ToString().ToLower()">
-                @switch (Model.AccountBadge)
-                {
-                    case AccountBadge.Banned: @Html.Raw("Banned"); break;
-                    case AccountBadge.SiteModerator: @Html.Raw("Moderator"); break;
-                    case AccountBadge.SiteAdministrator: @Html.Raw("Admin"); break;
-                }
+                @Html.DisplayFor(e => e.AccountBadge)
             </p>
         }
         <p class="own-display-id">Account ID:<br>@Model.DisplayID</p>
     </div>
-    <table class="user-profile-table">
-        <tr>
-            <th>Join Date:</th>
-            <td>@Model.JoinDate.ToString("dd/MM/yyyy")</td>
-        </tr>
-        <tr>
-            <th>Total votes received:</th>
-            <td>@totalVotes</td>
-        </tr>
-        <tr>
-            <th>Total submissions:</th>
-            <td>@totalSubmissions</td>
-        </tr>
-    </table>
 
-    @if (allowSelfEditing)
-    {
-        <a asp-controller="users" asp-action="edit" asp-route-id="@Model.DisplayID" class="profile-button edit-button">
-            <i class="fas fa-cog"></i>Edit
-        </a>
-    }
+    <div class="user-stats-column">
+        <h1>User Stats</h1>
+        <table class="user-info-table">
+            <tr>
+                <th>Member since:</th>
+                <td>@Model.JoinDate.ToString("dd/MM/yyyy")</td>
+            </tr>
+            <tr>
+                <th>Votes earned:</th>
+                <td>@totalVotesEarned</td>
+            </tr>
+            <tr>
+                <th>Votes given:</th>
+                <td>@totalVotesGiven</td>
+            </tr>
+        </table>
+        <h1>Event Submissions (@(visibleEntries.Count()))</h1>
+        <div class="submissions">
+            @foreach (Entry entry in visibleEntries)
+            {
+                <partial name="_EntryPreview" for="@entry"/>
+            }
+        </div>
+    </div>
 
-    @if (allowLogout)
-    {
-        <a href="/logout" class="profile-button logout-button">
-            <i class="fas fa-sign-out-alt"></i>Log Out
-        </a>
-    }
+    <div class="user-actions">
+        @if (allowSelfEditing)
+        {
+            <a class="edit-action" asp-controller="users" asp-action="edit" asp-route-id="@Model.DisplayID">
+                Edit <i class="fas fa-cog"></i>
+            </a>
+        }
+        @if (allowDataView)
+        {
+            <a class="data-action" asp-controller="users" asp-action="data" asp-route-id="@Model.DisplayID">
+                Data <i class="fas fa-database"></i>
+            </a>
+        }
+        @if (allowLogout)
+        {
+            <a class="logout-action" href="/logout">
+                Log Out <i class="fas fa-sign-out-alt"></i>
+            </a>
+        }
+    </div>
 </div>

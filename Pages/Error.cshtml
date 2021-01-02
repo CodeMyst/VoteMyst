@@ -1,31 +1,23 @@
 ﻿@page "{code?}"
 @using Microsoft.AspNetCore.WebUtilities
+
 @{
     ViewData["Title"] = "Error";
+    int statusCode = int.Parse(Request.Query["code"]);
+    string phrase = statusCode switch
+    {
+        403 => "I am sorry Hal, I can't let you do that.",
+        _ => ReasonPhrases.GetReasonPhrase(statusCode)
+    };
 }
 
-<style>
-    .panel.small
-    {
-        max-width: 100%;
-    }
-</style>
+<h2>Error @statusCode</h2>
 
-@{
-    string code = Request.Query["code"];
-}
+<div class="message small error">
+    @phrase
+</div>
 
-<h2>Error @code</h2>
-
-@{
-    if (code == "403")
-    {
-        <div class="panel small message error">I am sorry Hal, I can't let you do that.</div>
-    }
-    else
-    {
-        <div class="panel small message error">@ReasonPhrases.GetReasonPhrase(int.Parse(code))</div>
-    }
-
-    <p>If you think this is a mystake please open an issue on our <a href="https://github.com/CodeMyst/VoteMyst/issues" target="_blank">GitHub page</a>.</p>
-}
+<p>
+    If you think this is a mystake please open an issue on our 
+    <a href="https://github.com/CodeMyst/VoteMyst/issues" target="_blank">GitHub</a> page.
+</p>

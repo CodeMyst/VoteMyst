@@ -1,17 +1,14 @@
-@using VoteMyst.Database;
-
-@inject UserProfileBuilder ProfileBuilder
-@{
-    var user = ProfileBuilder.FromPrincipal(User);
-}
-
 <ul>
     <li><a href="/">home</a></li>
     <li><a href="/events">events</a></li>
 
-    @if (user.Permissions.HasFlag(GlobalPermissions.ManageUsers))
+    @if (ViewBag.UserAccount.Permissions.HasFlag(GlobalPermissions.ManageUsers))
     {
         <li><a href="/users/search">find user</a></li>
-        <li><a href="/reports">view reports</a></li>
+    }
+
+    @if (ViewBag.UserAccount.Permissions.HasFlag(GlobalPermissions.SiteAdministrator))
+    {
+        <li><a href="/administration">administration</a></li>
     }
 </ul>

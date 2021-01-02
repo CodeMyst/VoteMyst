@@ -1,0 +1,21 @@
+﻿@using VoteMyst.Maintenance
+
+@{
+    ViewData["Title"] = "Administration";
+
+    bool isMaintenanceActive = MaintenanceModeMiddleware.CheckActiveAndEnabled(Context);
+}
+
+<h1>Site Administration</h1>
+
+<h2>Maintenance Mode</h2>
+
+<p>
+    Maintenance mode can be used to prevent user access if a security issue is detected by the administrators.
+    Regular users will be redirected to the <a href="@MaintenanceModeConstants.PagePath">maintenance page</a> 
+    upon site access, while administrators retain full site access.
+</p>
+
+<form method="post" action="/administration/maintenance/@(isMaintenanceActive ? "deactivate" : "activate")">
+    <button type="submit" class="@(isMaintenanceActive ? "ok" : "danger")">@(isMaintenanceActive ? "Deactivate" : "Activate") Maintenance Mode</button>
+</form>
