@@ -53,19 +53,6 @@ namespace VoteMyst.Controllers
         }
 
         /// <summary>
-        /// Wipes the data of the current user and subsequentially logs him out.
-        /// </summary>
-        public IActionResult WipeAccount() 
-        {
-            UserAccount selfUser = GetCurrentUser();
-            DatabaseHelpers.Users.WipeUser(selfUser);
-
-            _logger.LogWarning("{0} wiped their account.", selfUser);
-
-            return Logout();
-        }
-
-        /// <summary>
         /// Provides the page to search for users.
         /// </summary>
         [RequireGlobalPermission(GlobalPermissions.ManageUsers)]
@@ -121,6 +108,24 @@ namespace VoteMyst.Controllers
         /// </summary>
         [Route("users/{id}/edit")]
         public IActionResult Edit(string id)
+        {
+            UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
+            UserAccount inspectedUser = ProfileBuilder.FromId(id);
+
+            if (inspectedUser == null)
+                return NotFound();
+            
+            if (!selfUser.Permissions.HasFlag(GlobalPermissions.ManageUsers) && selfUser.ID != inspectedUser.ID)
+                return Forbid();
+
+            return View(inspectedUser);
+        }
+
+        /// <summary>
+        /// Displays the personalized data of a user.
+        /// </summary>
+        [Route("users/{id}/data")]
+        public IActionResult Data(string id)
         {
             UserAccount selfUser = ProfileBuilder.FromPrincipal(User);
             UserAccount inspectedUser = ProfileBuilder.FromId(id);

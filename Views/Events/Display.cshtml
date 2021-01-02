@@ -71,7 +71,7 @@
 {
     EventsController.Leaderboard leaderboard = EventsController.Leaderboard.FromEvent(Model, DatabaseHelpers);
 
-    @if (leaderboard.Places != null && leaderboard.Places.Length > 0)
+    @if ((leaderboard.Places?.Length ?? 0) > 0)
     {
         <h2>Leaderboard</h2>
         <div class="leaderboard">
@@ -84,14 +84,8 @@
             </div>
         </div>
     }
-    else
-    {
-        <div class="notice">
-            <p>Nothing has been submit to this event.</p>
-        </div>
-    }
 
-    @if (leaderboard.NotEligable != null && leaderboard.NotEligable.Length > 0)
+    @if ((leaderboard.NotEligable?.Length ?? 0) > 0)
     {
         <h2>Not eligible to win</h2>
         <div class="entries">
@@ -100,6 +94,13 @@
                 EntryViewModel viewModel = ConvertEntryToViewModel(entry);
                 <partial name="_Entry" for="@viewModel" />
             }
+        </div>
+    }
+
+    if (((leaderboard.Places?.Length ?? 0) + (leaderboard.NotEligable?.Length ?? 0)) == 0)
+    {
+        <div class="notice">
+            <p>Nothing has been submit to this event.</p>
         </div>
     }
 }

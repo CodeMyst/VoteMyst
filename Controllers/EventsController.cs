@@ -213,6 +213,12 @@ namespace VoteMyst.Controllers
             }
 
             // Perform additional validation
+            EventState previousState = targetEvent.GetCurrentState(),
+                       updatedState = eventChanges.GetCurrentState();
+            if (updatedState < previousState)
+            {
+                errorMessages.Add($"The event may not transition from {previousState} to {updatedState}.");
+            }
 
             if (errorMessages.Count > 0)
             {
