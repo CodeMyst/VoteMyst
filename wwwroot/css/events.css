@@ -82,8 +82,15 @@
     color: var(--color-gray-6);
 }
 .event-page .event-description {
-    padding: 0.5rem 0 0.5rem 1rem;
+    margin: 1rem 0;
+    padding: 0.6rem 0 0.6rem 1.2rem;
     border-left: 3px solid var(--color-gray-3);
+}
+.event-page .event-description > *:first-child {
+    margin-top: 0;
+}
+.event-page .event-description > *:last-child {
+    margin-bottom: 0;
 }
 .event-page .event-dates {
     display: flex;

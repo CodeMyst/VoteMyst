@@ -23,6 +23,9 @@ input[type=text], textarea {
     min-height: 1.1rem;
     resize: vertical;
 }
+textarea {
+    min-height: 5rem;
+}
 
 input:focus, select:focus, textarea:focus {
     outline: none;

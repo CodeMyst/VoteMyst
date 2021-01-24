@@ -15,8 +15,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
+using Westwind.AspNetCore.Markdown;
+using Westwind.AspnetCore.Markdown.Utilities;
+
 using VoteMyst.Database;
 using VoteMyst.Maintenance;
+using Markdig;
 
 namespace VoteMyst
 {
@@ -37,10 +41,18 @@ namespace VoteMyst
             services.AddSingleton<SemVer>();
 
             services.AddRazorPages();
-          
+
             services.AddSingleton(Configuration);
             services.AddRouting(options => options.LowercaseUrls = true );
-            services.AddMvc(options => options.EnableEndpointRouting = false );
+            services.AddMarkdown(config => 
+            {
+                config.ConfigureMarkdigPipeline = builder => 
+                {
+                    builder.DisableHtml();
+                };
+            });
+            services.AddMvc(options => options.EnableEndpointRouting = false )
+                .AddApplicationPart(typeof(MarkdownPageProcessorMiddleware).Assembly);
 
             services.AddAuthentication(options =>
             {
@@ -125,6 +137,7 @@ namespace VoteMyst
 
             app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
             
+            app.UseMarkdown();
             app.UseStaticFiles();
             
             app.UseRouting();

@@ -1,3 +1,5 @@
+@using Westwind.AspNetCore.Markdown;
+
 @model EventViewModel
 
 @section ContentMeta
@@ -13,7 +15,7 @@
 
     @if (!string.IsNullOrWhiteSpace(Model.Event.Description))
     {
-        <p class="event-description">@Html.TextNewlines(Model.Event.Description)</p>
+        <div class="event-description">@Markdown.ParseHtmlString(Model.Event.Description)</div>
     }
 
     <div class="event-datebox">
