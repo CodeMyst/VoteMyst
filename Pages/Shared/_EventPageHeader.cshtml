@@ -2,13 +2,6 @@
 
 @model EventViewModel
 
-@section ContentMeta
-{
-    <meta property="og:title" content="@Model.Event.Title" />
-    <meta property="og:description" content="@Model.Event.Description" />
-    <meta property="og:image" content="/img/trophy.png" />
-}
-
 <div class="event-page">
     <h1 class="event-title">@Model.Event.Title</h1>
     <p class="event-hosts">Hosted by @Html.Raw(string.Join(", ", Model.Hosts))</p>

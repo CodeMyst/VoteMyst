@@ -13,6 +13,13 @@
     bool showClosedEvents = Model[EventState.Closed].Count() > 0;
 }
 
+@section ContentMeta
+{
+    <meta property="og:title" content="Events" />
+    <meta property="og:description" content="Check out the current events!" />
+    <meta property="og:image" content="/img/trophy.png" />
+}
+
 @if (currentUser.Permissions.HasFlag(GlobalPermissions.CreateEvents))
 {
     <div>
