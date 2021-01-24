@@ -41,7 +41,7 @@ namespace VoteMyst.Database
         /// <summary>
         /// The description of the event.
         /// </summary>
-        [StringLength(512)]
+        [StringLength(2048)]
         public string Description { get; set; }
 
         /// <summary>
