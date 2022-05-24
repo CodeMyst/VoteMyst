@@ -1,0 +1,13 @@
+{
+	"authors": [
+		"CodeMyst"
+	],
+	"copyright": "Copyright © 2022, CodeMyst",
+	"dependencies": {
+		"poodinis": "~>8.1.2",
+		"vibe-d": "~>0.9.4"
+	},
+	"description": "A website for hosting various events where users can vote on user-submitted content. The different event types are: art, text, code, etc. ",
+	"license": "GPL-3.0",
+	"name": "votemyst_api"
+}
