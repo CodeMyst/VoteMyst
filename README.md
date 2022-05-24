@@ -1,6 +1,6 @@
 # VoteMyst
 
-A website for hosting various events where users can vote on user-submitted content. These different event types are: art, text, code, etc.
+A website for hosting various events where users can vote on user-submitted content. The different event types are: art, text, code, etc.
 
 ## Contributing
 
