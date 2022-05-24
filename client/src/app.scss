@@ -1,0 +1,114 @@
+@import "normalize.css";
+
+:root {
+    --color-bg: #141414;
+    --color-bg-1: #1c1c1c;
+    --color-bg-2: #222222;
+    --color-bg-3: #777777;
+    --color-fg: #cccccc;
+
+    --color-prim: #ee720d;
+    --color-sec: #1eaedb;
+
+    --color-red: #ff4c4c;
+    --color-green: #2ec933;
+
+    --fs-small: 0.9rem;
+    --fs-normal: 1rem;
+    --fs-medium: 1.2rem;
+    --fs-large: 1.5rem;
+
+    --font-stack-sans-serif: "Ubuntu", sans-serif;
+
+    --border-radius: 0.2rem;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-size: var(--fs-normal);
+    font-family: var(--font-stack-sans-serif);
+}
+
+a {
+    color: var(--color-prim);
+    @include transition();
+
+    &:hover {
+        color: var(--color-sec);
+    }
+
+    &.no-dec {
+        text-decoration: none;
+    }
+}
+
+#container {
+    max-width: 90%;
+    width: 960px;
+    margin: 0 auto;
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.flex {
+    display: flex;
+
+    &.row,
+    &.sm-row {
+        flex-direction: row;
+    }
+
+    &.sm-row-rev {
+        flex-direction: row-reverse;
+    }
+
+    &.col {
+        flex-direction: column;
+    }
+
+    &.col-rev {
+        flex-direction: column-reverse;
+    }
+
+    &.center,
+    &.sm-center {
+        align-items: center;
+    }
+
+    &.space-between {
+        justify-content: space-between;
+    }
+
+    @media screen and (max-width: 620px) {
+        &.sm-row,
+        &.sm-row-rev {
+            flex-direction: column;
+
+            &.center {
+                align-items: flex-start;
+            }
+        }
+
+        &.sm-center {
+            align-items: flex-start;
+        }
+    }
+}
+
+.btn {
+    background-color: var(--color-bg-1);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    border-bottom: 3px solid var(--color-bg-2);
+    text-decoration: none;
+    color: var(--color-fg);
+    @include transition();
+
+    &:hover {
+        color: var(--color-fg);
+        background-color: var(--color-bg-2);
+        border-bottom-color: var(--color-bg-3);
+    }
+}
