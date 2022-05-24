@@ -3,5 +3,5 @@
     "host": "http://localhost:5000/",
 
     "mongoConnectionString": "mongodb+srv://user:pass@url.com/?retryWrites=true&w=majority",
-    "mongoDatabase": "database"
+    "mongoDatabase": "votemyst"
 }
