@@ -13,15 +13,9 @@ When contributing to this repository, please first discuss the change you wish t
 
 ## Writing Code
 
-VoteMyst runs on ASP.NET Core, which means that functionality is written in C#. We try to maintain the standard C# naming conventions throughout the projects and request that you try the same to ensure a consistent convention. Please refer to existing code for that matter and do not shy away from asking for feedback in your pull requests.
+VoteMyst is written in D. We try to maintain the standard D naming conventions throughout the projects and request that you try the same to ensure a consistent convention. Please refer to existing code for that matter and do not shy away from asking for feedback in your pull requests.
 
-Note that the project makes heavy use of database queries and dependency injection.
-
-### Extending the database
-
-If you modify the database models during a change note that you need to create a new migration for the change with `dotnet ef migrations add <name>`. Note that we try to change the database as little as possible to allow maximum compatibility.
-
-Please turn to the EntityFramework documentation for questions on how to configure the columns.
+[D style](https://dlang.org/dstyle.html)
 
 ### Modifying existing code
 
@@ -29,4 +23,4 @@ If possible, try to keep existing code intact while making a change. We will app
 
 ## Adding HTML/CSS content
 
-If you add a new view to the project please try to stick to the styling conventions established by the other pages inside the project. For color choices, stick to the pre-defined CSS variables in `:root`. If you want to propose a new color variable to be added, do not hesitate to include it.
+If you add a new page or component to the project please try to stick to the styling conventions established by the other pages inside the project. For color choices, stick to the pre-defined CSS variables in `:root`. If you want to propose a new color variable to be added, do not hesitate to include it.
