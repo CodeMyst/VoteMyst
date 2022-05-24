@@ -1,0 +1,27 @@
+name: API
+
+on:
+  push:
+    branches: [ v2-main ]
+  pull_request:
+    branches: [ v2-main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dlang-community/setup-dlang@4c99aa991ce7d19dd3064de0a4f2f6b2f152e2d7
+
+    - name: Build
+      run: |
+        cd api/
+        dub build
+
+    - name: D-Scanner
+      run: |
+        cd api/
+        dub fetch dscanner
+        dub run dscanner -- -S source/

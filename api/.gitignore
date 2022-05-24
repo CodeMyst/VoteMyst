@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/votemyst_api
+votemyst_api.so
+votemyst_api.dylib
+votemyst_api.dll
+votemyst_api.a
+votemyst_api.lib
+votemyst_api-test-*
+*.exe
+*.o
+*.obj
+*.lst
+config.json
