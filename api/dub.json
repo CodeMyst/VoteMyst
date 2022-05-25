@@ -4,6 +4,8 @@
 	],
 	"copyright": "Copyright © 2022, CodeMyst",
 	"dependencies": {
+		"crypto": "~>0.2.17",
+		"hunt-jwt": ">=0.2.0-beta.4 <0.3.0-0",
 		"poodinis": "~>8.1.2",
 		"vibe-d": "~>0.9.4"
 	},

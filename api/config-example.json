@@ -1,6 +1,9 @@
 {
     "port": 5000,
     "host": "http://localhost:5000/",
+    "clientHost": "http://localhost:3000/",
+
+    "jwtSecret": "super-strong-secret",
 
     "mongoConnectionString": "mongodb+srv://user:pass@url.com/?retryWrites=true&w=majority",
     "mongoDatabase": "votemyst"

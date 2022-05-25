@@ -22,15 +22,41 @@ public struct Config
     public string host;
 
     /**
+     * On what host is the client (frontend) hosted on.
+     */
+    public string clientHost;
+
+    /**
      * MongoDB connection string.
      */
     public string mongoConnectionString;
 
     /**
+     * Secret used for signing JWT auth keys.
+     */
+    public string jwtSecret;
+
+    /**
      * Name of the mongo database to connect to.
      */
     public string mongoDatabase;
+
+    /**
+     * Settings for github OAuth provider.
+     */
+    public GitHubConfig github;
 }
+
+///
+public struct GitHubConfig
+{
+    ///
+    public string clientId;
+
+    ///
+    public string clientSecret;
+}
+
 
 /**
  * Service that loads the configuration from file and serves it.
