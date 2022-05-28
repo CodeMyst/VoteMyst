@@ -221,7 +221,7 @@ public class AuthWebController
             cookie.expire = dur!"hours"(1);
             cookie.value = jwtToken.encode(configService.jwtSecret);
 
-            res.cookies.addField("pastemyst-registration", cookie);
+            res.cookies.addField("votemyst-registration", cookie);
 
             res.redirect(
                 configService.clientHost ~ "create-account?username=" ~ providerUser.username);
@@ -236,7 +236,7 @@ public class AuthWebController
             cookie.expire = dur!"days"(30);
             cookie.value = jwtToken.encode(configService.jwtSecret);
 
-            res.cookies.addField("pastemyst", cookie);
+            res.cookies.addField("votemyst", cookie);
 
             res.redirect(configService.clientHost);
         }

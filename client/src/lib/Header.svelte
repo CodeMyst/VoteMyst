@@ -1,8 +1,22 @@
+<script lang="ts">
+    import { currentUserStore } from "./stores";
+</script>
+
 <header>
     <div class="flex row space-between center">
         <a href="/" class="no-dec"><h1>VoteMyst</h1></a>
 
-        <a href="/login" class="btn">Login / Register</a>
+        {#if $currentUserStore != null}
+            <a href="/user/profile" class="btn user flex row center">
+                {$currentUserStore.username}
+                <img
+                    src={$currentUserStore.avatarUrl}
+                    alt="{$currentUserStore.username}'s avatar"
+                />
+            </a>
+        {:else}
+            <a href="/login" class="btn">Login / Register</a>
+        {/if}
     </div>
 
     <h2>A website for hosting various events where users can vote on user-submitted content.</h2>
@@ -57,6 +71,19 @@
                     text-decoration: none;
                 }
             }
+        }
+    }
+
+    .user {
+        font-size: var(--fs-normal);
+        text-decoration: none;
+        word-break: break-word;
+
+        img {
+            max-width: 28px;
+            margin: 0;
+            margin-left: 1rem;
+            border-radius: var(--border-radius);
         }
     }
 

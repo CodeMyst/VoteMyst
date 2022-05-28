@@ -79,6 +79,7 @@ public class UserService
      */
     public void createUser(ref User user)
     {
+        user.id = BsonObjectID.generate();
         user.displayId = randomIdPred(&existsByDisplayId);
 
         mongoService.insert!User(user);

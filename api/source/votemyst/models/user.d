@@ -8,6 +8,7 @@ import votemyst.models;
 public struct User
 {
     ///
+    @name("_id")
     public BsonObjectID id;
 
     /**
