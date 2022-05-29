@@ -44,12 +44,14 @@ public class AuthController : IAuthController
 {
     private ConfigService configService;
     private UserService userService;
+    private AuthService authService;
 
     ///
-    public this(ConfigService configService, UserService userService)
+    public this(ConfigService configService, UserService userService, AuthService authService)
     {
         this.configService = configService;
         this.userService = userService;
+        this.authService = authService;
     }
 
     public override Json postRegister(string authorization, string username) @trusted
@@ -93,6 +95,20 @@ public class AuthController : IAuthController
         };
 
         userService.createUser(user);
+
+        // To get the Discord user's avatar, their Discord ID is required.
+        // And since their ID is hashed, we have to download the avatar and save it locally.
+        if (providerName == authService.discordProvider.name)
+        {
+            import vibe.inet.urltransfer : download;
+
+            const url = "https://cdn.discordapp.com/avatars/" ~ providerId ~ "/" ~ avatarUrl ~ ".png";
+
+            download(url, "static/avatars/" ~ user.displayId ~ ".png");
+
+            user.avatarUrl = configService.host ~ "static/avatars/" ~ user.displayId ~ ".png";
+            userService.updateUserAvatarUrl(user);
+        }
 
         const timeInMonth = Clock.currTime() + 30.days;
         auto jwtToken = new JwtToken(JwtAlgorithm.HS512);
@@ -147,12 +163,12 @@ public class AuthWebController
     }
 
     /**
-     * /api/auth-web/login/github
+     * /api/auth-web/login/:serviceName
      *
-     * Initiates logging in with github.
+     * Initiates logging in with an OAuth provider.
      */
-    @path("login/github")
-    public void getGitHubLogin(HTTPServerResponse res) @safe
+    @path("login/:serviceName")
+    public void getOAuthLogin(string _serviceName, HTTPServerResponse res) @safe
     {
         import std.algorithm : filter, map;
         import std.array : appender;
@@ -170,14 +186,33 @@ public class AuthWebController
         auto session = res.startSession();
         session.set("oauth_state", state);
 
+        switch (_serviceName)
+        {
+        case "github":
+            {
+                res.redirect(authService.getAuthorizationUrl(authService.githubProvider, state));
+            }
+            break;
+
+        case "discord":
+            {
+                res.redirect(authService.getAuthorizationUrl(authService.discordProvider, state));
+            }
+            break;
+
+        default:
+            throw new HTTPStatusException(HTTPStatus.badRequest);
+        }
+
         res.redirect(authService.getAuthorizationUrl(authService.githubProvider, state));
     }
 
     /**
-     * This is an OAauth callback from github.
+     * This is an OAauth callback from a provider.
      */
-    @path("/login/github-callback")
-    public void getGithubCallback(HTTPServerRequest req, HTTPServerResponse res, string code, string state) @trusted
+    @path("/login/:serviceName/callback")
+    public void getGithubCallback(string _serviceName,
+        HTTPServerRequest req, HTTPServerResponse res, string code, string state) @trusted
     {
         if (!req.session)
         {
@@ -190,11 +225,31 @@ public class AuthWebController
         if (state != sessionState)
             throw new HTTPStatusException(HTTPStatus.badRequest, "Invalid state code.");
 
-        const accessToken = authService.getAccessToken(authService.githubProvider, code);
+        OAuthProvider provider;
 
-        const providerUser = authService.getProviderUser(authService.githubProvider, accessToken);
+        switch (_serviceName)
+        {
+        case "github":
+            {
+                provider = cast(OAuthProvider) authService.githubProvider;
+            }
+            break;
 
-        auto user = userService.findByProviderId(authService.githubProvider.name,
+        case "discord":
+            {
+                provider = cast(OAuthProvider) authService.discordProvider;
+            }
+            break;
+
+            default:
+                throw new HTTPStatusException(HTTPStatus.badRequest);
+        }
+
+        const accessToken = authService.getAccessToken(provider, code);
+
+        const providerUser = authService.getProviderUser(provider, accessToken);
+
+        auto user = userService.findByProviderId(provider.name,
             sha256Of(providerUser.id).toHexString());
 
         auto jwtToken = new JwtToken(JwtAlgorithm.HS512);
@@ -215,7 +270,7 @@ public class AuthWebController
             jwtToken.claims.exp = timeInHour.toUnixTime();
 
             jwtToken.claims.set("id", providerUser.id);
-            jwtToken.claims.set("provider", authService.githubProvider.name);
+            jwtToken.claims.set("provider", provider.name);
             jwtToken.claims.set("avatarUrl", providerUser.avatarUrl);
 
             cookie.expire = dur!"hours"(1);

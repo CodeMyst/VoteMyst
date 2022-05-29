@@ -23,6 +23,11 @@ void main()
     router.registerRestInterface(dependencies.resolve!AuthController());
     router.registerRestInterface(dependencies.resolve!UserController());
 
+    auto fsettings = new HTTPFileServerSettings();
+    fsettings.serverPathPrefix = "/static";
+
+    router.get("/static/*", serveStaticFiles("static/", fsettings));
+
     auto serverSettings = new HTTPServerSettings();
     serverSettings.bindAddresses = ["127.0.0.1", "localhost"];
     serverSettings.port = configService.port;

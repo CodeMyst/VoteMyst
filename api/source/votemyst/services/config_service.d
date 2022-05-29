@@ -42,9 +42,14 @@ public struct Config
     public string mongoDatabase;
 
     /**
-     * Settings for github OAuth provider.
+     * Settings for GitHub OAuth provider.
      */
     public GitHubConfig github;
+
+    /**
+     * Settings for Discord OAuth provider.
+     */
+    public DiscordConfig discord;
 }
 
 ///
@@ -57,6 +62,15 @@ public struct GitHubConfig
     public string clientSecret;
 }
 
+///
+public struct DiscordConfig
+{
+    ///
+    public string clientId;
+
+    ///
+    public string clientSecret;
+}
 
 /**
  * Service that loads the configuration from file and serves it.

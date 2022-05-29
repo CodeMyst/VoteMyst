@@ -86,6 +86,14 @@ public class UserService
     }
 
     /**
+     * Updates the provider user's avatar url (the new url should be in the same provided struct).
+     */
+    public void updateUserAvatarUrl(User user)
+    {
+        mongoService.update!User(["_id": user.id], ["$set": [User.avatarUrl.stringof: user.avatarUrl]]);
+    }
+
+    /**
      * Checks if the provided username is valid. Usernames must be unique, can contain alphanumeric chars and these symbols: ., -, _
      *
      * It does check if the username is already taken.

@@ -68,16 +68,28 @@ public struct OAuthProvider
  */
 public class AuthService
 {
+    private ConfigService configService;
+
     ///
     public const OAuthProvider githubProvider;
 
     ///
+    public const OAuthProvider discordProvider;
+
+    ///
     public this(ConfigService config)
     {
+        this.configService = config;
+
         githubProvider = OAuthProvider("GitHub", config.github.clientId, config.github.clientSecret,
             "https://github.com/login/oauth/authorize", "https://github.com/login/oauth/access_token",
-            "https://api.github.com/user", config.host ~ "api/auth-web/login/github-callback",
+            "https://api.github.com/user", config.host ~ "api/auth-web/login/github/callback",
             ["read:user"], "id", "login", "avatar_url");
+
+        discordProvider = OAuthProvider("Discord", config.discord.clientId, config.discord.clientSecret,
+            "https://discord.com/api/oauth2/authorize", "https://discord.com/api/oauth2/token",
+            "https://discord.com/api/users/@me", config.host ~ "api/auth-web/login/discord/callback",
+            ["identify"], "id", "username", "avatar");
     }
 
     /**
@@ -94,7 +106,8 @@ public class AuthService
             "?client_id=" ~ provider.clientId ~
             "&scope=" ~ scopes ~
             "&redirect_uri=" ~ encodeComponent(provider.redirectUrl) ~
-            "&state=" ~ state;
+            "&state=" ~ state ~
+            "&response_type=code";
     }
 
     /**
@@ -102,18 +115,32 @@ public class AuthService
      */
     public string getAccessToken(const OAuthProvider provider, string code) const
     {
-        const accessTokenUrl = provider.accessTokenUrl ~
-                               "?client_id=" ~ provider.clientId ~
-                               "&client_secret=" ~ provider.clientSecret ~
-                               "&code=" ~ code;
+        import std.uri : encode;
 
         string accessToken;
 
-        requestHTTP(accessTokenUrl,
+        requestHTTP(provider.accessTokenUrl,
             (scope req)
             {
-                req.headers.addField("Accept", "application/json");
                 req.method = HTTPMethod.POST;
+
+                auto data = ["client_id": provider.clientId,
+                             "client_secret": provider.clientSecret,
+                             "code": code,
+                             "grant_type": "authorization_code",
+                             "redirect_uri": encode(provider.redirectUrl)];
+
+                if (provider == discordProvider)
+                {
+                    req.headers.addField("Accept", "application/x-www-form-urlencoded");
+                    req.headers.addField("Content-Type", "application/x-www-form-urlencoded");
+                    req.writeFormBody(data);
+                }
+                else
+                {
+                    req.headers.addField("Accept", "application/json");
+                    req.writeJsonBody(data);
+                }
             },
             (scope res)
             {
@@ -121,6 +148,7 @@ public class AuthService
                 {
                     logError("Failed reading the access token. Error while making a request to %s. Got response: %d.",
                         provider.name, res.statusCode);
+                    logError(res.bodyReader.readAllUTF8());
                     throw new HTTPStatusException(HTTPStatus.internalServerError, "Failed reading the access token.");
                 }
 
@@ -182,9 +210,9 @@ public class AuthService
                 {
                     Json json = parseJsonString(res.bodyReader.readAllUTF8());
 
-                    user.id = json[provider.idJsonField].get!long().to!string();
-                    user.username = json[provider.usernameJsonField].get!string();
-                    user.avatarUrl = json[provider.avatarUrlJsonField].get!string();
+                    user.id = json[provider.idJsonField].to!string();
+                    user.username = json[provider.usernameJsonField].to!string();
+                    user.avatarUrl = json[provider.avatarUrlJsonField].to!string();
                 }
                 catch (Exception e)
                 {

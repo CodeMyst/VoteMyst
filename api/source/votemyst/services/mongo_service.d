@@ -70,6 +70,16 @@ public class MongoService
     }
 
     /**
+     * Updates an item in the DB.
+     */
+    public void update(T, S, U)(S selector, U update)
+    {
+        auto collection = db[getCollectionName!T()];
+
+        collection.update(selector, update);
+    }
+
+    /**
      * Returns the count of document inside the specified collection.
      */
     public ulong getDocumentCount(T)()
