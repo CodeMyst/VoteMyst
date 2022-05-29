@@ -13,7 +13,10 @@ export interface FetcherRequest {
     bearer?: string;
 }
 
-export const fetcherGet = async <T> (url: string, req: FetcherRequest = {}): Promise<FetcherResponse<T>> => {
+export const fetcherGet = async <T>(
+    url: string,
+    req: FetcherRequest = {}
+): Promise<FetcherResponse<T>> => {
     const res = await fetcher(url, "get", req);
 
     return {
@@ -23,7 +26,10 @@ export const fetcherGet = async <T> (url: string, req: FetcherRequest = {}): Pro
     };
 };
 
-export const fetcherPost = async <T> (url: string, req: FetcherRequest = {}): Promise<FetcherResponse<T>> => {
+export const fetcherPost = async <T>(
+    url: string,
+    req: FetcherRequest = {}
+): Promise<FetcherResponse<T>> => {
     const res = await fetcher(url, "post", req);
 
     return {
@@ -33,7 +39,11 @@ export const fetcherPost = async <T> (url: string, req: FetcherRequest = {}): Pr
     };
 };
 
-export const fetcher = async (url: string, method = "get", req: FetcherRequest): Promise<Response> => {
+export const fetcher = async (
+    url: string,
+    method = "get",
+    req: FetcherRequest
+): Promise<Response> => {
     const opts = {
         method: method,
         body: req.body,
@@ -43,7 +53,7 @@ export const fetcher = async (url: string, method = "get", req: FetcherRequest):
     if (req.bearer) {
         opts.headers = {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${req.bearer}`
+            Authorization: `Bearer ${req.bearer}`
         };
     } else {
         opts.headers = {
