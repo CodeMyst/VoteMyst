@@ -97,13 +97,16 @@ a {
     }
 }
 
+button,
 .btn {
     background-color: var(--color-bg-1);
     padding: 0.75rem 1rem;
     border-radius: var(--border-radius);
+    border: 0;
     border-bottom: 3px solid var(--color-bg-2);
     text-decoration: none;
     color: var(--color-fg);
+    cursor: pointer;
     @include transition();
 
     &:hover {
@@ -111,4 +114,74 @@ a {
         background-color: var(--color-bg-2);
         border-bottom-color: var(--color-bg-3);
     }
+
+    &.btn-main {
+        background-color: var(--color-prim);
+        color: var(--color-bg);
+        border: 0;
+
+        &:hover {
+            background-color: var(--color-sec);
+        }
+    }
+}
+
+section {
+    background-color: var(--color-bg-1);
+    border-radius: var(--border-radius);
+    border-bottom: 3px solid var(--color-bg-2);
+    padding: 1rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+
+    h2:first-child {
+        margin-top: 0;
+    }
+}
+
+.icon {
+    color: var(--color-fg);
+    max-width: 25px;
+    max-height: 25px;
+}
+
+input[type="text"],
+input[type="password"],
+textarea {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    outline: none;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    border: 0;
+    border-bottom: 3px solid var(--color-bg-2);
+    @include transition();
+
+    &:hover {
+        background-color: var(--color-bg-2);
+        border-bottom-color: var(--color-bg-3);
+    }
+
+    &:focus,
+    &:active {
+        outline: none;
+        border-bottom-color: var(--color-prim);
+    }
+}
+
+form {
+    span.required {
+        color: var(--color-red);
+    }
+
+    label {
+        font-weight: bold;
+    }
+}
+
+.error-message {
+    padding: 1rem;
+    border: 2px solid var(--color-red);
+    border-radius: var(--border-radius);
 }

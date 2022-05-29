@@ -14,3 +14,6 @@ votemyst_api-test-*
 *.obj
 *.lst
 config.json
+
+static/avatars/*
+!static/avatars/.gitkeep

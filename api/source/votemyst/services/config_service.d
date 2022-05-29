@@ -22,14 +22,54 @@ public struct Config
     public string host;
 
     /**
+     * On what host is the client (frontend) hosted on.
+     */
+    public string clientHost;
+
+    /**
      * MongoDB connection string.
      */
     public string mongoConnectionString;
 
     /**
+     * Secret used for signing JWT auth keys.
+     */
+    public string jwtSecret;
+
+    /**
      * Name of the mongo database to connect to.
      */
     public string mongoDatabase;
+
+    /**
+     * Settings for GitHub OAuth provider.
+     */
+    public GitHubConfig github;
+
+    /**
+     * Settings for Discord OAuth provider.
+     */
+    public DiscordConfig discord;
+}
+
+///
+public struct GitHubConfig
+{
+    ///
+    public string clientId;
+
+    ///
+    public string clientSecret;
+}
+
+///
+public struct DiscordConfig
+{
+    ///
+    public string clientId;
+
+    ///
+    public string clientSecret;
 }
 
 /**
