@@ -34,7 +34,7 @@ public interface IAuthController
      *      authorization = (header) Bearer JTW token.
      */
     @headerParam("authorization", "Authorization")
-    User getSelf(string authorization) @safe;
+    const(User) getSelf(string authorization) @safe;
 }
 
 /**
@@ -91,7 +91,8 @@ public class AuthController : IAuthController
             oauthProviderIds: [providerName: sha256Of(providerId).toHexString()],
             avatarUrl: avatarUrl,
             joinDate: Clock.currTime(),
-            role: UserRole.user
+            // first created account is an admin automatically
+            role: userService.getUserCount() == 0 ? UserRole.admin : UserRole.user
         };
 
         userService.createUser(user);
@@ -119,13 +120,17 @@ public class AuthController : IAuthController
         return Json(["token": Json(jwtToken.encode(configService.jwtSecret))]);
     }
 
-    public override User getSelf(string authorization) @trusted
+    public override const(User) getSelf(string authorization) @trusted
     {
         const tokenRes = authService.decodeToken(authorization);
 
         enforceHTTP(tokenRes.ok, HTTPStatus.badRequest, tokenRes.error);
 
-        return userService.findById(BsonObjectID.fromString(tokenRes.id)).get();
+        const user = userService.findById(BsonObjectID.fromString(tokenRes.id));
+
+        enforceHTTP(!user.isNull(), HTTPStatus.badRequest, "User doesn't exist.");
+
+        return user.get();
     }
 }
 

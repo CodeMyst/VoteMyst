@@ -94,6 +94,14 @@ public class UserService
     }
 
     /**
+     * Returns the number of existing users.
+     */
+    public ulong getUserCount()
+    {
+        return mongoService.getDocumentCount!User();
+    }
+
+    /**
      * Checks if the provided username is valid. Usernames must be unique, can contain alphanumeric chars and these symbols: ., -, _
      *
      * It does check if the username is already taken.

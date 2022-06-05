@@ -1,4 +1,6 @@
 <script lang="ts">
+import { UserRole } from "./api/user";
+
     import { currentUserStore } from "./stores";
 </script>
 
@@ -8,6 +10,9 @@
 
         {#if $currentUserStore != null}
             <a href="/user/profile" class="btn user flex row center">
+                {#if $currentUserStore.role === UserRole.ADMIN}
+                    <span class="admin">Admin</span>
+                {/if}
                 {$currentUserStore.username}
                 <img
                     src={$currentUserStore.avatarUrl}
@@ -78,6 +83,14 @@
         font-size: var(--fs-normal);
         text-decoration: none;
         word-break: break-word;
+
+        .admin {
+            background-color: var(--color-red);
+            color: var(--color-bg);
+            border-radius: var(--border-radius);
+            padding: 0.25rem;
+            margin-right: 0.5rem;
+        }
 
         img {
             max-width: 28px;
