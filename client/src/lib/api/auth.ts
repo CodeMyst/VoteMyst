@@ -27,7 +27,7 @@ export const createAccount = async (username: string): Promise<string | undefine
 export const getSelf = async (): Promise<User | null> => {
     const token = getCookie("votemyst");
 
-    if (token === null) return null;
+    if (!token) return null;
 
     const res = await fetcherGet<User>(`${apiBase}/auth/self`, { bearer: token });
 
