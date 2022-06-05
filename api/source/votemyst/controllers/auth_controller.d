@@ -18,7 +18,7 @@ public interface IAuthController
      * Creates a new account.
      *
      * Params:
-     *      authorization = (header) Bearer JTW token.
+     *      authorization = (header) Bearer JWT token.
      *      username = (body) Username to be used for the new account.
      */
     @headerParam("authorization", "Authorization")
@@ -121,26 +121,11 @@ public class AuthController : IAuthController
 
     public override User getSelf(string authorization) @trusted
     {
-        enforceHTTP(authorization.startsWith("Bearer "), HTTPStatus.badRequest,
-            "Invalid authorization scheme. The token must be provided as a Bearer token.");
+        const tokenRes = authService.decodeToken(authorization);
 
-        const encodedToken = authorization["Bearer ".length .. $];
+        enforceHTTP(tokenRes.ok, HTTPStatus.badRequest, tokenRes.error);
 
-        string id;
-
-        try
-        {
-            auto token = JwtToken.decode(encodedToken, configService.jwtSecret);
-
-            id = token.claims.get("id");
-        }
-        catch (Exception e)
-        {
-            logError("User tried calling an auth endpoint with an invalid token. Exception: %s", e);
-            throw new HTTPStatusException(HTTPStatus.badRequest, "Provided token is notr valid.");
-        }
-
-        return userService.findById(BsonObjectID.fromString(id)).get();
+        return userService.findById(BsonObjectID.fromString(tokenRes.id)).get();
     }
 }
 
