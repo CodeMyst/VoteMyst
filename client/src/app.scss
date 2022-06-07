@@ -147,6 +147,8 @@ section {
 
 input[type="text"],
 input[type="password"],
+input[type="datetime-local"],
+select,
 textarea {
     background-color: var(--color-bg);
     color: var(--color-fg);
