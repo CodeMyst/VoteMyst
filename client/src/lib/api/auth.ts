@@ -24,14 +24,14 @@ export const createAccount = async (username: string): Promise<string | undefine
     return null;
 };
 
-export const getSelf = async (): Promise<User | null> => {
+export const getSelf = async (): Promise<User | undefined> => {
     const token = getCookie("votemyst");
 
-    if (!token) return null;
+    if (!token) return undefined;
 
     const res = await fetcherGet<User>(`${apiBase}/auth/self`, { bearer: token });
 
     if (res.ok) return res.data;
 
-    return null;
+    return undefined;
 };

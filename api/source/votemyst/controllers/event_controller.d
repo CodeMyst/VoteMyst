@@ -10,7 +10,7 @@ import votemyst.services;
 /**
  * API /api/event
  */
-@path("/api/user")
+@path("/api/event")
 @serializationPolicy!EventPolicy
 public interface IEventController
 {
@@ -43,12 +43,14 @@ public class EventController : IEventController
     {
         this.authService = authService;
         this.userService = userService;
+        this.eventService = eventService;
     }
 
     public override Event postEvent(string authorization, EventCreateInfo createInfo) @safe
     {
         import std.conv : to;
         import std.regex : ctRegex, matchFirst;
+        import std.string : empty;
 
         const tokenRes = authService.decodeToken(authorization);
 
@@ -59,16 +61,19 @@ public class EventController : IEventController
         enforceHTTP(currentUser.role == UserRole.admin, HTTPStatus.forbidden,
             "Only site admins are allowed to host events for now.");
 
-        const rgx = ctRegex!(r"^[a-zA-Z\d\-]*$");
+        if (!createInfo.vanityUrl.empty())
+        {
+            const rgx = ctRegex!(r"^[a-zA-Z\d\-]*$");
 
-        enforceHTTP(!matchFirst(createInfo.vanityUrl, rgx).empty, HTTPStatus.badRequest,
-            "The vanity URL may only contain lowercase letters, digits and dashes.");
+            enforceHTTP(!matchFirst(createInfo.vanityUrl, rgx).empty, HTTPStatus.badRequest,
+                "The vanity URL may only contain lowercase letters, digits and dashes.");
 
-        enforceHTTP(createInfo.vanityUrl.length < vanityUrlMaxLength, HTTPStatus.badRequest,
-            "The vanity URL length must be less than " ~ vanityUrlMaxLength.to!string() ~ " characters.");
+            enforceHTTP(createInfo.vanityUrl.length < vanityUrlMaxLength, HTTPStatus.badRequest,
+                "The vanity URL length must be less than " ~ vanityUrlMaxLength.to!string() ~ " characters.");
 
-        enforceHTTP(!eventService.existsByVanityUrl(createInfo.vanityUrl), HTTPStatus.badRequest,
-            "The vanity URL is already taken.");
+            enforceHTTP(!eventService.existsByVanityUrl(createInfo.vanityUrl), HTTPStatus.badRequest,
+                "The vanity URL is already taken.");
+        }
 
         enforceHTTP(createInfo.title.length < eventTitleMaxLength, HTTPStatus.badRequest,
             "The event title length must be less than " ~ eventTitleMaxLength.to!string() ~ " characters.");

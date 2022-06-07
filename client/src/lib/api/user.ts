@@ -16,10 +16,10 @@ export interface User {
     avatarUrl: string;
 }
 
-export const getUser = async (username: string): Promise<User | null> => {
+export const getUser = async (username: string): Promise<User | undefined> => {
     const res = await fetcherGet<User>(`${apiBase}/user/${username}`);
 
-    if (!res.ok) return null;
+    if (!res.ok) return undefined;
 
     return res.data;
 };

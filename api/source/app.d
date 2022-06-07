@@ -12,16 +12,19 @@ void main()
     dependencies.register!MongoService();
     dependencies.register!UserService();
     dependencies.register!AuthService();
+    dependencies.register!EventService();
 
     dependencies.register!AuthController();
     dependencies.register!AuthWebController();
     dependencies.register!UserController();
+    dependencies.register!EventController();
 
     auto router = new URLRouter();
     router.registerWebInterface(dependencies.resolve!AuthWebController());
 
     router.registerRestInterface(dependencies.resolve!AuthController());
     router.registerRestInterface(dependencies.resolve!UserController());
+    router.registerRestInterface(dependencies.resolve!EventController());
 
     auto fsettings = new HTTPFileServerSettings();
     fsettings.serverPathPrefix = "/static";

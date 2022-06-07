@@ -35,8 +35,14 @@ public class EventService
      */
     public void createEvent(ref Event event)
     {
+        import std.string : empty;
         event.id = BsonObjectID.generate();
         event.displayId = randomIdPred(&existsByDisplayId);
+
+        if (event.vanityUrl.empty())
+        {
+            event.vanityUrl = event.displayId;
+        }
 
         mongoService.insert!Event(event);
     }
