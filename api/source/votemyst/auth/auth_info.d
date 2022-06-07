@@ -29,7 +29,7 @@ public struct AuthInfo
     }
 
     ///
-    public bool isLoggednIn()
+    public bool isLoggedIn()
     {
         return loggedIn;
     }

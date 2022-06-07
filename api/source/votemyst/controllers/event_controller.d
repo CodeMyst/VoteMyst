@@ -55,7 +55,8 @@ public class EventController : IEventController
     private ConfigService configService;
 
     ///
-    public this(AuthService authService, UserService userService, EventService eventService, ConfigService configService)
+    public this(AuthService authService, UserService userService,
+        EventService eventService, ConfigService configService)
     {
         this.authService = authService;
         this.userService = userService;

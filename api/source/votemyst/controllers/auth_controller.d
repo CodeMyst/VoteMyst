@@ -3,6 +3,8 @@ module votemyst.controllers.auth_controller;
 import hunt.jwt;
 import std.digest.sha;
 import vibe.d;
+import vibe.web.auth;
+import votemyst.auth;
 import votemyst.models;
 import votemyst.services;
 
@@ -10,6 +12,7 @@ import votemyst.services;
  * API /api/auth
  */
 @path("/api/auth")
+@requiresAuth
 public interface IAuthController
 {
     /**
@@ -21,20 +24,16 @@ public interface IAuthController
      *      authorization = (header) Bearer JWT token.
      *      username = (body) Username to be used for the new account.
      */
-    @headerParam("authorization", "Authorization")
-    @bodyParam("username", "username")
-    Json postRegister(string authorization, string username) @safe;
+    @noAuth
+    Json postRegister(@viaHeader("authorization") string authorization, @viaBody("username") string username) @safe;
 
     /**
      * POST /api/auth/self
      *
      * Returns the currently authorized user from the provided token.
-     *
-     * Params:
-     *      authorization = (header) Bearer JTW token.
      */
-    @headerParam("authorization", "Authorization")
-    const(User) getSelf(string authorization) @safe;
+    @auth(Role.loggedIn)
+    const(User) getSelf(AuthInfo auth) @safe;
 }
 
 /**
@@ -42,6 +41,8 @@ public interface IAuthController
  */
 public class AuthController : IAuthController
 {
+    mixin Auth;
+
     private ConfigService configService;
     private UserService userService;
     private AuthService authService;
@@ -120,15 +121,9 @@ public class AuthController : IAuthController
         return Json(["token": Json(jwtToken.encode(configService.jwtSecret))]);
     }
 
-    public override const(User) getSelf(string authorization) @trusted
+    public override const(User) getSelf(AuthInfo auth) @trusted
     {
-        const tokenRes = authService.decodeToken(authorization);
-
-        enforceHTTP(tokenRes.ok, HTTPStatus.badRequest, tokenRes.error);
-
-        const user = userService.findById(BsonObjectID.fromString(tokenRes.id));
-
-        enforceHTTP(!user.isNull(), HTTPStatus.badRequest, "User doesn't exist.");
+        const user = userService.findById(auth.id);
 
         return user.get();
     }
