@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { page } from "$app/stores";
-    import { createAccount } from "$lib/api/auth";
+    import { page, session } from "$app/stores";
+    import { createAccount, getSelf } from "$lib/api/auth";
     import { getUser } from "$lib/api/user";
     import { deleteCookie, setCookie } from "$lib/util/cookies";
 
@@ -37,11 +37,13 @@
         setCookie("votemyst", token!, 30);
         deleteCookie("votemyst-registration");
 
+        $session.user = (await getSelf())!;
+
         goto("/");
     };
 
     const validateUsername = async () => {
-        if ((await getUser(username!)) !== null) {
+        if ((await getUser(username!))) {
             usernameValid = false;
             usernameErrorMsg = "This username is already taken.";
         } else if (username!.length === 0) {

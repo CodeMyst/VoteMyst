@@ -14,12 +14,7 @@ public struct Event
     public BsonObjectID id;
 
     /**
-     * Publically visible ID of the event.
-     */
-    public string displayId;
-
-    /**
-     * Vanity URL. If empty then the `displayId` is used.
+     * Vanity URL. If empty then the `id` is used.
      */
     @optional
     public string vanityUrl;

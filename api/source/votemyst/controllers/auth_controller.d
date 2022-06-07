@@ -105,9 +105,9 @@ public class AuthController : IAuthController
 
             const url = "https://cdn.discordapp.com/avatars/" ~ providerId ~ "/" ~ avatarUrl ~ ".png";
 
-            download(url, "static/avatars/" ~ user.displayId ~ ".png");
+            download(url, "static/avatars/" ~ user.id.toString() ~ ".png");
 
-            user.avatarUrl = configService.host ~ "static/avatars/" ~ user.displayId ~ ".png";
+            user.avatarUrl = configService.host ~ "static/avatars/" ~ user.id.toString() ~ ".png";
             userService.updateUserAvatarUrl(user);
         }
 
@@ -283,7 +283,7 @@ public class AuthWebController
 
             res.cookies.addField("votemyst", cookie);
 
-            res.redirect(configService.clientHost);
+            res.redirect(configService.clientHost ~ "handle-login");
         }
     }
 }

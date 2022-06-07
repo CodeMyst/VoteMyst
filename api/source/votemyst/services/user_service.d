@@ -34,12 +34,6 @@ public class UserService
         return !findById(id).isNull();
     }
 
-    ///
-    public bool existsByDisplayId(const string displayId)
-    {
-        return !mongoService.findOne!User(["displayId": displayId]).isNull();
-    }
-
     /**
      * Checks if a user exists with the provided hashed OAuth provider id.
      */
@@ -75,12 +69,11 @@ public class UserService
     }
 
     /**
-     * Inserts a user into the DB. Modifies the provided user's Display ID field with the generated one.
+     * Inserts a user into the DB. Modifies the provided user's ID field.
      */
     public void createUser(ref User user)
     {
         user.id = BsonObjectID.generate();
-        user.displayId = randomIdPred(&existsByDisplayId);
 
         mongoService.insert!User(user);
     }

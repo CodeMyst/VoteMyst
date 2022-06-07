@@ -24,11 +24,9 @@ public class MongoService
 
         db["users"].createIndex(["username": "text"]);
         db["users"].createIndex(["username": 1], idxOpts);
-        db["users"].createIndex(["displayId": 1], idxOpts);
 
         db["events"].createIndex(["vanityUrl": "text"]);
         db["events"].createIndex(["vanityUrl": 1], idxOpts);
-        db["events"].createIndex(["displayId": 1], idxOpts);
     }
 
     /**

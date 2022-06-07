@@ -2,6 +2,8 @@ module votemyst.controllers.event_controller;
 
 import hunt.jwt;
 import vibe.d;
+import vibe.web.auth;
+import votemyst.auth;
 import votemyst.constants;
 import votemyst.models;
 import votemyst.serialization;
@@ -11,7 +13,7 @@ import votemyst.services;
  * API /api/event
  */
 @path("/api/event")
-@serializationPolicy!EventPolicy
+@requiresAuth
 public interface IEventController
 {
     /**
@@ -24,9 +26,20 @@ public interface IEventController
      *      createInfo = (body) Event create info.
      */
     @path("/")
-    @headerParam("authorization", "Authorization")
-    @bodyParam("createInfo")
-    Event postEvent(string authorization, EventCreateInfo createInfo) @safe;
+    @auth(Role.admin)
+    Event postEvent(AuthInfo auth, @viaBody("") EventCreateInfo createInfo) @safe;
+
+    /**
+     * GET /api/event/listing
+     *
+     * Gets the list of all events.
+     *
+     * Params:
+     *      authorization = (header) Bearer JWT token.
+     */
+    @path("/listing")
+    @anyAuth
+    Event[] getEventListing() @safe;
 }
 
 /**
@@ -34,32 +47,27 @@ public interface IEventController
  */
 public class EventController : IEventController
 {
+    mixin Auth;
+
     private AuthService authService;
     private UserService userService;
     private EventService eventService;
+    private ConfigService configService;
 
     ///
-    public this(AuthService authService, UserService userService, EventService eventService)
+    public this(AuthService authService, UserService userService, EventService eventService, ConfigService configService)
     {
         this.authService = authService;
         this.userService = userService;
         this.eventService = eventService;
+        this.configService = configService;
     }
 
-    public override Event postEvent(string authorization, EventCreateInfo createInfo) @safe
+    public override Event postEvent(AuthInfo auth, EventCreateInfo createInfo) @safe
     {
         import std.conv : to;
         import std.regex : ctRegex, matchFirst;
         import std.string : empty;
-
-        const tokenRes = authService.decodeToken(authorization);
-
-        enforceHTTP(tokenRes.ok, HTTPStatus.badRequest, tokenRes.error);
-
-        const currentUser = userService.findById(BsonObjectID.fromString(tokenRes.id)).get();
-
-        enforceHTTP(currentUser.role == UserRole.admin, HTTPStatus.forbidden,
-            "Only site admins are allowed to host events for now.");
 
         if (!createInfo.vanityUrl.empty())
         {
@@ -102,11 +110,16 @@ public class EventController : IEventController
             submissionStartDate: createInfo.submissionStartDate,
             submissionEndDate: createInfo.submissionEndDate,
             voteEndDate: createInfo.voteEndDate,
-            hostIds: [currentUser.id]
+            hostIds: [auth.id]
         };
 
         eventService.createEvent(event);
 
         return event;
+    }
+
+    public override Event[] getEventListing() @safe
+    {
+        return [];
     }
 }

@@ -19,29 +19,22 @@ public class EventService
     }
 
     ///
-    public bool existsByDisplayId(const string displayId)
-    {
-        return !mongoService.findOne!Event(["displayId": displayId]).isNull();
-    }
-
-    ///
     public bool existsByVanityUrl(const string vanityUrl)
     {
         return !mongoService.findOne!Event(["vanityUrl": vanityUrl]).isNull();
     }
 
     /**
-     * Inserts an event into the DB. Modifies the ID and Display ID fields.
+     * Inserts an event into the DB. Modifies the ID and ID field.
      */
     public void createEvent(ref Event event)
     {
         import std.string : empty;
         event.id = BsonObjectID.generate();
-        event.displayId = randomIdPred(&existsByDisplayId);
 
         if (event.vanityUrl.empty())
         {
-            event.vanityUrl = event.displayId;
+            event.vanityUrl = event.id.toString();
         }
 
         mongoService.insert!Event(event);

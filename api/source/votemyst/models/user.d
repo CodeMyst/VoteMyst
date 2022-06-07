@@ -11,11 +11,6 @@ public struct User
     @name("_id")
     public BsonObjectID id;
 
-    /**
-     * The ID used for publically referring to the user.
-     */
-    public string displayId;
-
     ///
     public string username;
 

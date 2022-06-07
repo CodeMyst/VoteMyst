@@ -7,7 +7,7 @@
 		"crypto": "~>0.2.17",
 		"hunt-jwt": ">=0.2.0-beta.4 <0.3.0-0",
 		"poodinis": "~>8.1.2",
-		"vibe-d": "~>0.9.4"
+		"vibe-d": "~>0.9.5-beta.2"
 	},
 	"description": "A website for hosting various events where users can vote on user-submitted content. The different event types are: art, text, code, etc. ",
 	"license": "GPL-3.0",
