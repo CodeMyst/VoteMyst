@@ -25,6 +25,7 @@
 
     let vanityUrl: string;
     let title: string;
+    let shortDescription: string;
     let description: string;
     let type: string;
     let randomizeEntries: boolean = true;
@@ -69,6 +70,7 @@
         eventResponse = await createEvent({
             vanityUrl: vanityUrl,
             title: title,
+            shortDescription: shortDescription,
             description: description,
             type: typeEnum,
             settings: settingsEnum,
@@ -116,6 +118,20 @@
             bind:value={title}
         />
 
+        <label for="shortDescription">
+            Short Description: <span class="required">*</span>
+        </label>
+        <input
+            type="text"
+            name="shortDescription"
+            id="shortDescription"
+            placeholder="Short Description..."
+            maxlength="50"
+            minlength="4"
+            required
+            bind:value={shortDescription}
+        />
+
         <label for="description">
             Description: <span class="required">*</span>
         </label>
@@ -125,10 +141,11 @@
             cols="30"
             rows="10"
             placeholder="Description..."
-            maxlength="512"
+            maxlength="1024"
             required
             bind:value={description}
         />
+        <span class="note">Markdown supported.</span>
 
         <label for="type">
             Type: <span class="required">*</span>
@@ -249,5 +266,11 @@
         padding: 1rem;
         color: var(--color-bg);
         border-radius: var(--border-radius);
+    }
+
+    .note {
+        margin-top: 0.5rem;
+        font-size: var(--fs-small);
+        color: var(--color-bg-3);
     }
 </style>

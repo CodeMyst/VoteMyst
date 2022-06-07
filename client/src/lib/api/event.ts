@@ -23,6 +23,7 @@ export interface Event {
     displayId: string;
     vanityUrl?: string;
     title: string;
+    shortDescription: string;
     description: string;
     type: EventType;
     settings: EventSettings;
@@ -35,6 +36,7 @@ export interface Event {
 export interface EventCreateInfo {
     vanityUrl?: string;
     title: string;
+    shortDescription: string;
     description: string;
     type: EventType;
     settings: EventSettings;

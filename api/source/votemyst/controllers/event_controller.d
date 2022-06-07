@@ -78,6 +78,10 @@ public class EventController : IEventController
         enforceHTTP(createInfo.title.length < eventTitleMaxLength, HTTPStatus.badRequest,
             "The event title length must be less than " ~ eventTitleMaxLength.to!string() ~ " characters.");
 
+        enforceHTTP(createInfo.shortDescription.length < eventShortDescriptionMaxLength, HTTPStatus.badRequest,
+            "The event short description length must be less than "
+            ~ eventShortDescriptionMaxLength.to!string() ~ " characters.");
+
         enforceHTTP(createInfo.description.length < eventDescriptionMaxLength, HTTPStatus.badRequest,
             "The event description length must be less than " ~ eventDescriptionMaxLength.to!string() ~ " characters.");
 
@@ -90,6 +94,7 @@ public class EventController : IEventController
         Event event = {
             vanityUrl: createInfo.vanityUrl,
             title: createInfo.title,
+            shortDescription: createInfo.shortDescription,
             description: createInfo.description,
             type: createInfo.type,
             settings: createInfo.settings,

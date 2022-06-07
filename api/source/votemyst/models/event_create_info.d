@@ -18,6 +18,11 @@ public struct EventCreateInfo
     ///
     public string title;
 
+    /**
+     * Description that is showed on the events listing page.
+     */
+    public string shortDescription;
+
     ///
     public string description;
 
