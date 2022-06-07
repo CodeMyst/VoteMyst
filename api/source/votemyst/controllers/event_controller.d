@@ -96,7 +96,8 @@ public class EventController : IEventController
             revealDate: createInfo.revealDate,
             submissionStartDate: createInfo.submissionStartDate,
             submissionEndDate: createInfo.submissionEndDate,
-            voteEndDate: createInfo.voteEndDate
+            voteEndDate: createInfo.voteEndDate,
+            hostIds: [currentUser.id]
         };
 
         eventService.createEvent(event);

@@ -55,4 +55,9 @@ public struct Event
      * When the voting for the event is over.
      */
     public SysTime voteEndDate;
+
+    /**
+     * List of event hosts.
+     */
+    public BsonObjectID[] hostIds;
 }
