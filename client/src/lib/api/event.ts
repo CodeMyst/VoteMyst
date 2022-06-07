@@ -20,7 +20,6 @@ export enum EventSettings {
 }
 
 export interface Event {
-    displayId: string;
     vanityUrl?: string;
     title: string;
     shortDescription: string;

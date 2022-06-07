@@ -39,7 +39,7 @@ public interface IEventController
      */
     @path("/listing")
     @anyAuth
-    Event[] getEventListing() @safe;
+    Event[] getEventListing(AuthInfo auth) @safe;
 }
 
 /**
@@ -119,8 +119,10 @@ public class EventController : IEventController
         return event;
     }
 
-    public override Event[] getEventListing() @safe
+    public override Event[] getEventListing(AuthInfo auth) @safe
     {
-        return [];
+        const currentUserId = auth.isLoggedIn() ? auth.id : BsonObjectID.init;
+
+        return eventService.findAllRevealed(currentUserId);
     }
 }

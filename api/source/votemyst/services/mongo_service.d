@@ -49,6 +49,16 @@ public class MongoService
     }
 
     /**
+     * Returns all elements based on the query.
+     */
+    public MongoCursor!R find(R, T)(T query)
+    {
+        auto collection = db[getCollectionName!R()];
+
+        return collection.find!R(query);
+    }
+
+    /**
      * Finds one element based on the query.
      */
     public Nullable!R findOne(R, T)(T query)

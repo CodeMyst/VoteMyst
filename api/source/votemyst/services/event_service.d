@@ -39,4 +39,27 @@ public class EventService
 
         mongoService.insert!Event(event);
     }
+
+    /**
+     * Returns all events which are revealed, or the provided user is the host of (can be empty).
+     */
+    public Event[] findAllRevealed(const BsonObjectID userId)
+    {
+        import std.datetime : Clock, UTC;
+
+        auto cur = mongoService.find!Event([
+            "$or": [
+                Bson(["revealDate": Bson(["$lt": Bson(BsonDate(Clock.currTime(UTC())))])]),
+                Bson(["hostIds": Bson(userId)])
+            ]
+        ]);
+
+        Event[] res;
+        foreach (iterator; cur)
+        {
+            res ~= iterator;
+        }
+
+        return res;
+    }
 }

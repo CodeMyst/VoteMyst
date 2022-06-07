@@ -9,7 +9,6 @@ export enum UserRole {
 }
 
 export interface User {
-    displayId: string;
     username: string;
     joinDate: Date;
     role: UserRole;
