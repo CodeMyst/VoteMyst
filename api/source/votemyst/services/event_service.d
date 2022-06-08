@@ -1,5 +1,6 @@
 module votemyst.services.event_service;
 
+import std.typecons;
 import vibe.d;
 import votemyst.models;
 import votemyst.services;
@@ -21,7 +22,13 @@ public class EventService
     ///
     public bool existsByVanityUrl(const string vanityUrl)
     {
-        return !mongoService.findOne!Event(["vanityUrl": vanityUrl]).isNull();
+        return !findEventByVanityUrl(vanityUrl).isNull();
+    }
+
+    ///
+    public Nullable!Event findEventByVanityUrl(const string vanityUrl)
+    {
+        return mongoService.findOne!Event([Event.vanityUrl.stringof: vanityUrl]);
     }
 
     /**

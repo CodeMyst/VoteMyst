@@ -22,7 +22,6 @@ public interface IEventController
      * Creates a new event.
      *
      * Params:
-     *      authorization = (header) Bearer JWT token.
      *      createInfo = (body) Event create info.
      */
     @path("/")
@@ -33,13 +32,19 @@ public interface IEventController
      * GET /api/event/listing
      *
      * Gets the list of all events.
-     *
-     * Params:
-     *      authorization = (header) Bearer JWT token.
      */
     @path("/listing")
     @anyAuth
     Event[] getEventListing(AuthInfo auth) @safe;
+
+    /**
+     * GET /api/event/:vanityUrl
+     *
+     * Gets a single event.
+     */
+    @path("/:vanityUrl")
+    @anyAuth
+    const(Event) getEvent(AuthInfo auth, string _vanityUrl) @safe;
 }
 
 /**
@@ -124,5 +129,26 @@ public class EventController : IEventController
         const currentUserId = auth.isLoggedIn() ? auth.id : BsonObjectID.init;
 
         return eventService.findAllRevealed(currentUserId);
+    }
+
+    public override const(Event) getEvent(AuthInfo auth, string _vanityUrl) @safe
+    {
+        import std.algorithm : canFind;
+        import std.datetime : Clock, UTC;
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl);
+
+        enforceHTTP(!event.isNull(), HTTPStatus.notFound);
+
+        // not yet revealed, check if we are the host
+        if (Clock.currTime(UTC()) < event.get().revealDate)
+        {
+            // don't leak event by returning forbidden status
+            enforceHTTP(auth.isLoggedIn(), HTTPStatus.notFound);
+
+            enforceHTTP(event.get().hostIds.canFind(auth.id), HTTPStatus.notFound);
+        }
+
+        return event.get();
     }
 }
