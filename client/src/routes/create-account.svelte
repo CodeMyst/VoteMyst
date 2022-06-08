@@ -2,7 +2,7 @@
     import { goto } from "$app/navigation";
     import { page, session } from "$app/stores";
     import { createAccount, getSelf } from "$lib/api/auth";
-    import { getUser } from "$lib/api/user";
+    import { getUserByUsername } from "$lib/api/user";
     import { deleteCookie, setCookie } from "$lib/util/cookies";
 
     let usernameValid = true;
@@ -43,7 +43,7 @@
     };
 
     const validateUsername = async () => {
-        if ((await getUser(username!))) {
+        if ((await getUserByUsername(username!))) {
             usernameValid = false;
             usernameErrorMsg = "This username is already taken.";
         } else if (username!.length === 0) {

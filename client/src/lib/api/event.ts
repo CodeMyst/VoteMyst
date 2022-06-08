@@ -1,6 +1,6 @@
 import { getCookie } from "$lib/util/cookies";
 import { apiBase } from "./api";
-import { fetcherPost } from "./fetcher";
+import { fetcherGet, fetcherPost } from "./fetcher";
 
 export enum EventType {
     ART,
@@ -30,6 +30,7 @@ export interface Event {
     submissionStartDate: string;
     submissionEndDate: string;
     votingEndDate: string;
+    hostIds: string[];
 }
 
 export interface EventCreateInfo {
@@ -72,4 +73,16 @@ export const createEvent = async (createInfo: EventCreateInfo): Promise<EventCre
             event: res.data
         };
     }
+};
+
+export const getEventsListing = async (): Promise<Event[]> => {
+    const token = getCookie("votemyst");
+
+    const res = await fetcherGet<Event[]>(`${apiBase}/event/listing`, {
+        bearer: token
+    });
+
+    if (res.ok && res.data) return res.data;
+
+    return [];
 };
