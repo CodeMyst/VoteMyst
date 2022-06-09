@@ -9,7 +9,9 @@ export interface UserSession {
     token: string;
 }
 
-export const getSession = async (event: RequestEvent<Record<string, string>>): Promise<UserSession | Record<string, never>> => {
+export const getSession = async (
+    event: RequestEvent<Record<string, string>>
+): Promise<UserSession | Record<string, never>> => {
     const cookieHeader = event.request.headers.get("cookie");
 
     if (!cookieHeader) return {};

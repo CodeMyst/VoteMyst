@@ -13,10 +13,7 @@
                     <span class="admin">Admin</span>
                 {/if}
                 {$session.user.username}
-                <img
-                    src={$session.user.avatarUrl}
-                    alt="{$session.user.username}'s avatar"
-                />
+                <img src={$session.user.avatarUrl} alt="{$session.user.username}'s avatar" />
             </a>
         {:else}
             <a href="/login" class="btn">Login / Register</a>

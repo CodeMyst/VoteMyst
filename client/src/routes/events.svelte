@@ -93,7 +93,10 @@
                     {:else if now > new Date(event.submissionEndDate)}
                         <p>Voting open until: {new Date(event.submissionEndDate).toDateString()}</p>
                     {:else if now > new Date(event.submissionStartDate)}
-                        <p>Submissions open until: {new Date(event.submissionEndDate).toDateString()}</p>
+                        <p>
+                            Submissions open until:
+                            {new Date(event.submissionEndDate).toDateString()}
+                        </p>
                     {:else if now > new Date(event.revealDate)}
                         <p>Starts on: {new Date(event.submissionStartDate).toDateString()}</p>
                     {:else if now < new Date(event.revealDate)}

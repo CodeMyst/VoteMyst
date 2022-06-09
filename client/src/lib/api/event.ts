@@ -87,7 +87,10 @@ export const getEventsListing = async (): Promise<Event[]> => {
     return [];
 };
 
-export const getEvent = async (vanityUrl: string, token: string | undefined): Promise<Event | null> => {
+export const getEvent = async (
+    vanityUrl: string,
+    token: string | undefined
+): Promise<Event | null> => {
     const res = await fetcherGet<Event>(`${apiBase}/event/${vanityUrl}`, {
         bearer: token
     });

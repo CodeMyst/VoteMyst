@@ -43,7 +43,7 @@
     };
 
     const validateUsername = async () => {
-        if ((await getUserByUsername(username!))) {
+        if (await getUserByUsername(username!)) {
             usernameValid = false;
             usernameErrorMsg = "This username is already taken.";
         } else if (username!.length === 0) {
