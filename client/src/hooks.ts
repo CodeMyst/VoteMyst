@@ -5,7 +5,8 @@ import { getCookieServer } from "$lib/util/cookies";
 import type { RequestEvent } from "@sveltejs/kit";
 
 export interface UserSession {
-    user: User
+    user: User;
+    token: string;
 }
 
 export const getSession = async (event: RequestEvent<Record<string, string>>): Promise<UserSession | Record<string, never>> => {
@@ -22,6 +23,7 @@ export const getSession = async (event: RequestEvent<Record<string, string>>): P
     if (!user.ok || !user.data) return {};
 
     return {
-        user: user.data
+        user: user.data,
+        token: token
     };
 };

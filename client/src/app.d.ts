@@ -12,6 +12,7 @@ declare global {
 
         interface Session {
             user: User;
+            token: string;
         }
     }
 }

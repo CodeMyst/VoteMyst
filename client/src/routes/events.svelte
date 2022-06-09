@@ -139,9 +139,7 @@
             }
 
             .type.art {
-                &.art {
-                    background-color: var(--color-green);
-                }
+                background-color: var(--color-green);
             }
 
             .host {
