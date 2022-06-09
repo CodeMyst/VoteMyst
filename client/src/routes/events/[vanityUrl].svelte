@@ -26,6 +26,10 @@
     };
 </script>
 
+<svelte:head>
+    <title>VoteMyst | {event.title}</title>
+</svelte:head>
+
 <script lang="ts">
     import SvelteMarkdown from "svelte-markdown";
     import moment from "moment";

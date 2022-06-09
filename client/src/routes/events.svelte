@@ -41,6 +41,10 @@
     };
 </script>
 
+<svelte:head>
+    <title>VoteMyst | Events</title>
+</svelte:head>
+
 <h2>Events</h2>
 
 <p>This is a list of all hosted events.</p>

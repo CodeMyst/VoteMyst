@@ -2,6 +2,10 @@
     import { apiBase } from "$lib/api/api";
 </script>
 
+<svelte:head>
+    <title>VoteMyst | Login / Register</title>
+</svelte:head>
+
 <section>
     <h2>Login / Register</h2>
 
