@@ -5,7 +5,11 @@
     import { onMount } from "svelte";
 
     onMount(async () => {
-        $session.user = (await getSelf())!;
+        const self = await getSelf();
+
+        if (!self) return;
+
+        $session.user = self;
 
         goto("/");
     });

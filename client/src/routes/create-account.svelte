@@ -20,6 +20,8 @@
     };
 
     const onFormSubmit = async () => {
+        if (!username) return;
+
         await validateUsername();
 
         if (!usernameValid) {
@@ -27,29 +29,35 @@
             return;
         }
 
-        const token = await createAccount(username!);
+        const token = await createAccount(username);
 
-        if (token === null) {
+        if (!token) {
             createAccountError = true;
             return;
         }
 
-        setCookie("votemyst", token!, 30);
+        setCookie("votemyst", token, 30);
         deleteCookie("votemyst-registration");
 
-        $session.user = (await getSelf())!;
+        const self = await getSelf();
+
+        if (!self) return;
+
+        $session.user = self;
 
         goto("/");
     };
 
     const validateUsername = async () => {
-        if (await getUserByUsername(username!)) {
+        if (!username) return;
+
+        if (await getUserByUsername(username)) {
             usernameValid = false;
             usernameErrorMsg = "This username is already taken.";
-        } else if (username!.length === 0) {
+        } else if (username.length === 0) {
             usernameValid = false;
             usernameErrorMsg = "The username can't be empty.";
-        } else if (!usernameRegex.test(username!)) {
+        } else if (!usernameRegex.test(username)) {
             usernameValid = false;
             usernameErrorMsg = "The username contains invalid symbols.";
         } else {

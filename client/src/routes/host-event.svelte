@@ -28,9 +28,9 @@
     let shortDescription: string;
     let description: string;
     let type: string;
-    let randomizeEntries: boolean = true;
-    let excludeStaffFromWinning: boolean = true;
-    let requireVoteToWin: boolean = false;
+    let randomizeEntries = true;
+    let excludeStaffFromWinning = true;
+    let requireVoteToWin = false;
     let revealDate: string;
     let submissionStartDate: string;
     let submissionEndDate: string;
