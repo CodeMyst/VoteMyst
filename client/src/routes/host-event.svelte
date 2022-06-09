@@ -86,6 +86,10 @@
     };
 </script>
 
+<svelte:head>
+    <title>VoteMyst | Host a new event</title>
+</svelte:head>
+
 <section>
     <h2>Host a new event</h2>
 

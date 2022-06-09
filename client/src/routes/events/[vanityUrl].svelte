@@ -67,6 +67,10 @@
     let timeleft = calcTimeLeft();
 </script>
 
+<svelte:head>
+    <title>VoteMyst | {event.title}</title>
+</svelte:head>
+
 <section>
     <h2 class="flex center sm-row space-between">
         <span class="title">{event.title}</span>

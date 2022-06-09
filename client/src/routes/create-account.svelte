@@ -67,6 +67,10 @@
     };
 </script>
 
+<svelte:head>
+    <title>VoteMyst | Create a new account</title>
+</svelte:head>
+
 <section>
     <h2>Create a new account</h2>
 
