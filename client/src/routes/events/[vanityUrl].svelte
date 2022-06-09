@@ -26,10 +26,6 @@
     };
 </script>
 
-<svelte:head>
-    <title>VoteMyst | {event.title}</title>
-</svelte:head>
-
 <script lang="ts">
     import SvelteMarkdown from "svelte-markdown";
     import moment from "moment";
@@ -70,6 +66,10 @@
 
     let timeleft = calcTimeLeft();
 </script>
+
+<svelte:head>
+    <title>VoteMyst | {event.title}</title>
+</svelte:head>
 
 <section>
     <h2 class="flex center sm-row space-between">
