@@ -7,7 +7,7 @@ public mixin template Auth()
 {
     ///
     @noRoute
-    public AuthInfo authenticate(scope HTTPServerRequest req, scope HTTPServerResponse res) @trusted
+    public AuthInfo authenticate(scope HTTPServerRequest req, scope HTTPServerResponse _) @trusted
     {
         import std.string : startsWith;
 
