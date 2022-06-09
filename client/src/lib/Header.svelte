@@ -1,18 +1,19 @@
 <script lang="ts">
-    import { currentUserStore } from "./stores";
+    import { session } from "$app/stores";
+    import { UserRole } from "./api/user";
 </script>
 
 <header>
     <div class="flex row space-between center">
         <a href="/" class="no-dec"><h1>VoteMyst</h1></a>
 
-        {#if $currentUserStore != null}
+        {#if $session.user}
             <a href="/user/profile" class="btn user flex row center">
-                {$currentUserStore.username}
-                <img
-                    src={$currentUserStore.avatarUrl}
-                    alt="{$currentUserStore.username}'s avatar"
-                />
+                {#if $session.user.role === UserRole.ADMIN}
+                    <span class="admin">Admin</span>
+                {/if}
+                {$session.user.username}
+                <img src={$session.user.avatarUrl} alt="{$session.user.username}'s avatar" />
             </a>
         {:else}
             <a href="/login" class="btn">Login / Register</a>
@@ -27,6 +28,10 @@
         <li><a href="/">Home</a></li>
         <li><a href="/events">Events</a></li>
         <li><a href="/legal">Terms of Service</a></li>
+
+        {#if $session.user && $session.user.role === UserRole.ADMIN}
+            <li class="admin-link"><a href="/host-event">Host Event</a></li>
+        {/if}
     </ul>
 </nav>
 
@@ -65,6 +70,26 @@
 
                 &:last-child::after {
                     content: "";
+                    margin: 0;
+                }
+
+                &.admin-link {
+                    background-color: var(--color-red);
+                    padding: 0.25rem 0.5rem;
+                    border-radius: var(--border-radius);
+                    @include transition();
+
+                    &:hover {
+                        background-color: var(--color-bg);
+
+                        a {
+                            color: var(--color-red);
+                        }
+                    }
+
+                    a {
+                        color: var(--color-bg);
+                    }
                 }
 
                 a {
@@ -78,6 +103,14 @@
         font-size: var(--fs-normal);
         text-decoration: none;
         word-break: break-word;
+
+        .admin {
+            background-color: var(--color-red);
+            color: var(--color-bg);
+            border-radius: var(--border-radius);
+            padding: 0.25rem;
+            margin-right: 0.5rem;
+        }
 
         img {
             max-width: 28px;

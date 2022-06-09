@@ -3,6 +3,8 @@ module votemyst.controllers.auth_controller;
 import hunt.jwt;
 import std.digest.sha;
 import vibe.d;
+import vibe.web.auth;
+import votemyst.auth;
 import votemyst.models;
 import votemyst.services;
 
@@ -10,6 +12,7 @@ import votemyst.services;
  * API /api/auth
  */
 @path("/api/auth")
+@requiresAuth
 public interface IAuthController
 {
     /**
@@ -18,23 +21,19 @@ public interface IAuthController
      * Creates a new account.
      *
      * Params:
-     *      authorization = (header) Bearer JTW token.
+     *      authorization = (header) Bearer JWT token.
      *      username = (body) Username to be used for the new account.
      */
-    @headerParam("authorization", "Authorization")
-    @bodyParam("username", "username")
-    Json postRegister(string authorization, string username) @safe;
+    @noAuth
+    Json postRegister(@viaHeader("authorization") string authorization, @viaBody("username") string username) @safe;
 
     /**
      * POST /api/auth/self
      *
      * Returns the currently authorized user from the provided token.
-     *
-     * Params:
-     *      authorization = (header) Bearer JTW token.
      */
-    @headerParam("authorization", "Authorization")
-    User getSelf(string authorization) @safe;
+    @auth(Role.loggedIn)
+    const(User) getSelf(AuthInfo auth) @safe;
 }
 
 /**
@@ -42,6 +41,8 @@ public interface IAuthController
  */
 public class AuthController : IAuthController
 {
+    mixin Auth;
+
     private ConfigService configService;
     private UserService userService;
     private AuthService authService;
@@ -91,7 +92,8 @@ public class AuthController : IAuthController
             oauthProviderIds: [providerName: sha256Of(providerId).toHexString()],
             avatarUrl: avatarUrl,
             joinDate: Clock.currTime(),
-            role: UserRole.user
+            // first created account is an admin automatically
+            role: userService.getUserCount() == 0 ? UserRole.admin : UserRole.user
         };
 
         userService.createUser(user);
@@ -104,9 +106,9 @@ public class AuthController : IAuthController
 
             const url = "https://cdn.discordapp.com/avatars/" ~ providerId ~ "/" ~ avatarUrl ~ ".png";
 
-            download(url, "static/avatars/" ~ user.displayId ~ ".png");
+            download(url, "static/avatars/" ~ user.id.toString() ~ ".png");
 
-            user.avatarUrl = configService.host ~ "static/avatars/" ~ user.displayId ~ ".png";
+            user.avatarUrl = configService.host ~ "static/avatars/" ~ user.id.toString() ~ ".png";
             userService.updateUserAvatarUrl(user);
         }
 
@@ -119,28 +121,11 @@ public class AuthController : IAuthController
         return Json(["token": Json(jwtToken.encode(configService.jwtSecret))]);
     }
 
-    public override User getSelf(string authorization) @trusted
+    public override const(User) getSelf(AuthInfo auth) @trusted
     {
-        enforceHTTP(authorization.startsWith("Bearer "), HTTPStatus.badRequest,
-            "Invalid authorization scheme. The token must be provided as a Bearer token.");
+        const user = userService.findById(auth.id);
 
-        const encodedToken = authorization["Bearer ".length .. $];
-
-        string id;
-
-        try
-        {
-            auto token = JwtToken.decode(encodedToken, configService.jwtSecret);
-
-            id = token.claims.get("id");
-        }
-        catch (Exception e)
-        {
-            logError("User tried calling an auth endpoint with an invalid token. Exception: %s", e);
-            throw new HTTPStatusException(HTTPStatus.badRequest, "Provided token is notr valid.");
-        }
-
-        return userService.findById(BsonObjectID.fromString(id)).get();
+        return user.get();
     }
 }
 
@@ -293,7 +278,7 @@ public class AuthWebController
 
             res.cookies.addField("votemyst", cookie);
 
-            res.redirect(configService.clientHost);
+            res.redirect(configService.clientHost ~ "handle-login");
         }
     }
 }

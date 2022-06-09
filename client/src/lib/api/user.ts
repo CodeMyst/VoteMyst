@@ -9,17 +9,25 @@ export enum UserRole {
 }
 
 export interface User {
-    displayId: string;
+    _id: string;
     username: string;
     joinDate: Date;
     role: UserRole;
     avatarUrl: string;
 }
 
-export const getUser = async (username: string): Promise<User | null> => {
-    const res = await fetcherGet<User>(`${apiBase}/user/${username}`);
+export const getUserByUsername = async (username: string): Promise<User | undefined> => {
+    const res = await fetcherGet<User>(`${apiBase}/user/username/${username}`);
 
-    if (!res.ok) return null;
+    if (!res.ok) return undefined;
+
+    return res.data;
+};
+
+export const getUserById = async (id: string): Promise<User | undefined> => {
+    const res = await fetcherGet<User>(`${apiBase}/user/id/${id}`);
+
+    if (!res.ok) return undefined;
 
     return res.data;
 };

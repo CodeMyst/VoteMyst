@@ -6,7 +6,7 @@ import votemyst.models;
 /**
  * A specific serialization policy for the User struct.
  * Used in any API interface that returns the User object to the caller.
- * It hides the oauth service IDs tied to the user as well as the ID from the public.
+ * It hides the oauth service IDs tied to the user from the public.
  *
  * The reason this is needed is because oauth service IDs are used internally
  * and stored in the mongo DB. The issue is that both mongo and API interfaces
@@ -16,13 +16,12 @@ import votemyst.models;
 public template UserPolicy(T) if (is(T : User))
 {
     /**
-     * Converts a User struct to a JSON string without the oauthProviderIds or _id field.
+     * Converts a User struct to a JSON string without the oauthProviderIds.
      */
     public static Json toRepresentation(in T data) @safe
     {
         auto json = serializeToJson(data);
         json.remove(User.oauthProviderIds.stringof);
-        json.remove("_id");
 
         return json;
     }

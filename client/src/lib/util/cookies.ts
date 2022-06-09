@@ -1,9 +1,13 @@
 export const getCookie = (name: string): string | undefined => {
-    const cookie = document.cookie.split("; ").find((r) => r.startsWith(`${name}=`));
+    return getCookieServer(name, document.cookie);
+};
 
-    if (cookie === undefined) return undefined;
+export const getCookieServer = (name: string, cookie: string): string | undefined => {
+    const c = cookie.split("; ").find((r) => r.startsWith(`${name}=`));
 
-    return cookie.split("=")[1];
+    if (c === undefined) return undefined;
+
+    return c.split("=")[1];
 };
 
 export const setCookie = (name: string, value: string, days: number) => {

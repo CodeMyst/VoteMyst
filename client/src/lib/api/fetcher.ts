@@ -5,7 +5,8 @@
 export interface FetcherResponse<T> {
     status: number;
     ok: boolean;
-    data: T | null;
+    message?: string;
+    data?: T;
 }
 
 export interface FetcherRequest {
@@ -22,7 +23,8 @@ export const fetcherGet = async <T>(
     return {
         status: res.status,
         ok: res.ok,
-        data: res.ok ? await res.json() : null
+        data: res.ok ? await res.json() : null,
+        message: res.ok ? null : (await res.json())["statusMessage"]
     };
 };
 
@@ -35,7 +37,8 @@ export const fetcherPost = async <T>(
     return {
         status: res.status,
         ok: res.ok,
-        data: res.ok ? await res.json() : null
+        data: res.ok ? await res.json() : null,
+        message: res.ok ? null : (await res.json())["statusMessage"]
     };
 };
 

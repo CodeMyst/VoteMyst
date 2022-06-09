@@ -1,5 +1,6 @@
 module votemyst.services.auth_service;
 
+import hunt.jwt;
 import vibe.d;
 import votemyst.models;
 import votemyst.services;
@@ -61,6 +62,23 @@ public struct OAuthProvider
      * Field name for the user avatar url. Used when reading user info from the service.
      */
     public string avatarUrlJsonField;
+}
+
+/**
+ * Result of decoding the authorization token.
+ */
+public struct AuthDecodeRes
+{
+    ///
+    public bool ok;
+
+    ///
+    public string error = null;
+
+    ///
+    public string id = null;
+    ///
+    public string username = null;
 }
 
 /**
@@ -232,5 +250,56 @@ public class AuthService
         }
 
         return user;
+    }
+
+    /**
+     * Validates the provided authorization token.
+     *
+     * Returns null if token valid, otherwise returns the error message.
+     */
+    public AuthDecodeRes decodeToken(string token) @trusted
+    {
+        if (!token.startsWith("Bearer "))
+        {
+            AuthDecodeRes res =
+            {
+                ok: false,
+                error: "Invalid authorization scheme. The token must be provided as a Bearer token."
+            };
+
+            return res;
+        }
+
+        const encodedToken = token["Bearer ".length .. $];
+
+        string id;
+        string username;
+
+        try
+        {
+            auto jwtToken = JwtToken.decode(encodedToken, configService.jwtSecret);
+
+            id = jwtToken.claims.get("id");
+            username = jwtToken.claims.get("username");
+        }
+        catch (Exception e)
+        {
+            AuthDecodeRes res =
+            {
+                ok: false,
+                error: "Provided token is not valid."
+            };
+
+            return res;
+        }
+
+        AuthDecodeRes res =
+        {
+            ok: true,
+            id: id,
+            username: username
+        };
+
+        return res;
     }
 }

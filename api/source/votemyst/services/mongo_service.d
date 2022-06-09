@@ -21,9 +21,12 @@ public class MongoService
 
         IndexOptions idxOpts;
         idxOpts.unique = true;
+
         db["users"].createIndex(["username": "text"]);
         db["users"].createIndex(["username": 1], idxOpts);
-        db["users"].createIndex(["displayId": 1], idxOpts);
+
+        db["events"].createIndex(["vanityUrl": "text"]);
+        db["events"].createIndex(["vanityUrl": 1], idxOpts);
     }
 
     /**
@@ -35,10 +38,24 @@ public class MongoService
         {
             return "users";
         }
+        else static if (is(T == Event))
+        {
+            return "events";
+        }
         else
         {
             static assert(false, "Cannot get a collection name from the type " ~ T.stringof);
         }
+    }
+
+    /**
+     * Returns all elements based on the query.
+     */
+    public MongoCursor!R find(R, T)(T query)
+    {
+        auto collection = db[getCollectionName!R()];
+
+        return collection.find!R(query);
     }
 
     /**
