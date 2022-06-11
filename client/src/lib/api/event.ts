@@ -29,7 +29,7 @@ export interface Event {
     revealDate: string;
     submissionStartDate: string;
     submissionEndDate: string;
-    votingEndDate: string;
+    voteEndDate: string;
     hostIds: string[];
 }
 

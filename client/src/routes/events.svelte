@@ -19,7 +19,7 @@
 
         for (const event of events) {
             const revealDate = new Date(event.revealDate);
-            const votingEndDate = new Date(event.votingEndDate);
+            const votingEndDate = new Date(event.voteEndDate);
             const submissionStartDate = new Date(event.submissionStartDate);
 
             // host
@@ -92,8 +92,8 @@
                         </p>
                     {/await}
 
-                    {#if now > new Date(event.votingEndDate)}
-                        <p>Event ended on: {new Date(event.votingEndDate).toDateString()}</p>
+                    {#if now > new Date(event.voteEndDate)}
+                        <p>Event ended on: {new Date(event.voteEndDate).toDateString()}</p>
                     {:else if now > new Date(event.submissionEndDate)}
                         <p>Voting open until: {new Date(event.submissionEndDate).toDateString()}</p>
                     {:else if now > new Date(event.submissionStartDate)}

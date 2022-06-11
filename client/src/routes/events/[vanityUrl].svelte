@@ -38,7 +38,7 @@
 
     const submissionStartDate = moment(event.submissionStartDate);
     const submissionEndDate = moment(event.submissionEndDate);
-    const votingEndDate = moment(event.votingEndDate);
+    const votingEndDate = moment(event.voteEndDate);
 
     onMount(() => {
         setInterval(() => {
@@ -110,7 +110,7 @@
                     {:else if now < submissionEndDate}
                         <span>Submissions due in</span>
                     {:else if now < votingEndDate}
-                        <span>Voting end in</span>
+                        <span>Voting ends in</span>
                     {/if}
 
                     <div class="timer flex row center">
@@ -176,7 +176,7 @@
                     </div>
                 </div>
             {:else}
-                <p>
+                <p class="event-over">
                     This event is over. It ran from
                     <span class="date">
                         {dateToString(submissionStartDate)}
@@ -268,6 +268,10 @@
                 }
             }
         }
+    }
+
+    .event-over {
+        padding: 0 1rem;
     }
 
     @media screen and (max-width: 620px) {
