@@ -1,5 +1,7 @@
 module votemyst.models;
 
+public import votemyst.models.art_entry;
+public import votemyst.models.entry;
 public import votemyst.models.event;
 public import votemyst.models.event_create_info;
 public import votemyst.models.event_settings;
