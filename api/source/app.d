@@ -36,6 +36,7 @@ void main()
     serverSettings.port = configService.port;
     serverSettings.sessionOptions = SessionOption.noSameSiteStrict | SessionOption.httpOnly;
     serverSettings.sessionStore = new MemorySessionStore();
+    serverSettings.maxRequestSize = 5_000_000; // max 5MB
 
     listenHTTP(serverSettings, router);
     runApplication();

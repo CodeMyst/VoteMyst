@@ -8,6 +8,7 @@ import votemyst.constants;
 import votemyst.models;
 import votemyst.serialization;
 import votemyst.services;
+import votemyst.utils;
 
 /**
  * API /api/event
@@ -45,6 +46,15 @@ public interface IEventController
     @path("/:vanityUrl")
     @anyAuth
     const(Event) getEvent(AuthInfo auth, string _vanityUrl) @safe;
+
+    /**
+     * POST /api/event/:vanityUrl/artSubmit
+     *
+     * Posts a single submission to an **art** event.
+     */
+    @path("/:vanityUrl/artSubmit")
+    @anyAuth
+    const(ArtEntry) postArtSubmission(AuthInfo auth, string _vanityUrl, HTTPServerRequest req) @safe;
 }
 
 /**
@@ -151,4 +161,23 @@ public class EventController : IEventController
 
         return event.get();
     }
+
+    @before!getReq("req") // needed to get the raw request to get access to uploaded file
+    public override const(ArtEntry) postArtSubmission(AuthInfo auth, string _vanityUrl, HTTPServerRequest req) @safe
+    {
+        const file = "file" in req.files();
+
+        enforceHTTP(file !is null, HTTPStatus.badRequest, "Missing file.");
+
+        enforceHTTP(validateImage(file.tempPath.toString()), HTTPStatus.badRequest, "Not a valid image file.");
+
+        return ArtEntry.init;
+    }
+
+    /**
+     * Helper function to return raw `HTTPServerRequest` in REST interfaces because this is the only way to do that.
+     *
+     * Just passing `HTTPServerRequest` to a REST interface param will throw an error.
+     */
+    public HTTPServerRequest getReq(HTTPServerRequest req, HTTPServerResponse _) @safe { return req; }
 }
