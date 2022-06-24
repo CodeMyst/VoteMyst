@@ -165,6 +165,16 @@ public class EventController : IEventController
     @before!getReq("req") // needed to get the raw request to get access to uploaded file
     public override const(ArtEntry) postArtSubmission(AuthInfo auth, string _vanityUrl, HTTPServerRequest req) @safe
     {
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(Clock.currTime(UTC()) > event.submissionStartDate, HTTPStatus.forbidden,
+            "Event submissions are not yet opened.");
+
+        enforceHTTP(Clock.currTime(UTC()) < event.submissionEndDate, HTTPStatus.forbidden,
+            "Event submissions are closed.");
+
         const file = "file" in req.files();
 
         enforceHTTP(file !is null, HTTPStatus.badRequest, "Missing file.");
