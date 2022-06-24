@@ -82,6 +82,7 @@ public class EventController : IEventController
     public override Event postEvent(AuthInfo auth, EventCreateInfo createInfo) @safe
     {
         import std.conv : to;
+        import std.file : mkdir;
         import std.regex : ctRegex, matchFirst;
         import std.string : empty;
 
@@ -130,6 +131,9 @@ public class EventController : IEventController
         };
 
         eventService.createEvent(event);
+
+        // create dir to hold all assets
+        mkdir("static/events/" ~ event.id.toString());
 
         return event;
     }
