@@ -1,6 +1,5 @@
 module votemyst.controllers.event_controller;
 
-import hunt.jwt;
 import vibe.d;
 import vibe.web.auth;
 import votemyst.auth;
