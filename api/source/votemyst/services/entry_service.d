@@ -39,4 +39,17 @@ public class EntryService
             ]
         ]).isNull();
     }
+
+    /**
+     * Returns all art entries for the specified event.
+     */
+    public const(ArtEntry)[] findAllArtEntries(BsonObjectID eventId)
+    {
+        auto cur = mongoService.find!ArtEntry(["eventId": Bson(eventId)]);
+
+        ArtEntry[] res;
+        foreach (iterator; cur) res ~= iterator;
+
+        return res;
+    }
 }

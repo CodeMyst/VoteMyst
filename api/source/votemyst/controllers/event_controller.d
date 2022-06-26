@@ -54,6 +54,24 @@ public interface IEventController
     @path("/:vanityUrl/artSubmit")
     @anyAuth
     const(ArtEntry) postArtSubmission(AuthInfo auth, string _vanityUrl, HTTPServerRequest req) @safe;
+
+    /**
+     * GET /api/event/:vanityUrl/artSubmissions
+     *
+     * Returns all existing art submissions for this event.
+     */
+    @path("/:vanityUrl/artSubmissions")
+    @anyAuth
+    const(ArtEntry)[] getArtSubmissions(string _vanityUrl) @safe;
+
+    /**
+     * GET /api/event/:vanityUrl/submitted
+     *
+     * Checks if the current logged in user has submitted to this event.
+     */
+    @path("/:vanityUrl/submitted")
+    @anyAuth
+    void getSubmitted(AuthInfo auth, string _vanityUrl) @safe;
 }
 
 /**
@@ -174,11 +192,14 @@ public class EventController : IEventController
         import std.file : copy, remove;
         import std.path : chainPath, extension;
 
-        enforceHTTP(auth.isLoggedIn(), HTTPStatus.forbidden);
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
 
         enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
 
         const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(event.type == EventType.art, HTTPStatus.badRequest,
+            "Trying to post an art submission to a non art event.");
 
         enforceHTTP(!entryService.existsByEventAndAuthor(event.id, auth.id), HTTPStatus.badRequest,
             "Only one submission per user is allowed for this event.");
@@ -211,6 +232,29 @@ public class EventController : IEventController
         entryService.createArtEntry(entry);
 
         return entry;
+    }
+
+    public override const(ArtEntry)[] getArtSubmissions(string _vanityUrl) @safe
+    {
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(event.type == EventType.art, HTTPStatus.badRequest,
+            "Trying to get art submissions to a non art event.");
+
+        return entryService.findAllArtEntries(event.id);
+    }
+
+    public override void getSubmitted(AuthInfo auth, string _vanityUrl) @safe
+    {
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
+
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(entryService.existsByEventAndAuthor(event.id, auth.id), HTTPStatus.notFound);
     }
 
     /**
