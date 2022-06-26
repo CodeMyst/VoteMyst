@@ -13,6 +13,7 @@ void main()
     dependencies.register!UserService();
     dependencies.register!AuthService();
     dependencies.register!EventService();
+    dependencies.register!EntryService();
 
     dependencies.register!AuthController();
     dependencies.register!AuthWebController();

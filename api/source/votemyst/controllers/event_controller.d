@@ -67,15 +67,17 @@ public class EventController : IEventController
     private UserService userService;
     private EventService eventService;
     private ConfigService configService;
+    private EntryService entryService;
 
     ///
     public this(AuthService authService, UserService userService,
-        EventService eventService, ConfigService configService)
+        EventService eventService, ConfigService configService, EntryService entryService)
     {
         this.authService = authService;
         this.userService = userService;
         this.eventService = eventService;
         this.configService = configService;
+        this.entryService = entryService;
     }
 
     public override Event postEvent(AuthInfo auth, EventCreateInfo createInfo) @safe
@@ -168,9 +170,18 @@ public class EventController : IEventController
     @before!getReq("req") // needed to get the raw request to get access to uploaded file
     public override const(ArtEntry) postArtSubmission(AuthInfo auth, string _vanityUrl, HTTPServerRequest req) @safe
     {
+        import std.array : array;
+        import std.file : copy, remove;
+        import std.path : chainPath, extension;
+
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.forbidden);
+
         enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
 
         const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(!entryService.existsByEventAndAuthor(event.id, auth.id), HTTPStatus.badRequest,
+            "Only one submission per user is allowed for this event.");
 
         enforceHTTP(Clock.currTime(UTC()) > event.submissionStartDate, HTTPStatus.forbidden,
             "Event submissions are not yet opened.");
@@ -184,7 +195,22 @@ public class EventController : IEventController
 
         enforceHTTP(validateImage(file.tempPath.toString()), HTTPStatus.badRequest, "Not a valid image file.");
 
-        return ArtEntry.init;
+        ArtEntry entry;
+        entry.id = BsonObjectID.generate();
+        entry.eventId = event.id;
+        entry.authorId = auth.id;
+        entry.submitDate = Clock.currTime(UTC());
+
+        const ext = extension(file.filename.name);
+        copy(file.tempPath.toString(),
+             chainPath("./static/events/", event.id.toString(), entry.id.toString() ~ ext).array());
+        remove(file.tempPath.toString());
+
+        entry.filename = entry.id.toString() ~ ext;
+
+        entryService.createArtEntry(entry);
+
+        return entry;
     }
 
     /**

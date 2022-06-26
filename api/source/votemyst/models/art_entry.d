@@ -7,10 +7,7 @@ import votemyst.models;
  */
 public struct ArtEntry
 {
-    ///
-    public BaseEntry base;
-
-    public alias base this;
+    mixin BaseEntryTmpl;
 
     /**
      * File name of the uploaded image stored on this server.
