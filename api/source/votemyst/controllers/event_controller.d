@@ -243,7 +243,16 @@ public class EventController : IEventController
         enforceHTTP(event.type == EventType.art, HTTPStatus.badRequest,
             "Trying to get art submissions to a non art event.");
 
-        return entryService.findAllArtEntries(event.id);
+        auto entries = entryService.findAllArtEntries(event.id);
+
+        if (event.settings | EventSettings.randomizeEntries)
+        {
+            import std.random : randomShuffle;
+
+            entries.randomShuffle();
+        }
+
+        return entries;
     }
 
     public override void getSubmitted(AuthInfo auth, string _vanityUrl) @safe
