@@ -152,7 +152,7 @@ public class EventController : IEventController
         eventService.createEvent(event);
 
         // create dir to hold all assets
-        mkdir("static/events/" ~ event.id.toString());
+        mkdir("static/events/" ~ event.vanityUrl);
 
         return event;
     }
@@ -224,7 +224,7 @@ public class EventController : IEventController
 
         const ext = extension(file.filename.name);
         copy(file.tempPath.toString(),
-             chainPath("./static/events/", event.id.toString(), entry.id.toString() ~ ext).array());
+             chainPath("./static/events/", event.vanityUrl, entry.id.toString() ~ ext).array());
         remove(file.tempPath.toString());
 
         entry.filename = entry.id.toString() ~ ext;

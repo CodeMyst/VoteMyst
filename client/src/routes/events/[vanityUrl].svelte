@@ -1,6 +1,14 @@
 <script lang="ts" context="module">
     import type { UserSession } from "src/hooks";
-    import { createArtSubmission, EventType, getEvent, hasSubmitted, type ArtEntry, type Event } from "$lib/api/event";
+    import {
+        createArtSubmission,
+        EventType,
+        getArtSubmissions,
+        getEvent,
+        hasSubmitted,
+        type ArtEntry,
+        type Event
+    } from "$lib/api/event";
     import { getUserById, type User } from "$lib/api/user";
 
     export const load = async ({
@@ -19,8 +27,10 @@
                 ? await hasSubmitted(event.vanityUrl, session.token)
                 : false;
 
+            const artSubmissions = await getArtSubmissions(event.vanityUrl);
+
             return {
-                props: { event, host, submitted }
+                props: { event, host, submitted, artSubmissions }
             };
         }
 
@@ -36,10 +46,12 @@
     import { onMount } from "svelte";
     import { session } from "$app/stores";
     import type { FetcherResponse } from "$lib/api/fetcher";
+    import { staticBase } from "$lib/api/api";
 
     export let event: Event;
     export let host: User;
     export let submitted: boolean;
+    export let artSubmissions: ArtEntry[];
 
     const now = moment();
 
@@ -81,7 +93,10 @@
     const onUpload = async () => {
         uploadRes = await createArtSubmission(event.vanityUrl, new FormData(uploadForm));
 
-        if (uploadRes.ok) submitted = true;
+        if (uploadRes.ok) {
+            submitted = true;
+            artSubmissions = await getArtSubmissions(event.vanityUrl);
+        }
     };
 </script>
 
@@ -247,6 +262,32 @@
     </p>
 </section>
 
+<div class="art-entries">
+    {#each artSubmissions as entry}
+        <div class="entry" id={entry._id}>
+            <div class="entry-header">
+                {#await getUserById(entry.authorId) then author}
+                    <a href="/users/{author?.username}" class="entry-author">
+                        <img src={author?.avatarUrl} alt="{author?.username}'s avatar" />
+                        <p>{author?.username}</p>
+                    </a>
+                {/await}
+
+                <div class="entry-date">
+                    {dateToString(moment(entry.submitDate))}
+                </div>
+            </div>
+
+            <div class="entry-content">
+                <img
+                    src="{staticBase}/events/{event.vanityUrl}/{entry.filename}"
+                    alt="Submission"
+                />
+            </div>
+        </div>
+    {/each}
+</div>
+
 <style lang="scss">
     h2 {
         margin-bottom: 0.5rem;
@@ -355,6 +396,66 @@
             input {
                 margin-bottom: 1rem;
             }
+        }
+    }
+
+    .art-entries {
+        display: grid;
+        grid-gap: 4vmin;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+        margin: 2rem 0;
+
+        .entry {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--color-bg-1);
+            border-bottom: 3px solid var(--color-bg-2);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+
+            .entry-header {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1rem;
+
+                .entry-author {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+
+                    img {
+                        max-width: 28px;
+                        border-radius: var(--border-radius);
+                        margin: 0;
+                        margin-right: 0.5rem;
+                    }
+
+                    p {
+                        margin: 0;
+                    }
+                }
+            }
+
+            .entry-content {
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                height: 100%;
+
+                img {
+                    max-width: 100%;
+                    border-radius: var(--border-radius);
+                }
+            }
+        }
+    }
+
+    @media screen and (max-width: 1280px) {
+        .art-entries {
+            grid-template-columns: repeat(1, 1fr);
         }
     }
 </style>

@@ -132,3 +132,11 @@ export const createArtSubmission = async (vanityUrl: string, formData: FormData)
 
     return res;
 };
+
+export const getArtSubmissions = async (vanityUrl: string): Promise<ArtEntry[]> => {
+    const res = await fetcherGet<ArtEntry[]>(`${apiBase}/event/${vanityUrl}/artSubmissions`);
+
+    if (res.ok && res.data) return res.data;
+
+    return [];
+};
