@@ -1,6 +1,6 @@
 import { getCookie } from "$lib/util/cookies";
 import { apiBase } from "./api";
-import { fetcherGet, fetcherPost } from "./fetcher";
+import { fetcherGet, fetcherPost, type FetcherResponse } from "./fetcher";
 
 export enum EventType {
     ART,
@@ -20,7 +20,7 @@ export enum EventSettings {
 }
 
 export interface Event {
-    vanityUrl?: string;
+    vanityUrl: string;
     title: string;
     shortDescription: string;
     description: string;
@@ -52,6 +52,17 @@ export interface EventCreateResponse {
     message?: string;
 
     event?: Event;
+}
+
+export interface BaseEntry {
+    _id: string;
+    eventId: string;
+    authorId: string;
+    submitDate: string;
+}
+
+export interface ArtEntry extends BaseEntry {
+    filename: string;
 }
 
 export const createEvent = async (createInfo: EventCreateInfo): Promise<EventCreateResponse> => {
@@ -98,4 +109,26 @@ export const getEvent = async (
     if (res.ok && res.data) return res.data;
 
     return null;
+};
+
+export const hasSubmitted = async (vanityUrl: string, token: string | undefined): Promise<boolean> => {
+    const res = await fetcherGet<null>(`${apiBase}/event/${vanityUrl}/submitted`, {
+        bearer: token
+    });
+
+    return res.ok;
+};
+
+export const createArtSubmission = async (vanityUrl: string, formData: FormData): Promise<FetcherResponse<ArtEntry>> => {
+    const token = getCookie("votemyst");
+
+    if (!token) return { status: 400, ok: false, message: "Missing token." };
+
+    const res = await fetcherPost<ArtEntry>(`${apiBase}/event/${vanityUrl}/artSubmit`, {
+        bearer: token,
+        body: formData,
+        multipart: true
+    });
+
+    return res;
 };

@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
     import type { UserSession } from "src/hooks";
-    import { EventType, getEvent, type Event } from "$lib/api/event";
+    import { createArtSubmission, EventType, getEvent, hasSubmitted, type ArtEntry, type Event } from "$lib/api/event";
     import { getUserById, type User } from "$lib/api/user";
 
     export const load = async ({
@@ -15,8 +15,12 @@
         if (event) {
             const host = await getUserById(event.hostIds[0]);
 
+            const submitted = session.user
+                ? await hasSubmitted(event.vanityUrl, session.token)
+                : false;
+
             return {
-                props: { event, host }
+                props: { event, host, submitted }
             };
         }
 
@@ -30,15 +34,23 @@
     import SvelteMarkdown from "svelte-markdown";
     import moment from "moment";
     import { onMount } from "svelte";
+    import { session } from "$app/stores";
+    import type { FetcherResponse } from "$lib/api/fetcher";
 
     export let event: Event;
     export let host: User;
+    export let submitted: boolean;
 
     const now = moment();
 
     const submissionStartDate = moment(event.submissionStartDate);
     const submissionEndDate = moment(event.submissionEndDate);
     const votingEndDate = moment(event.voteEndDate);
+
+    const submissionsOpen = now > submissionStartDate && now < submissionEndDate;
+
+    let uploadForm: HTMLFormElement;
+    let uploadRes: FetcherResponse<ArtEntry>;
 
     onMount(() => {
         setInterval(() => {
@@ -65,6 +77,12 @@
     };
 
     let timeleft = calcTimeLeft();
+
+    const onUpload = async () => {
+        uploadRes = await createArtSubmission(event.vanityUrl, new FormData(uploadForm));
+
+        if (uploadRes.ok) submitted = true;
+    };
 </script>
 
 <svelte:head>
@@ -103,6 +121,8 @@
                         {dateToString(submissionEndDate)}
                     </span>
                 </div>
+
+                <div class="hr" />
 
                 <div class="time-timer flex row center">
                     {#if now < submissionStartDate}
@@ -190,6 +210,38 @@
         </div>
     </div>
 
+    {#if $session.user && submissionsOpen && event.type === EventType.ART}
+        {#if !submitted}
+            <div class="upload-submission-wrapper">
+                <div class="upload-submission">
+                    <p class="upload-header">Upload your submission</p>
+                    <div class="hr" />
+                    <p>Max file size: 5MB</p>
+
+                    {#if uploadRes && !uploadRes.ok}
+                        <p class="error">{uploadRes.message}</p>
+                    {/if}
+
+                    <form
+                        class="flex col"
+                        on:submit|preventDefault={onUpload}
+                        bind:this={uploadForm}
+                    >
+                        <label for="file">File:</label>
+                        <input
+                            type="file"
+                            name="file"
+                            id="file"
+                            accept="image/png, image/jpeg, image/jpg"
+                        />
+
+                        <button type="submit" class="btn btn-main">Upload</button>
+                    </form>
+                </div>
+            </div>
+        {/if}
+    {/if}
+
     <p class="description">
         <SvelteMarkdown source={event.description} />
     </p>
@@ -229,10 +281,8 @@
     }
 
     .time {
-        border: 3px solid var(--color-bg-2);
         border-radius: var(--border-radius);
         margin-bottom: 2rem;
-        display: inline-block;
 
         .date {
             font-weight: bold;
@@ -241,7 +291,6 @@
         .time-header {
             padding: 1rem;
             text-align: center;
-            border-bottom: 3px solid var(--color-bg-2);
         }
 
         .time-timer {
@@ -274,11 +323,38 @@
         padding: 0 1rem;
     }
 
-    @media screen and (max-width: 620px) {
-        .time {
-            border: 0;
-            border-top: 3px solid var(--color-bg-2);
-            margin: -1rem;
+    .hr {
+        width: 100%;
+        background-color: var(--color-bg-2);
+        height: 3px;
+    }
+
+    .upload-submission-wrapper {
+        text-align: center;
+    }
+
+    .upload-submission {
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+
+        .upload-header {
+            padding: 1rem;
+            text-align: center;
+            margin: 0;
+        }
+
+        form {
+            text-align: left;
+            display: inline-block;
+
+            label {
+                margin-bottom: 0.25rem;
+                margin-right: 0.5rem;
+            }
+
+            input {
+                margin-bottom: 1rem;
+            }
         }
     }
 </style>
