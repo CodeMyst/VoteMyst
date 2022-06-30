@@ -98,6 +98,16 @@
             artSubmissions = await getArtSubmissions(event.vanityUrl);
         }
     };
+
+    let focusedEntry: ArtEntry | null = null;
+
+    const onEntryImageClick = (entry: ArtEntry) => {
+        focusedEntry = entry;
+    };
+
+    const onFocusedClick = (event: MouseEvent) => {
+        focusedEntry = null;
+    };
 </script>
 
 <svelte:head>
@@ -280,12 +290,22 @@
 
             <div class="entry-content">
                 <img
+                    on:click={() => onEntryImageClick(entry)}
                     src="{staticBase}/events/{event.vanityUrl}/{entry.filename}"
                     alt="Submission"
                 />
             </div>
         </div>
     {/each}
+</div>
+
+<div class="focused-entry" class:enabled={focusedEntry != null} on:click={onFocusedClick}>
+    {#if focusedEntry}
+        <img
+            src="{staticBase}/events/{event.vanityUrl}/{focusedEntry.filename}"
+            alt="Submission"
+        />
+    {/if}
 </div>
 
 <style lang="scss">
@@ -444,12 +464,38 @@
                 display: flex;
                 align-items: center;
                 height: 100%;
+                cursor: pointer;
 
                 img {
                     max-width: 100%;
                     border-radius: var(--border-radius);
                 }
             }
+        }
+    }
+
+    .focused-entry {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        @include transition();
+
+        &.enabled {
+            background-color: rgba(0.1, 0.1, 0.1, 0.5);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        img {
+            max-width: 90%;
+            margin: 0 auto;
+            cursor: pointer;
         }
     }
 
