@@ -13,6 +13,7 @@ void main()
     dependencies.register!UserService();
     dependencies.register!AuthService();
     dependencies.register!EventService();
+    dependencies.register!EntryService();
 
     dependencies.register!AuthController();
     dependencies.register!AuthWebController();
@@ -36,6 +37,7 @@ void main()
     serverSettings.port = configService.port;
     serverSettings.sessionOptions = SessionOption.noSameSiteStrict | SessionOption.httpOnly;
     serverSettings.sessionStore = new MemorySessionStore();
+    serverSettings.maxRequestSize = 5_000_000; // max 5MB
 
     listenHTTP(serverSettings, router);
     runApplication();

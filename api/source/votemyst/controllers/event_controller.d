@@ -1,6 +1,5 @@
 module votemyst.controllers.event_controller;
 
-import hunt.jwt;
 import vibe.d;
 import vibe.web.auth;
 import votemyst.auth;
@@ -8,6 +7,7 @@ import votemyst.constants;
 import votemyst.models;
 import votemyst.serialization;
 import votemyst.services;
+import votemyst.utils;
 
 /**
  * API /api/event
@@ -45,6 +45,33 @@ public interface IEventController
     @path("/:vanityUrl")
     @anyAuth
     const(Event) getEvent(AuthInfo auth, string _vanityUrl) @safe;
+
+    /**
+     * POST /api/event/:vanityUrl/artSubmit
+     *
+     * Posts a single submission to an **art** event.
+     */
+    @path("/:vanityUrl/artSubmit")
+    @anyAuth
+    const(ArtEntry) postArtSubmission(AuthInfo auth, string _vanityUrl, HTTPServerRequest req) @safe;
+
+    /**
+     * GET /api/event/:vanityUrl/artSubmissions
+     *
+     * Returns all existing art submissions for this event.
+     */
+    @path("/:vanityUrl/artSubmissions")
+    @anyAuth
+    const(ArtEntry)[] getArtSubmissions(string _vanityUrl) @safe;
+
+    /**
+     * GET /api/event/:vanityUrl/submitted
+     *
+     * Checks if the current logged in user has submitted to this event.
+     */
+    @path("/:vanityUrl/submitted")
+    @anyAuth
+    void getSubmitted(AuthInfo auth, string _vanityUrl) @safe;
 }
 
 /**
@@ -58,20 +85,23 @@ public class EventController : IEventController
     private UserService userService;
     private EventService eventService;
     private ConfigService configService;
+    private EntryService entryService;
 
     ///
     public this(AuthService authService, UserService userService,
-        EventService eventService, ConfigService configService)
+        EventService eventService, ConfigService configService, EntryService entryService)
     {
         this.authService = authService;
         this.userService = userService;
         this.eventService = eventService;
         this.configService = configService;
+        this.entryService = entryService;
     }
 
     public override Event postEvent(AuthInfo auth, EventCreateInfo createInfo) @safe
     {
         import std.conv : to;
+        import std.file : mkdir;
         import std.regex : ctRegex, matchFirst;
         import std.string : empty;
 
@@ -121,6 +151,9 @@ public class EventController : IEventController
 
         eventService.createEvent(event);
 
+        // create dir to hold all assets
+        mkdir("static/events/" ~ event.vanityUrl);
+
         return event;
     }
 
@@ -151,4 +184,92 @@ public class EventController : IEventController
 
         return event.get();
     }
+
+    @before!getReq("req") // needed to get the raw request to get access to uploaded file
+    public override const(ArtEntry) postArtSubmission(AuthInfo auth, string _vanityUrl, HTTPServerRequest req) @safe
+    {
+        import std.array : array;
+        import std.file : copy, remove;
+        import std.path : chainPath, extension;
+
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
+
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(event.type == EventType.art, HTTPStatus.badRequest,
+            "Trying to post an art submission to a non art event.");
+
+        enforceHTTP(!entryService.existsByEventAndAuthor(event.id, auth.id), HTTPStatus.badRequest,
+            "Only one submission per user is allowed for this event.");
+
+        enforceHTTP(Clock.currTime(UTC()) > event.submissionStartDate, HTTPStatus.forbidden,
+            "Event submissions are not yet opened.");
+
+        enforceHTTP(Clock.currTime(UTC()) < event.submissionEndDate, HTTPStatus.forbidden,
+            "Event submissions are closed.");
+
+        const file = "file" in req.files();
+
+        enforceHTTP(file !is null, HTTPStatus.badRequest, "Missing file.");
+
+        enforceHTTP(validateImage(file.tempPath.toString()), HTTPStatus.badRequest, "Not a valid image file.");
+
+        ArtEntry entry;
+        entry.id = BsonObjectID.generate();
+        entry.eventId = event.id;
+        entry.authorId = auth.id;
+        entry.submitDate = Clock.currTime(UTC());
+
+        const ext = extension(file.filename.name);
+        copy(file.tempPath.toString(),
+             chainPath("./static/events/", event.vanityUrl, entry.id.toString() ~ ext).array());
+        remove(file.tempPath.toString());
+
+        entry.filename = entry.id.toString() ~ ext;
+
+        entryService.createArtEntry(entry);
+
+        return entry;
+    }
+
+    public override const(ArtEntry)[] getArtSubmissions(string _vanityUrl) @safe
+    {
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(event.type == EventType.art, HTTPStatus.badRequest,
+            "Trying to get art submissions to a non art event.");
+
+        auto entries = entryService.findAllArtEntries(event.id);
+
+        if (event.settings | EventSettings.randomizeEntries)
+        {
+            import std.random : randomShuffle;
+
+            entries.randomShuffle();
+        }
+
+        return entries;
+    }
+
+    public override void getSubmitted(AuthInfo auth, string _vanityUrl) @safe
+    {
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
+
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(entryService.existsByEventAndAuthor(event.id, auth.id), HTTPStatus.notFound);
+    }
+
+    /**
+     * Helper function to return raw `HTTPServerRequest` in REST interfaces because this is the only way to do that.
+     *
+     * Just passing `HTTPServerRequest` to a REST interface param will throw an error.
+     */
+    public HTTPServerRequest getReq(HTTPServerRequest req, HTTPServerResponse _) @safe { return req; }
 }

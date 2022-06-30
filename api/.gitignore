@@ -17,3 +17,6 @@ config.json
 
 static/avatars/*
 !static/avatars/.gitkeep
+
+static/events/*
+!static/events/.gitkeep

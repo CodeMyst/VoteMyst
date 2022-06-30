@@ -42,6 +42,10 @@ public class MongoService
         {
             return "events";
         }
+        else static if (is(T == ArtEntry) || is (T == BaseEntry))
+        {
+            return "entries";
+        }
         else
         {
             static assert(false, "Cannot get a collection name from the type " ~ T.stringof);

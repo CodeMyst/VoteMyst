@@ -9,6 +9,8 @@ public mixin template Auth()
     @noRoute
     public AuthInfo authenticate(scope HTTPServerRequest req, scope HTTPServerResponse _) @trusted
     {
+        import jwt.algorithms : JWTAlgorithm;
+        import jwt.jwt : verify;
         import std.string : startsWith;
 
         const string authHeader = req.headers.get("Authorization", null);
@@ -28,7 +30,7 @@ public mixin template Auth()
 
         try
         {
-            auto jwtToken = JwtToken.decode(encodedToken, configService.jwtSecret);
+            auto jwtToken = verify(encodedToken, configService.jwtSecret, [JWTAlgorithm.HS512]);
 
             id = jwtToken.claims.get("id");
             username = jwtToken.claims.get("username");

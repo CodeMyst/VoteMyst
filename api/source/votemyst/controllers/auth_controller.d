@@ -1,6 +1,7 @@
 module votemyst.controllers.auth_controller;
 
-import hunt.jwt;
+import jwt.algorithms;
+import jwt.jwt;
 import std.digest.sha;
 import vibe.d;
 import vibe.web.auth;
@@ -72,7 +73,7 @@ public class AuthController : IAuthController
 
         try
         {
-            auto token = JwtToken.decode(encodedToken, configService.jwtSecret);
+            auto token = verify(encodedToken, configService.jwtSecret, [JWTAlgorithm.HS512]);
 
             providerName = token.claims.get("provider");
             providerId = token.claims.get("id");
@@ -113,7 +114,7 @@ public class AuthController : IAuthController
         }
 
         const timeInMonth = Clock.currTime() + 30.days;
-        auto jwtToken = new JwtToken(JwtAlgorithm.HS512);
+        auto jwtToken = new Token(JWTAlgorithm.HS512);
         jwtToken.claims.exp = timeInMonth.toUnixTime();
         jwtToken.claims.set("id", user.id.toString());
         jwtToken.claims.set("username", user.username);
@@ -237,7 +238,7 @@ public class AuthWebController
         auto user = userService.findByProviderId(provider.name,
             sha256Of(providerUser.id).toHexString());
 
-        auto jwtToken = new JwtToken(JwtAlgorithm.HS512);
+        auto jwtToken = new Token(JWTAlgorithm.HS512);
 
         // todo: make sure cookie is secure on https
         auto cookie = new Cookie();

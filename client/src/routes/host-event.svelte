@@ -81,7 +81,7 @@
         });
 
         if (eventResponse.ok) {
-            goto(`/event/${eventResponse.event?.vanityUrl}`);
+            goto(`/events/${eventResponse.event?.vanityUrl}`);
         }
     };
 </script>

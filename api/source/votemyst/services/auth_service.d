@@ -1,6 +1,7 @@
 module votemyst.services.auth_service;
 
-import hunt.jwt;
+import jwt.algorithms;
+import jwt.jwt;
 import vibe.d;
 import votemyst.models;
 import votemyst.services;
@@ -277,7 +278,7 @@ public class AuthService
 
         try
         {
-            auto jwtToken = JwtToken.decode(encodedToken, configService.jwtSecret);
+            auto jwtToken = verify(encodedToken, configService.jwtSecret, [JWTAlgorithm.HS512]);
 
             id = jwtToken.claims.get("id");
             username = jwtToken.claims.get("username");

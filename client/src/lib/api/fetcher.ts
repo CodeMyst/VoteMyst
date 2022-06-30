@@ -12,6 +12,7 @@ export interface FetcherResponse<T> {
 export interface FetcherRequest {
     body?: BodyInit;
     bearer?: string;
+    multipart?: boolean;
 }
 
 export const fetcherGet = async <T>(
@@ -20,12 +21,19 @@ export const fetcherGet = async <T>(
 ): Promise<FetcherResponse<T>> => {
     const res = await fetcher(url, "get", req);
 
-    return {
+    const fres: FetcherResponse<T> = {
         status: res.status,
         ok: res.ok,
-        data: res.ok ? await res.json() : null,
         message: res.ok ? null : (await res.json())["statusMessage"]
     };
+
+    try {
+        fres.data = await res.json();
+    } catch (_) {
+        fres.data = undefined;
+    }
+
+    return fres;
 };
 
 export const fetcherPost = async <T>(
@@ -54,14 +62,22 @@ export const fetcher = async (
     };
 
     if (req.bearer) {
-        opts.headers = {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${req.bearer}`
-        };
+        if (req.multipart) {
+            opts.headers = {
+                Authorization: `Bearer ${req.bearer}`
+            };
+        } else {
+            opts.headers = {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${req.bearer}`
+            };
+        }
     } else {
-        opts.headers = {
-            "Content-Type": "application/json"
-        };
+        if (!req.multipart) {
+            opts.headers = {
+                "Content-Type": "application/json"
+            };
+        }
     }
 
     return await fetch(url, opts);
