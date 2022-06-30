@@ -111,7 +111,10 @@ export const getEvent = async (
     return null;
 };
 
-export const hasSubmitted = async (vanityUrl: string, token: string | undefined): Promise<boolean> => {
+export const hasSubmitted = async (
+    vanityUrl: string,
+    token: string | undefined
+): Promise<boolean> => {
     const res = await fetcherGet<null>(`${apiBase}/event/${vanityUrl}/submitted`, {
         bearer: token
     });
@@ -119,7 +122,10 @@ export const hasSubmitted = async (vanityUrl: string, token: string | undefined)
     return res.ok;
 };
 
-export const createArtSubmission = async (vanityUrl: string, formData: FormData): Promise<FetcherResponse<ArtEntry>> => {
+export const createArtSubmission = async (
+    vanityUrl: string,
+    formData: FormData
+): Promise<FetcherResponse<ArtEntry>> => {
     const token = getCookie("votemyst");
 
     if (!token) return { status: 400, ok: false, message: "Missing token." };

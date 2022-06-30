@@ -105,7 +105,7 @@
         focusedEntry = entry;
     };
 
-    const onFocusedClick = (event: MouseEvent) => {
+    const onFocusedClick = () => {
         focusedEntry = null;
     };
 </script>
@@ -301,10 +301,7 @@
 
 <div class="focused-entry" class:enabled={focusedEntry != null} on:click={onFocusedClick}>
     {#if focusedEntry}
-        <img
-            src="{staticBase}/events/{event.vanityUrl}/{focusedEntry.filename}"
-            alt="Submission"
-        />
+        <img src="{staticBase}/events/{event.vanityUrl}/{focusedEntry.filename}" alt="Submission" />
     {/if}
 </div>
 

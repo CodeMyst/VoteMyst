@@ -62,22 +62,18 @@ export const fetcher = async (
     };
 
     if (req.bearer) {
-        if (req.multipart)
-        {
+        if (req.multipart) {
             opts.headers = {
                 Authorization: `Bearer ${req.bearer}`
             };
-        }
-        else
-        {
+        } else {
             opts.headers = {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${req.bearer}`
             };
         }
     } else {
-        if (!req.multipart)
-        {
+        if (!req.multipart) {
             opts.headers = {
                 "Content-Type": "application/json"
             };
