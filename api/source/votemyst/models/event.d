@@ -37,6 +37,11 @@ public struct Event
     public EventSettings settings = EventSettings.defaultSettings;
 
     /**
+     * How the entries are voted on.
+     */
+    public VoteType voteType = VoteType.upvote;
+
+    /**
      * Time when the event will be publically revealed to non-hosts.
      */
     public SysTime revealDate;

@@ -19,6 +19,12 @@ export enum EventSettings {
     defaultSettings = randomizeEntries | excludeStaffFromWinning
 }
 
+export enum VoteType {
+    upvote, // every entry can be upvoted (no downvoting)
+    simple, // every entry can be rated from 1-5
+    categories // multiple categories, each category can be rated from 1-5
+}
+
 export interface Event {
     vanityUrl: string;
     title: string;
@@ -26,6 +32,7 @@ export interface Event {
     description: string;
     type: EventType;
     settings: EventSettings;
+    voteType: VoteType;
     revealDate: string;
     submissionStartDate: string;
     submissionEndDate: string;
@@ -40,6 +47,7 @@ export interface EventCreateInfo {
     description: string;
     type: EventType;
     settings: EventSettings;
+    voteType: VoteType;
     revealDate: string;
     submissionStartDate: string;
     submissionEndDate: string;

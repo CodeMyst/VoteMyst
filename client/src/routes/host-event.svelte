@@ -19,6 +19,7 @@
         createEvent,
         EventSettings,
         EventType,
+        VoteType,
         type EventCreateResponse
     } from "$lib/api/event";
     import { goto } from "$app/navigation";
@@ -28,6 +29,7 @@
     let shortDescription: string;
     let description: string;
     let type: string;
+    let voteType: string;
     let randomizeEntries = true;
     let excludeStaffFromWinning = true;
     let requireVoteToWin = false;
@@ -40,6 +42,7 @@
 
     const onFormSubmit = async () => {
         let typeEnum: EventType = EventType.ART;
+        let voteTypeEnum: VoteType = VoteType.upvote;
         let settingsEnum: EventSettings = EventSettings.none;
 
         switch (type) {
@@ -54,6 +57,20 @@
                 break;
             case "gameJam":
                 typeEnum = EventType.GAMEJAM;
+                break;
+        }
+
+        switch (voteType) {
+            case "upvote":
+                voteTypeEnum = VoteType.upvote;
+                break;
+
+            case "simple":
+                voteTypeEnum = VoteType.simple;
+                break;
+
+            case "categories":
+                voteTypeEnum = VoteType.categories;
                 break;
         }
 
@@ -74,6 +91,7 @@
             description: description,
             type: typeEnum,
             settings: settingsEnum,
+            voteType: voteTypeEnum,
             revealDate: new Date(revealDate).toISOString(),
             submissionStartDate: new Date(submissionStartDate).toISOString(),
             submissionEndDate: new Date(submissionEndDate).toISOString(),
@@ -192,6 +210,15 @@
                 bind:checked={requireVoteToWin}
             />
         </div>
+
+        <label for="voteType">
+            Voting Type: <span class="required">*</span>
+        </label>
+        <select name="voteType" id="voteType" required bind:value={voteType}>
+            <option value="upvote">Upvote (simple upvote per entry)</option>
+            <option value="simple">Simple (1-5)</option>
+            <option value="categories">Categories (Custom categories, 1-5)</option>
+        </select>
 
         <label for="revealDate">
             Reveal date: <span class="required">*</span>
