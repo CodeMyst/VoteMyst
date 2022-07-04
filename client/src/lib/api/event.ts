@@ -1,6 +1,7 @@
 import { getCookie } from "$lib/util/cookies";
 import { apiBase } from "./api";
 import { fetcherGet, fetcherPost, type FetcherResponse } from "./fetcher";
+import type { Vote } from "./vote";
 
 export enum EventType {
     ART,
@@ -33,6 +34,7 @@ export interface Event {
     type: EventType;
     settings: EventSettings;
     voteType: VoteType;
+    categories?: string[];
     revealDate: string;
     submissionStartDate: string;
     submissionEndDate: string;
@@ -48,6 +50,7 @@ export interface EventCreateInfo {
     type: EventType;
     settings: EventSettings;
     voteType: VoteType;
+    categories?: string[];
     revealDate: string;
     submissionStartDate: string;
     submissionEndDate: string;
@@ -62,14 +65,15 @@ export interface EventCreateResponse {
     event?: Event;
 }
 
-export interface BaseEntry {
+export interface Entry {
     _id: string;
     eventId: string;
     authorId: string;
     submitDate: string;
+    votes: Vote[];
 }
 
-export interface ArtEntry extends BaseEntry {
+export interface ArtEntry extends Entry {
     filename: string;
 }
 

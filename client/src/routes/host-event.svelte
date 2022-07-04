@@ -23,6 +23,7 @@
         type EventCreateResponse
     } from "$lib/api/event";
     import { goto } from "$app/navigation";
+    import CategoriesList from "$lib/CategoriesList.svelte";
 
     let vanityUrl: string;
     let title: string;
@@ -30,6 +31,7 @@
     let description: string;
     let type: string;
     let voteType: string;
+    let categories: string[];
     let randomizeEntries = true;
     let excludeStaffFromWinning = true;
     let requireVoteToWin = false;
@@ -84,6 +86,8 @@
             settingsEnum |= EventSettings.requireVoteToWin;
         }
 
+        console.log(categories);
+
         eventResponse = await createEvent({
             vanityUrl: vanityUrl,
             title: title,
@@ -92,6 +96,7 @@
             type: typeEnum,
             settings: settingsEnum,
             voteType: voteTypeEnum,
+            categories: categories,
             revealDate: new Date(revealDate).toISOString(),
             submissionStartDate: new Date(submissionStartDate).toISOString(),
             submissionEndDate: new Date(submissionEndDate).toISOString(),
@@ -220,6 +225,14 @@
             <option value="categories">Categories (Custom categories, 1-5)</option>
         </select>
 
+        {#if voteType === "categories"}
+            <span class="label">
+                Categories: <span class="required">*</span>
+            </span>
+
+            <CategoriesList bind:categories={categories} />
+        {/if}
+
         <label for="revealDate">
             Reveal date: <span class="required">*</span>
         </label>
@@ -269,9 +282,11 @@
 </section>
 
 <style lang="scss">
-    label {
+    label,
+    .label {
         line-height: 2rem;
         margin-top: 1rem;
+        font-weight: bold;
     }
 
     textarea {

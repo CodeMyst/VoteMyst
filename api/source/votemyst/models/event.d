@@ -42,6 +42,14 @@ public struct Event
     public VoteType voteType = VoteType.upvote;
 
     /**
+     * List of all categories to be voted on.
+     *
+     * This field is only applicable when the `VoteType` is `categories`.
+     */
+    @optional
+    public string[] categories;
+
+    /**
      * Time when the event will be publically revealed to non-hosts.
      */
     public SysTime revealDate;

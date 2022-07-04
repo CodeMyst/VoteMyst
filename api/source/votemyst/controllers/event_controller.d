@@ -135,6 +135,12 @@ public class EventController : IEventController
                     HTTPStatus.badRequest,
                     "All dates must be in ascending order.");
 
+        if (createInfo.voteType == VoteType.categories)
+        {
+            enforceHTTP(createInfo.categories.length > 1, HTTPStatus.badRequest,
+                "At least one category must be specified.");
+        }
+
         Event event = {
             vanityUrl: createInfo.vanityUrl,
             title: createInfo.title,
@@ -142,6 +148,8 @@ public class EventController : IEventController
             description: createInfo.description,
             type: createInfo.type,
             settings: createInfo.settings,
+            voteType: createInfo.voteType,
+            categories: createInfo.categories,
             revealDate: createInfo.revealDate,
             submissionStartDate: createInfo.submissionStartDate,
             submissionEndDate: createInfo.submissionEndDate,
