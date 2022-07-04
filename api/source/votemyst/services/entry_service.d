@@ -32,12 +32,12 @@ public class EntryService
      */
     public bool existsByEventAndAuthor(BsonObjectID eventId, BsonObjectID authorId)
     {
-        return !mongoService.findOne!BaseEntry([
+        return mongoService.findOne!Entry([
             "$and": [
                 Bson(["eventId": Bson(eventId)]),
                 Bson(["authorId": Bson(authorId)])
             ]
-        ]).isNull();
+        ]) !is null;
     }
 
     /**

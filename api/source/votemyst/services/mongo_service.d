@@ -42,7 +42,7 @@ public class MongoService
         {
             return "events";
         }
-        else static if (is(T == ArtEntry) || is (T == BaseEntry))
+        else static if (is(T : Entry))
         {
             return "entries";
         }
@@ -65,7 +65,7 @@ public class MongoService
     /**
      * Finds one element based on the query.
      */
-    public Nullable!R findOne(R, T)(T query)
+    public auto findOne(R, T)(T query)
     {
         auto collection = db[getCollectionName!R()];
 
