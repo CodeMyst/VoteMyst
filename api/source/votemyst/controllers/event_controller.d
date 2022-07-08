@@ -334,7 +334,7 @@ public class EventController : IEventController
 
         entry.votes ~= vote;
 
-        entryService.update(entry);
+        entryService.updateVotes(entry);
     }
 
     public override void getEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe
@@ -374,9 +374,9 @@ public class EventController : IEventController
 
         enforceHTTP(entry.votes.canFind!(v => v.authorId == auth.id), HTTPStatus.notFound);
 
-        entry.votes.remove!(v => v.authorId == auth.id);
+        entry.votes = entry.votes.remove!(v => v.authorId == auth.id);
 
-        entryService.update(entry);
+        entryService.updateVotes(entry);
     }
 
     /**

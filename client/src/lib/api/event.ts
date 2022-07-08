@@ -1,6 +1,6 @@
 import { getCookie } from "$lib/util/cookies";
 import { apiBase } from "./api";
-import { fetcherGet, fetcherPost, type FetcherResponse } from "./fetcher";
+import { fetcherDelete, fetcherGet, fetcherPost, type FetcherResponse } from "./fetcher";
 import type { Vote } from "./vote";
 
 export enum EventType {
@@ -157,4 +157,32 @@ export const getArtSubmissions = async (vanityUrl: string): Promise<ArtEntry[]> 
     if (res.ok && res.data) return res.data;
 
     return [];
+};
+
+export const entryUpvote = async (vanityUrl: string, entryId: string) => {
+    const token = getCookie("votemyst");
+
+    await fetcherPost<null>(`${apiBase}/event/${vanityUrl}/${entryId}/upvote`, {
+        bearer: token
+    });
+};
+
+export const entryHasUpvoted = async (vanityUrl: string, entryId: string): Promise<boolean> => {
+    const token = getCookie("votemyst");
+
+    const res = await fetcherGet<null>(`${apiBase}/event/${vanityUrl}/${entryId}/upvote`, {
+        bearer: token
+    });
+
+    if (res.ok) return true;
+
+    return false;
+};
+
+export const entryRemoveUpvote = async (vanityUrl: string, entryId: string) => {
+    const token = getCookie("votemyst");
+
+    await fetcherDelete<null>(`${apiBase}/event/${vanityUrl}/${entryId}/upvote`, {
+        bearer: token
+    });
 };

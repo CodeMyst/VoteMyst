@@ -2,10 +2,14 @@
     import type { UserSession } from "src/hooks";
     import {
         createArtSubmission,
+        entryHasUpvoted,
+        entryRemoveUpvote,
+        entryUpvote,
         EventType,
         getArtSubmissions,
         getEvent,
         hasSubmitted,
+        VoteType,
         type ArtEntry,
         type Event
     } from "$lib/api/event";
@@ -107,6 +111,14 @@
 
     const onFocusedClick = () => {
         focusedEntry = null;
+    };
+
+    const onUpvote = async (entryId: string) => {
+        await entryUpvote(event.vanityUrl, entryId);
+    };
+
+    const onRemoveUpvote = async (entryId: string) => {
+        await entryRemoveUpvote(event.vanityUrl, entryId);
     };
 </script>
 
@@ -295,6 +307,20 @@
                     alt="Submission"
                 />
             </div>
+
+            <div class="entry-footer flex center">
+                {#if now > submissionEndDate && $session.user && $session.user._id != entry.authorId}
+                    {#if event.voteType === VoteType.upvote}
+                        {#await entryHasUpvoted(event.vanityUrl, entry._id) then hasUpvoted}
+                            {#if hasUpvoted}
+                                <button class="btn upvoted" on:click|preventDefault={() => {onRemoveUpvote(entry._id); hasUpvoted = false;}} />
+                            {:else}
+                                <button class="btn btn-main upvote" on:click|preventDefault={() => {onUpvote(entry._id); hasUpvoted = true;}}>Upvote</button>
+                            {/if}
+                        {/await}
+                    {/if}
+                {/if}
+            </div>
         </div>
     {/each}
 </div>
@@ -466,6 +492,29 @@
                 img {
                     max-width: 100%;
                     border-radius: var(--border-radius);
+                }
+            }
+
+            .entry-footer {
+                margin-top: 1rem;
+                flex-flow: row-reverse;
+
+                .upvoted {
+                    background-color: var(--color-green);
+                    color: var(--color-bg);
+                    border: none;
+
+                    &::after {
+                        content: "Upvoted";
+                    }
+
+                    &:hover {
+                        background-color: var(--color-red);
+
+                        &::after {
+                            content: "Remove update";
+                        }
+                    }
                 }
             }
         }

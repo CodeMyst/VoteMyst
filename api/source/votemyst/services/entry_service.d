@@ -62,10 +62,10 @@ public class EntryService
     }
 
     /**
-     * Updates the entry in the DB.
+     * Updates only the entrie's votes in the DB.
      */
-    public void update(Entry entry)
+    public void updateVotes(Entry entry)
     {
-        mongoService.update!Entry(["_id": Bson(entry.id)], entry);
+        mongoService.update!Entry(["_id": Bson(entry.id)], ["$set": Bson(["votes": serializeToBson(entry.votes)])]);
     }
 }

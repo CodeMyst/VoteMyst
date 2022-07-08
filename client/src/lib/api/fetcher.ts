@@ -42,12 +42,40 @@ export const fetcherPost = async <T>(
 ): Promise<FetcherResponse<T>> => {
     const res = await fetcher(url, "post", req);
 
-    return {
+    const fres: FetcherResponse<T> = {
         status: res.status,
         ok: res.ok,
-        data: res.ok ? await res.json() : null,
         message: res.ok ? null : (await res.json())["statusMessage"]
     };
+
+    try {
+        fres.data = await res.json();
+    } catch (_) {
+        fres.data = undefined;
+    }
+
+    return fres;
+};
+
+export const fetcherDelete = async <T>(
+    url: string,
+    req: FetcherRequest = {}
+): Promise<FetcherResponse<T>> => {
+    const res = await fetcher(url, "delete", req);
+
+    const fres: FetcherResponse<T> = {
+        status: res.status,
+        ok: res.ok,
+        message: res.ok ? null : (await res.json())["statusMessage"]
+    };
+
+    try {
+        fres.data = await res.json();
+    } catch (_) {
+        fres.data = undefined;
+    }
+
+    return fres;
 };
 
 export const fetcher = async (
