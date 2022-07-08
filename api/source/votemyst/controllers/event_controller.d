@@ -224,7 +224,7 @@ public class EventController : IEventController
 
         enforceHTTP(validateImage(file.tempPath.toString()), HTTPStatus.badRequest, "Not a valid image file.");
 
-        ArtEntry entry;
+        ArtEntry entry = new ArtEntry();
         entry.id = BsonObjectID.generate();
         entry.eventId = event.id;
         entry.authorId = auth.id;
