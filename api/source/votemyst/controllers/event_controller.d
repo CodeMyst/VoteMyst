@@ -321,6 +321,9 @@ public class EventController : IEventController
 
         enforceHTTP(entry !is null, HTTPStatus.notFound);
 
+        enforceHTTP(entry.authorId != auth.id, HTTPStatus.forbidden,
+            "You can't upvote your own entry.");
+
         enforceHTTP(!entry.votes.canFind!(v => v.authorId == auth.id), HTTPStatus.forbidden,
             "You have already voted on this entry.");
 
