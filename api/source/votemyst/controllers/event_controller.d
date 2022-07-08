@@ -83,13 +83,22 @@ public interface IEventController
     void postEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
 
     /**
-     * GET /api/event/:vanityUrl/:entryId/upvoted
+     * GET /api/event/:vanityUrl/:entryId/upvote
      *
      * Checks if the current user upvoted the specified entry.
      */
-    @path("/:vanityUrl/:entryId/upvoted")
+    @path("/:vanityUrl/:entryId/upvote")
     @anyAuth
-    void getEntryUpvoted(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
+    void getEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
+
+    /**
+     * DELETE /api/event/:vanityUrl/:entryId/upvote
+     *
+     * Removes the current user's upvote on the specified entry.
+     */
+    @path("/:vanityUrl/:entryId/upvote")
+    @anyAuth
+    void deleteEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
 }
 
 /**
@@ -325,7 +334,7 @@ public class EventController : IEventController
         entryService.update(entry);
     }
 
-    public override void getEntryUpvoted(AuthInfo auth, string _vanityUrl, string _entryId) @safe
+    public override void getEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe
     {
         import std.algorithm : canFind;
 
@@ -338,7 +347,33 @@ public class EventController : IEventController
         enforceHTTP(entry !is null, HTTPStatus.notFound);
 
         enforceHTTP(entry.votes.canFind!(v => v.authorId == auth.id), HTTPStatus.notFound);
+    }
 
+    public override void deleteEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe
+    {
+        import std.algorithm : canFind, remove;
+
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
+
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(Clock.currTime(UTC()) > event.submissionEndDate, HTTPStatus.forbidden,
+            "Event voting hasn't begun yet.");
+
+        enforceHTTP(Clock.currTime(UTC()) < event.voteEndDate, HTTPStatus.forbidden,
+            "Event voting is over.");
+
+        auto entry = entryService.findById(BsonObjectID.fromString(_entryId));
+
+        enforceHTTP(entry !is null, HTTPStatus.notFound);
+
+        enforceHTTP(entry.votes.canFind!(v => v.authorId == auth.id), HTTPStatus.notFound);
+
+        entry.votes.remove!(v => v.authorId == auth.id);
+
+        entryService.update(entry);
     }
 
     /**
