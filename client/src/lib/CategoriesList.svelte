@@ -33,7 +33,7 @@
     {/if}
 
     <div class="cats" bind:this={catElements}>
-        {#each categories as cat, idx}
+        {#each categories as _, idx}
             <div class="cat flex row center">
                 {#if categories.length > 1}
                     <button class="reorder">

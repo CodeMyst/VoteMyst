@@ -313,9 +313,21 @@
                     {#if event.voteType === VoteType.upvote}
                         {#await entryHasUpvoted(event.vanityUrl, entry._id) then hasUpvoted}
                             {#if hasUpvoted}
-                                <button class="btn upvoted" on:click|preventDefault={() => {onRemoveUpvote(entry._id); hasUpvoted = false;}} />
+                                <button
+                                    class="btn upvoted"
+                                    on:click|preventDefault={() => {
+                                        onRemoveUpvote(entry._id);
+                                        hasUpvoted = false;
+                                    }}
+                                />
                             {:else}
-                                <button class="btn btn-main upvote" on:click|preventDefault={() => {onUpvote(entry._id); hasUpvoted = true;}}>Upvote</button>
+                                <button
+                                    class="btn btn-main upvote"
+                                    on:click|preventDefault={() => {
+                                        onUpvote(entry._id);
+                                        hasUpvoted = true;
+                                    }}>Upvote</button
+                                >
                             {/if}
                         {/await}
                     {/if}

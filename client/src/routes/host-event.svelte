@@ -230,7 +230,7 @@
                 Categories: <span class="required">*</span>
             </span>
 
-            <CategoriesList bind:categories={categories} />
+            <CategoriesList bind:categories />
         {/if}
 
         <label for="revealDate">
