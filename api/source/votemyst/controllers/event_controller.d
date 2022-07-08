@@ -72,6 +72,33 @@ public interface IEventController
     @path("/:vanityUrl/submitted")
     @anyAuth
     void getSubmitted(AuthInfo auth, string _vanityUrl) @safe;
+
+    /**
+     * POST /api/event/:vanityUrl/:entryId/upvote
+     *
+     * Upvotes a single entry.
+     */
+    @path("/:vanityUrl/:entryId/upvote")
+    @anyAuth
+    void postEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
+
+    /**
+     * GET /api/event/:vanityUrl/:entryId/upvote
+     *
+     * Checks if the current user upvoted the specified entry.
+     */
+    @path("/:vanityUrl/:entryId/upvote")
+    @anyAuth
+    void getEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
+
+    /**
+     * DELETE /api/event/:vanityUrl/:entryId/upvote
+     *
+     * Removes the current user's upvote on the specified entry.
+     */
+    @path("/:vanityUrl/:entryId/upvote")
+    @anyAuth
+    void deleteEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
 }
 
 /**
@@ -135,6 +162,12 @@ public class EventController : IEventController
                     HTTPStatus.badRequest,
                     "All dates must be in ascending order.");
 
+        if (createInfo.voteType == VoteType.categories)
+        {
+            enforceHTTP(createInfo.categories.length > 1, HTTPStatus.badRequest,
+                "At least one category must be specified.");
+        }
+
         Event event = {
             vanityUrl: createInfo.vanityUrl,
             title: createInfo.title,
@@ -142,6 +175,8 @@ public class EventController : IEventController
             description: createInfo.description,
             type: createInfo.type,
             settings: createInfo.settings,
+            voteType: createInfo.voteType,
+            categories: createInfo.categories,
             revealDate: createInfo.revealDate,
             submissionStartDate: createInfo.submissionStartDate,
             submissionEndDate: createInfo.submissionEndDate,
@@ -216,7 +251,7 @@ public class EventController : IEventController
 
         enforceHTTP(validateImage(file.tempPath.toString()), HTTPStatus.badRequest, "Not a valid image file.");
 
-        ArtEntry entry;
+        ArtEntry entry = new ArtEntry();
         entry.id = BsonObjectID.generate();
         entry.eventId = event.id;
         entry.authorId = auth.id;
@@ -264,6 +299,84 @@ public class EventController : IEventController
         const event = eventService.findEventByVanityUrl(_vanityUrl).get();
 
         enforceHTTP(entryService.existsByEventAndAuthor(event.id, auth.id), HTTPStatus.notFound);
+    }
+
+    public override void postEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe
+    {
+        import std.algorithm : canFind;
+
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
+
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(Clock.currTime(UTC()) > event.submissionEndDate, HTTPStatus.forbidden,
+            "Event voting hasn't begun yet.");
+
+        enforceHTTP(Clock.currTime(UTC()) < event.voteEndDate, HTTPStatus.forbidden,
+            "Event voting is over.");
+
+        auto entry = entryService.findById(BsonObjectID.fromString(_entryId));
+
+        enforceHTTP(entry !is null, HTTPStatus.notFound);
+
+        enforceHTTP(entry.authorId != auth.id, HTTPStatus.forbidden,
+            "You can't upvote your own entry.");
+
+        enforceHTTP(!entry.votes.canFind!(v => v.authorId == auth.id), HTTPStatus.forbidden,
+            "You have already voted on this entry.");
+
+        auto vote = new UpvoteVote();
+        vote.id = BsonObjectID.generate();
+        vote.authorId = auth.id;
+        vote.votedAt = Clock.currTime(UTC());
+
+        entry.votes ~= vote;
+
+        entryService.updateVotes(entry);
+    }
+
+    public override void getEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe
+    {
+        import std.algorithm : canFind;
+
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
+
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        auto entry = entryService.findById(BsonObjectID.fromString(_entryId));
+
+        enforceHTTP(entry !is null, HTTPStatus.notFound);
+
+        enforceHTTP(entry.votes.canFind!(v => v.authorId == auth.id), HTTPStatus.notFound);
+    }
+
+    public override void deleteEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe
+    {
+        import std.algorithm : canFind, remove;
+
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
+
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        const event = eventService.findEventByVanityUrl(_vanityUrl).get();
+
+        enforceHTTP(Clock.currTime(UTC()) > event.submissionEndDate, HTTPStatus.forbidden,
+            "Event voting hasn't begun yet.");
+
+        enforceHTTP(Clock.currTime(UTC()) < event.voteEndDate, HTTPStatus.forbidden,
+            "Event voting is over.");
+
+        auto entry = entryService.findById(BsonObjectID.fromString(_entryId));
+
+        enforceHTTP(entry !is null, HTTPStatus.notFound);
+
+        enforceHTTP(entry.votes.canFind!(v => v.authorId == auth.id), HTTPStatus.notFound);
+
+        entry.votes = entry.votes.remove!(v => v.authorId == auth.id);
+
+        entryService.updateVotes(entry);
     }
 
     /**

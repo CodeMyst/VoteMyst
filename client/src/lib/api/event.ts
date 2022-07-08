@@ -1,6 +1,7 @@
 import { getCookie } from "$lib/util/cookies";
 import { apiBase } from "./api";
-import { fetcherGet, fetcherPost, type FetcherResponse } from "./fetcher";
+import { fetcherDelete, fetcherGet, fetcherPost, type FetcherResponse } from "./fetcher";
+import type { Vote } from "./vote";
 
 export enum EventType {
     ART,
@@ -19,6 +20,12 @@ export enum EventSettings {
     defaultSettings = randomizeEntries | excludeStaffFromWinning
 }
 
+export enum VoteType {
+    upvote, // every entry can be upvoted (no downvoting)
+    simple, // every entry can be rated from 1-5
+    categories // multiple categories, each category can be rated from 1-5
+}
+
 export interface Event {
     vanityUrl: string;
     title: string;
@@ -26,6 +33,8 @@ export interface Event {
     description: string;
     type: EventType;
     settings: EventSettings;
+    voteType: VoteType;
+    categories?: string[];
     revealDate: string;
     submissionStartDate: string;
     submissionEndDate: string;
@@ -40,6 +49,8 @@ export interface EventCreateInfo {
     description: string;
     type: EventType;
     settings: EventSettings;
+    voteType: VoteType;
+    categories?: string[];
     revealDate: string;
     submissionStartDate: string;
     submissionEndDate: string;
@@ -54,14 +65,15 @@ export interface EventCreateResponse {
     event?: Event;
 }
 
-export interface BaseEntry {
+export interface Entry {
     _id: string;
     eventId: string;
     authorId: string;
     submitDate: string;
+    votes: Vote[];
 }
 
-export interface ArtEntry extends BaseEntry {
+export interface ArtEntry extends Entry {
     filename: string;
 }
 
@@ -145,4 +157,32 @@ export const getArtSubmissions = async (vanityUrl: string): Promise<ArtEntry[]> 
     if (res.ok && res.data) return res.data;
 
     return [];
+};
+
+export const entryUpvote = async (vanityUrl: string, entryId: string) => {
+    const token = getCookie("votemyst");
+
+    await fetcherPost<null>(`${apiBase}/event/${vanityUrl}/${entryId}/upvote`, {
+        bearer: token
+    });
+};
+
+export const entryHasUpvoted = async (vanityUrl: string, entryId: string): Promise<boolean> => {
+    const token = getCookie("votemyst");
+
+    const res = await fetcherGet<null>(`${apiBase}/event/${vanityUrl}/${entryId}/upvote`, {
+        bearer: token
+    });
+
+    if (res.ok) return true;
+
+    return false;
+};
+
+export const entryRemoveUpvote = async (vanityUrl: string, entryId: string) => {
+    const token = getCookie("votemyst");
+
+    await fetcherDelete<null>(`${apiBase}/event/${vanityUrl}/${entryId}/upvote`, {
+        bearer: token
+    });
 };

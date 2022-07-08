@@ -1,6 +1,5 @@
 module votemyst.services.mongo_service;
 
-import std.typecons;
 import vibe.d;
 import votemyst.models;
 import votemyst.services;
@@ -42,7 +41,7 @@ public class MongoService
         {
             return "events";
         }
-        else static if (is(T == ArtEntry) || is (T == BaseEntry))
+        else static if (is(T : Entry))
         {
             return "entries";
         }
@@ -65,7 +64,7 @@ public class MongoService
     /**
      * Finds one element based on the query.
      */
-    public Nullable!R findOne(R, T)(T query)
+    public auto findOne(R, T)(T query)
     {
         auto collection = db[getCollectionName!R()];
 
@@ -75,7 +74,7 @@ public class MongoService
     /**
      * Finds one element based on the id. Same as `findOne(["_id": id])`
      */
-    public Nullable!R findOneById(R, T)(T id)
+    public auto findOneById(R, T)(T id)
     {
         return findOne!R(["_id": id]);
     }

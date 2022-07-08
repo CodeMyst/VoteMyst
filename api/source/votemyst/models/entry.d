@@ -4,19 +4,15 @@ import std.datetime;
 import vibe.data.bson;
 import vibe.data.json;
 import vibe.data.serialization;
+import votemyst.models;
 
 /**
  * Represents one submission to an event by a user. Different entry types (based on the event type) should use these base fields.
  *
- * This is a template instead of a struct (and "inheiriting" with alias this) because MongoDB won't serialize it right.
+ * This is a class so we can have inheritance (multiple types of entries).
  */
-public template BaseEntryTmpl()
+public class Entry
 {
-    import std.datetime;
-    import vibe.data.bson;
-    import vibe.data.json;
-    import vibe.data.serialization;
-
     ///
     @name("_id")
     public BsonObjectID id;
@@ -35,14 +31,9 @@ public template BaseEntryTmpl()
      * When the entry was submitted.
      */
     public SysTime submitDate;
-}
 
-/**
- * Represents one submission to an event by a user. Different entry types (based on the event type) should use these base fields.
- *
- * This is a template instead of a struct (and "inheiriting" with alias this) because MongoDB won't serialize it right.
- */
-public struct BaseEntry
-{
-    mixin BaseEntryTmpl;
+    /**
+     * List of all votes on this entry.
+     */
+    public Vote[] votes;
 }

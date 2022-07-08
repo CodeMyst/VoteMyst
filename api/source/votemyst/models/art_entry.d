@@ -5,10 +5,8 @@ import votemyst.models;
 /**
  * Submission for art events.
  */
-public struct ArtEntry
+public class ArtEntry : Entry
 {
-    mixin BaseEntryTmpl;
-
     /**
      * File name of the uploaded image stored on this server.
      *

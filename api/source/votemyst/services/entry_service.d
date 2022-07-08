@@ -28,16 +28,24 @@ public class EntryService
     }
 
     /**
+     * Finds a single entry by its ID.
+     */
+    public Entry findById(BsonObjectID id)
+    {
+        return mongoService.findOneById!ArtEntry(id);
+    }
+
+    /**
      * Checks if an entry exists by its event and author.
      */
     public bool existsByEventAndAuthor(BsonObjectID eventId, BsonObjectID authorId)
     {
-        return !mongoService.findOne!BaseEntry([
+        return mongoService.findOne!Entry([
             "$and": [
                 Bson(["eventId": Bson(eventId)]),
                 Bson(["authorId": Bson(authorId)])
             ]
-        ]).isNull();
+        ]) !is null;
     }
 
     /**
@@ -51,5 +59,13 @@ public class EntryService
         foreach (iterator; cur) res ~= iterator;
 
         return res;
+    }
+
+    /**
+     * Updates only the entrie's votes in the DB.
+     */
+    public void updateVotes(Entry entry)
+    {
+        mongoService.update!Entry(["_id": Bson(entry.id)], ["$set": Bson(["votes": serializeToBson(entry.votes)])]);
     }
 }
