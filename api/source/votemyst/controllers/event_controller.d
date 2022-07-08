@@ -80,7 +80,16 @@ public interface IEventController
      */
     @path("/:vanityUrl/:entryId/upvote")
     @anyAuth
-    void postEntryVote(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
+    void postEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
+
+    /**
+     * GET /api/event/:vanityUrl/:entryId/upvoted
+     *
+     * Checks if the current user upvoted the specified entry.
+     */
+    @path("/:vanityUrl/:entryId/upvoted")
+    @anyAuth
+    void getEntryUpvoted(AuthInfo auth, string _vanityUrl, string _entryId) @safe;
 }
 
 /**
@@ -283,7 +292,7 @@ public class EventController : IEventController
         enforceHTTP(entryService.existsByEventAndAuthor(event.id, auth.id), HTTPStatus.notFound);
     }
 
-    public override void postEntryVote(AuthInfo auth, string _vanityUrl, string _entryId) @safe
+    public override void postEntryUpvote(AuthInfo auth, string _vanityUrl, string _entryId) @safe
     {
         import std.algorithm : canFind;
 
@@ -314,6 +323,22 @@ public class EventController : IEventController
         entry.votes ~= vote;
 
         entryService.update(entry);
+    }
+
+    public override void getEntryUpvoted(AuthInfo auth, string _vanityUrl, string _entryId) @safe
+    {
+        import std.algorithm : canFind;
+
+        enforceHTTP(auth.isLoggedIn(), HTTPStatus.unauthorized);
+
+        enforceHTTP(eventService.existsByVanityUrl(_vanityUrl), HTTPStatus.notFound);
+
+        auto entry = entryService.findById(BsonObjectID.fromString(_entryId));
+
+        enforceHTTP(entry !is null, HTTPStatus.notFound);
+
+        enforceHTTP(entry.votes.canFind!(v => v.authorId == auth.id), HTTPStatus.notFound);
+
     }
 
     /**
