@@ -33,14 +33,14 @@ public class Vote
  *
  * Stores the same stuff as `Vote`, no need for extra data.
  */
-public class UpvoteVote { }
+public class UpvoteVote : Vote { }
 
 /**
  * Represents a single vote cast by a user on an entry.
  *
  * Every entry can be rated from 1-5.
  */
-public class SimpleVote
+public class SimpleVote : Vote
 {
     /**
      * 1-5 rating.
@@ -53,7 +53,7 @@ public class SimpleVote
  *
  * Every entry can be rated in multiple categories, 1-5.
  */
-public class CategoriesVote
+public class CategoriesVote : Vote
 {
     /**
      * All categories and their ratings.

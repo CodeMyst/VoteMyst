@@ -1,6 +1,5 @@
 module votemyst.services.mongo_service;
 
-import std.typecons;
 import vibe.d;
 import votemyst.models;
 import votemyst.services;
@@ -75,7 +74,7 @@ public class MongoService
     /**
      * Finds one element based on the id. Same as `findOne(["_id": id])`
      */
-    public Nullable!R findOneById(R, T)(T id)
+    public auto findOneById(R, T)(T id)
     {
         return findOne!R(["_id": id]);
     }
